@@ -28,7 +28,9 @@ export const useVendors = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('useVendors: Setting up Firebase subscription');
     const unsubscribe = vendorService.subscribe((vendorList) => {
+      console.log('useVendors: Received vendor data:', vendorList);
       setVendors(vendorList);
       setLoading(false);
       setError(null);
@@ -41,7 +43,10 @@ export const useVendors = () => {
       setLoading(false);
     };
 
-    return () => unsubscribe();
+    return () => {
+      console.log('useVendors: Cleaning up subscription');
+      unsubscribe();
+    };
   }, []);
 
   const createVendor = useCallback(async (vendor: InsertVendor) => {

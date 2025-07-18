@@ -1,10 +1,5 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchTransactions } from "@/store/slices/transactionSlice";
-import { fetchPayments } from "@/store/slices/paymentSlice";
-import { fetchVendors } from "@/store/slices/vendorSlice";
-import { fetchCustomers } from "@/store/slices/customerSlice";
+import { useState } from "react";
+import { useTransactions, usePayments, useVendors, useCustomers } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,21 +10,13 @@ import { Download, FileText } from "lucide-react";
 import TransactionTable from "@/components/Tables/TransactionTable";
 
 export default function Reports() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { transactions, loading: transactionsLoading } = useSelector((state: RootState) => state.transactions);
-  const { payments, loading: paymentsLoading } = useSelector((state: RootState) => state.payments);
-  const { vendors, loading: vendorsLoading } = useSelector((state: RootState) => state.vendors);
-  const { customers, loading: customersLoading } = useSelector((state: RootState) => state.customers);
+  const { transactions, loading: transactionsLoading } = useTransactions();
+  const { payments, loading: paymentsLoading } = usePayments();
+  const { vendors, loading: vendorsLoading } = useVendors();
+  const { customers, loading: customersLoading } = useCustomers();
 
   const [dateRange, setDateRange] = useState("month");
   const [reportType, setReportType] = useState("all");
-
-  useEffect(() => {
-    dispatch(fetchTransactions());
-    dispatch(fetchPayments());
-    dispatch(fetchVendors());
-    dispatch(fetchCustomers());
-  }, [dispatch]);
 
   const loading = transactionsLoading || paymentsLoading || vendorsLoading || customersLoading;
 

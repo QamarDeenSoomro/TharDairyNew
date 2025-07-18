@@ -13,10 +13,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+console.log('Initializing Firebase with config:', firebaseConfig);
 const app = initializeApp(firebaseConfig);
 
 // Initialize Realtime Database
 export const db = getDatabase(app);
+console.log('Firebase Realtime Database initialized');
 
 // Initialize Auth
 export const auth = getAuth(app);
