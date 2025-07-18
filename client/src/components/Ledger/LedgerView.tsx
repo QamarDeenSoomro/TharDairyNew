@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Send, Download, X } from "lucide-react";
+import { Calendar, Send, Download, X, MessageSquare, Smartphone } from "lucide-react";
 import { useTransactions, usePayments } from "@/hooks/useFirestore";
 import { formatDistanceToNow, format, isWithinInterval } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +26,8 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
   
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [isSending, setIsSending] = useState(false);
+  const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
+  const [isSendingSMS, setIsSendingSMS] = useState(false);
 
   // Filter transactions for this entity
   const entityTransactions = useMemo(() => {
@@ -139,7 +140,7 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
 
   const sendViaWhatsApp = async () => {
     try {
-      setIsSending(true);
+      setIsSendingWhatsApp(true);
       const message = generateLedgerText();
       const phoneNumber = entity.contact.replace(/[^0-9]/g, ""); // Remove non-numeric characters
       
@@ -162,7 +163,55 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
         variant: "destructive",
       });
     } finally {
-      setIsSending(false);
+      setIsSendingWhatsApp(false);
+    }
+  };
+
+  const sendViaSMS = async () => {
+    try {
+      setIsSendingSMS(true);
+      const message = generateLedgerText();
+      const phoneNumber = entity.contact.replace(/[^0-9]/g, "");
+      
+      // For SMS, we'll use the browser's SMS capability or show instructions
+      if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i)) {
+        // On mobile devices, try to open SMS app
+        const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+        window.location.href = smsUrl;
+        
+        toast({
+          title: "SMS App Opened",
+          description: "SMS app opened with ledger message",
+        });
+      } else {
+        // On desktop, copy to clipboard and show instructions
+        await navigator.clipboard.writeText(`Phone: ${phoneNumber}\n\nMessage:\n${message}`);
+        
+        toast({
+          title: "SMS Details Copied",
+          description: "Phone number and message copied to clipboard. Use your SMS service to send.",
+        });
+      }
+    } catch (error) {
+      // Fallback: copy to clipboard
+      try {
+        const phoneNumber = entity.contact.replace(/[^0-9]/g, "");
+        const message = generateLedgerText();
+        await navigator.clipboard.writeText(`Phone: ${phoneNumber}\n\nMessage:\n${message}`);
+        
+        toast({
+          title: "SMS Details Copied",
+          description: "Phone number and message copied to clipboard",
+        });
+      } catch (clipboardError) {
+        toast({
+          title: "Error",
+          description: "Failed to prepare SMS. Please copy the ledger manually.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSendingSMS(false);
     }
   };
 
