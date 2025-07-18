@@ -1,4 +1,4 @@
-import { useTransactions, usePayments, useDashboard } from "@/hooks/useFirestore";
+import { useTransactions, usePayments, useDashboard } from "@/hooks/useDatabase";
 import StatsCard from "@/components/Dashboard/StatsCard";
 import RecentActivity from "@/components/Dashboard/RecentActivity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

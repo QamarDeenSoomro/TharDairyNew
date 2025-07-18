@@ -5,7 +5,7 @@ import {
   transactionService, 
   paymentService, 
   dashboardService 
-} from '@/services/firestore';
+} from '@/services/database';
 import type { 
   InsertVendor, 
   InsertCustomer, 
