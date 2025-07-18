@@ -40,6 +40,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
     try {
       setLoading(true);
       
+      console.log('PaymentForm - Creating payment with data:', data);
       await dispatch(createPayment(data)).unwrap();
       toast({
         title: "Success",

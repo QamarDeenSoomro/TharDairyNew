@@ -32,13 +32,7 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
   // Filter transactions for this entity
   const entityTransactions = useMemo(() => {
     console.log(`Filtering transactions for ${entityType} ${entity.name} (ID: ${entity.id})`);
-    console.log('All transactions:', transactions.map(t => ({
-      id: t.id,
-      type: t.type,
-      vendorId: t.vendorId,
-      customerId: t.customerId,
-      totalAmount: t.totalAmount
-    })));
+    console.log('All transactions:', transactions);
     
     const filtered = transactions.filter(t => {
       if (entityType === "vendor") {
@@ -70,13 +64,7 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
   // Filter payments for this entity
   const entityPayments = useMemo(() => {
     console.log(`Filtering payments for ${entityType} ${entity.name} (ID: ${entity.id})`);
-    console.log('All payments:', payments.map(p => ({
-      id: p.id,
-      type: p.type,
-      vendorId: p.vendorId,
-      customerId: p.customerId,
-      amount: p.amount
-    })));
+    console.log('All payments:', payments);
     
     const filtered = payments.filter(p => {
       if (entityType === "vendor") {

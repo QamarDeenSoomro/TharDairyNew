@@ -228,6 +228,7 @@ export const transactionService = {
       date: transactionData.date ? new Date(transactionData.date).toISOString() : new Date().toISOString(),
       createdAt: new Date().toISOString(),
     };
+    console.log('Firebase transactionService.create - Saving data:', data);
     await set(newTransactionRef, data);
     return newTransactionRef.key!;
   },
