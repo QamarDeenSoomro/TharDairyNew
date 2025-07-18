@@ -61,6 +61,8 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
         totalAmount: Number(data.totalAmount),
       };
       
+      console.log('Creating milk send transaction:', transformedData);
+      
       await transactionService.create(transformedData);
       toast({
         title: "Success",

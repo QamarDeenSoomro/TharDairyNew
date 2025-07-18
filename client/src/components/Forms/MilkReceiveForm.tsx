@@ -61,6 +61,8 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
         totalAmount: Number(data.totalAmount),
       };
       
+      console.log('Creating milk receive transaction:', transformedData);
+      
       await transactionService.create(transformedData);
       toast({
         title: "Success",
