@@ -240,10 +240,26 @@ export const transactionService = {
     if (!snapshot.exists()) return [];
     
     const data = snapshot.val();
-    return Object.keys(data).map(key => ({
-      id: key,
-      ...data[key]
-    })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const transactions = Object.keys(data).map(key => {
+      const transaction = {
+        id: key,
+        type: data[key].type,
+        vendorId: data[key].vendorId || null,
+        customerId: data[key].customerId || null,
+        milkType: data[key].milkType,
+        quantity: data[key].quantity,
+        rate: data[key].rate,
+        totalAmount: data[key].totalAmount,
+        fat: data[key].fat || null,
+        snf: data[key].snf || null,
+        date: data[key].date,
+        createdAt: data[key].createdAt
+      };
+      console.log(`Retrieved transaction ${key}:`, transaction);
+      return transaction;
+    });
+    
+    return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   },
 
   // Get transactions by vendor
