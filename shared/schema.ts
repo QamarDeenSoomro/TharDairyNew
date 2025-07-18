@@ -40,8 +40,8 @@ export const milkTransactions = pgTable("milk_transactions", {
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
   type: text("type").notNull(), // 'received' or 'paid'
-  vendorId: integer("vendor_id").references(() => vendors.id),
-  customerId: integer("customer_id").references(() => customers.id),
+  vendorId: text("vendor_id"),
+  customerId: text("customer_id"),
   amount: real("amount").notNull(),
   method: text("method").notNull(), // 'cash', 'bank', 'cheque'
   reference: text("reference"),
@@ -63,8 +63,8 @@ export const insertMilkTransactionSchema = createInsertSchema(milkTransactions).
   id: true,
   createdAt: true,
 }).extend({
-  vendorId: z.string().optional().nullable().transform(val => val ? parseInt(val, 10) : null),
-  customerId: z.string().optional().nullable().transform(val => val ? parseInt(val, 10) : null),
+  vendorId: z.string().optional().nullable(),
+  customerId: z.string().optional().nullable(),
   quantity: z.number().or(z.string().transform(val => parseFloat(val))),
   rate: z.number().or(z.string().transform(val => parseFloat(val))),
   totalAmount: z.number().or(z.string().transform(val => parseFloat(val))),
@@ -73,6 +73,10 @@ export const insertMilkTransactionSchema = createInsertSchema(milkTransactions).
 export const insertPaymentSchema = createInsertSchema(payments).omit({
   id: true,
   createdAt: true,
+}).extend({
+  vendorId: z.string().optional().nullable(),
+  customerId: z.string().optional().nullable(),
+  amount: z.number().or(z.string().transform(val => parseFloat(val))),
 });
 
 export type InsertVendor = z.infer<typeof insertVendorSchema>;

@@ -31,11 +31,24 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
 
   // Filter transactions for this entity
   const entityTransactions = useMemo(() => {
+    console.log(`Filtering transactions for ${entityType} ${entity.name} (ID: ${entity.id})`);
+    console.log('All transactions:', transactions.map(t => ({
+      id: t.id,
+      type: t.type,
+      vendorId: t.vendorId,
+      customerId: t.customerId,
+      totalAmount: t.totalAmount
+    })));
+    
     const filtered = transactions.filter(t => {
       if (entityType === "vendor") {
-        return t.vendorId === entity.id && t.type === "receive";
+        const matches = t.vendorId === entity.id && t.type === "receive";
+        console.log(`Transaction ${t.id}: vendorId="${t.vendorId}" vs entity.id="${entity.id}", type="${t.type}", matches=${matches}`);
+        return matches;
       } else {
-        return t.customerId === entity.id && t.type === "send";
+        const matches = t.customerId === entity.id && t.type === "send";
+        console.log(`Transaction ${t.id}: customerId="${t.customerId}" vs entity.id="${entity.id}", type="${t.type}", matches=${matches}`);
+        return matches;
       }
     });
 
@@ -56,11 +69,24 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
 
   // Filter payments for this entity
   const entityPayments = useMemo(() => {
+    console.log(`Filtering payments for ${entityType} ${entity.name} (ID: ${entity.id})`);
+    console.log('All payments:', payments.map(p => ({
+      id: p.id,
+      type: p.type,
+      vendorId: p.vendorId,
+      customerId: p.customerId,
+      amount: p.amount
+    })));
+    
     const filtered = payments.filter(p => {
       if (entityType === "vendor") {
-        return p.vendorId === entity.id;
+        const matches = p.vendorId === entity.id && p.type === "paid";
+        console.log(`Payment ${p.id}: vendorId="${p.vendorId}" vs entity.id="${entity.id}", type="${p.type}", matches=${matches}`);
+        return matches;
       } else {
-        return p.customerId === entity.id;
+        const matches = p.customerId === entity.id && p.type === "received";
+        console.log(`Payment ${p.id}: customerId="${p.customerId}" vs entity.id="${entity.id}", type="${p.type}", matches=${matches}`);
+        return matches;
       }
     });
 
