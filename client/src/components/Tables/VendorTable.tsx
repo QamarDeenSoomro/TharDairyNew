@@ -1,7 +1,4 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { deleteVendor } from "@/store/slices/vendorSlice";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -10,25 +7,23 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import VendorForm from "@/components/Forms/VendorForm";
-import type { Vendor } from "@shared/schema";
+import type { FirebaseVendor } from "@/services/firebase-realtime";
 
 interface VendorTableProps {
-  vendors: Vendor[];
+  vendors: FirebaseVendor[];
+  onDelete?: (id: string) => void;
 }
 
-export default function VendorTable({ vendors }: VendorTableProps) {
-  const dispatch = useDispatch<AppDispatch>();
+export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
   const { toast } = useToast();
-  const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
+  const [editingVendor, setEditingVendor] = useState<FirebaseVendor | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
-      await dispatch(deleteVendor(id)).unwrap();
-      toast({
-        title: "Success",
-        description: "Vendor deleted successfully",
-      });
+      if (onDelete) {
+        await onDelete(id);
+      }
     } catch (error) {
       toast({
         title: "Error",

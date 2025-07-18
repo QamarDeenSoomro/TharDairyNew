@@ -264,33 +264,31 @@ export const useDashboard = () => {
     todaySent: 0,
     todayProfit: 0,
     pendingPayments: 0,
-    totalReceived: 0,
-    totalPaid: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStats = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const dashboardStats = await dashboardService.getStats();
-      setStats(dashboardStats);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard stats');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const dashboardStats = await dashboardService.getStats();
+        setStats(dashboardStats);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch dashboard stats');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchStats();
     
     // Refresh stats every 30 seconds
     const interval = setInterval(fetchStats, 30000);
     
     return () => clearInterval(interval);
-  }, [fetchStats]);
+  }, []);
 
-  return { stats, loading, error, refreshStats: fetchStats };
+  return { stats, loading, error };
 };
