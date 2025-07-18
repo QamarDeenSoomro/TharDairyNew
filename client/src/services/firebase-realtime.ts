@@ -63,21 +63,14 @@ export type FirebasePayment = {
 export const vendorService = {
   // Create vendor
   async create(vendorData: InsertVendor): Promise<string> {
-    console.log('vendorService: Creating vendor:', vendorData);
     const vendorsRef = ref(db, PATHS.VENDORS);
     const newVendorRef = push(vendorsRef);
     const data = {
       ...vendorData,
       createdAt: new Date().toISOString(),
     };
-    try {
-      await set(newVendorRef, data);
-      console.log('vendorService: Vendor created successfully with ID:', newVendorRef.key);
-      return newVendorRef.key!;
-    } catch (error) {
-      console.error('vendorService: Error creating vendor:', error);
-      throw error;
-    }
+    await set(newVendorRef, data);
+    return newVendorRef.key!;
   },
 
   // Get all vendors
@@ -121,11 +114,9 @@ export const vendorService = {
 
   // Real-time subscription
   subscribe(callback: (vendors: FirebaseVendor[]) => void): () => void {
-    console.log('vendorService: Setting up Firebase subscription');
     const vendorsRef = ref(db, PATHS.VENDORS);
     
     const unsubscribe = onValue(vendorsRef, (snapshot) => {
-      console.log('vendorService: Received snapshot:', snapshot.exists(), snapshot.val());
       const vendors: FirebaseVendor[] = [];
       if (snapshot.exists()) {
         const data = snapshot.val();
@@ -136,10 +127,7 @@ export const vendorService = {
           });
         });
       }
-      console.log('vendorService: Processed vendors:', vendors);
       callback(vendors);
-    }, (error) => {
-      console.error('vendorService: Firebase error:', error);
     });
 
     return () => off(vendorsRef, 'value', unsubscribe);

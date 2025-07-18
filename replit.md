@@ -14,28 +14,28 @@ Preferred communication style: Simple, everyday language.
 - **Framework**: React 18 with TypeScript
 - **UI Library**: Radix UI components with shadcn/ui styling
 - **Styling**: Tailwind CSS with custom CSS variables for theming
-- **State Management**: Redux Toolkit for global state
-- **Data Fetching**: TanStack Query (React Query) for server state
+- **State Management**: Firebase Realtime Database with custom hooks
+- **Data Fetching**: Firebase SDK with real-time subscriptions
 - **Routing**: Wouter for lightweight client-side routing
 - **Forms**: React Hook Form with Zod validation
 - **Build Tool**: Vite for fast development and optimized builds
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js
+- **Runtime**: Node.js with Express.js (minimal, mainly for development)
 - **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL with Neon serverless connection
-- **ORM**: Drizzle ORM with schema-first approach
-- **API Style**: RESTful API with JSON responses
-- **Session Management**: Express sessions with PostgreSQL store
+- **Database**: Firebase Realtime Database
+- **Real-time**: Firebase real-time subscriptions for live data updates
+- **Authentication**: Firebase Auth (configured but not implemented)
 
 ### Database Design
-- **Schema Location**: `shared/schema.ts` - shared between frontend and backend
-- **Tables**:
+- **Database**: Firebase Realtime Database
+- **Schema Location**: `shared/schema.ts` - shared validation schemas
+- **Collections**:
   - `vendors`: Milk suppliers with contact info and rates
   - `customers`: Milk buyers with contact info and rates
   - `milk_transactions`: Records of milk received/sent with quantity, fat, SNF
   - `payments`: Financial transactions between parties
-- **Relationships**: Foreign keys linking transactions and payments to vendors/customers
+- **Real-time Updates**: All data syncs in real-time across all connected clients
 
 ## Key Components
 

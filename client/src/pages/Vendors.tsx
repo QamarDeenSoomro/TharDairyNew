@@ -19,7 +19,6 @@ export default function Vendors() {
 
   const handleAddVendor = async (vendorData: InsertVendor) => {
     try {
-      console.log('handleAddVendor: Attempting to create vendor:', vendorData);
       await createVendor(vendorData);
       setDialogOpen(false);
       toast({
@@ -27,7 +26,6 @@ export default function Vendors() {
         description: "Vendor added successfully",
       });
     } catch (error) {
-      console.error('handleAddVendor: Error creating vendor:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to add vendor",

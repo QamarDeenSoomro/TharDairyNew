@@ -28,23 +28,13 @@ export const useVendors = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('useVendors: Setting up Firebase subscription');
     const unsubscribe = vendorService.subscribe((vendorList) => {
-      console.log('useVendors: Received vendor data:', vendorList);
       setVendors(vendorList);
       setLoading(false);
       setError(null);
     });
 
-    // Handle connection errors
-    const handleError = (error: Error) => {
-      console.warn('Firebase connection error:', error);
-      setError(error.message);
-      setLoading(false);
-    };
-
     return () => {
-      console.log('useVendors: Cleaning up subscription');
       unsubscribe();
     };
   }, []);
