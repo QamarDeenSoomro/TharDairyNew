@@ -10,6 +10,7 @@ This is a full-stack web application for managing milk supply chain operations. 
 - Remove Fat% and SNF% fields from milk forms (completed)
 - Make application mobile responsive (completed)
 - Add ledger functionality with WhatsApp sharing for vendors and customers (completed)
+- Convert to Progressive Web App (PWA) for offline functionality (completed)
 
 ## System Architecture
 
@@ -29,6 +30,7 @@ This is a full-stack web application for managing milk supply chain operations. 
 - **Database**: Firebase Realtime Database
 - **Real-time**: Firebase real-time subscriptions for live data updates
 - **Authentication**: Firebase Auth (configured but not implemented)
+- **PWA Features**: Service workers for offline functionality, IndexedDB for offline storage
 
 ### Database Design
 - **Database**: Firebase Realtime Database
@@ -55,6 +57,7 @@ This is a full-stack web application for managing milk supply chain operations. 
 - **UI Components**: Complete shadcn/ui component library with mobile responsiveness
 - **Mobile Design**: Responsive card layouts for tables, adaptive form grids, flexible navigation
 - **Ledger System**: Individual ledgers for vendors/customers with date filtering and WhatsApp sharing
+- **PWA Components**: Install prompt, offline indicator, background sync, service worker integration
 
 ### Backend Services
 - **Storage Layer**: Abstract storage interface with in-memory implementation
@@ -100,12 +103,13 @@ This is a full-stack web application for managing milk supply chain operations. 
 - Vercel deployment ready with `vercel.json` configuration
 
 ### Vercel Deployment
-- **Status**: Ready for deployment
+- **Status**: Ready for deployment as PWA
 - **Build Command**: `vite build`
 - **Output Directory**: `dist/public`
-- **Architecture**: JAMstack (JavaScript, APIs, Markup)
-- **Database**: Firebase Realtime Database
+- **Architecture**: JAMstack PWA (JavaScript, APIs, Markup)
+- **Database**: Firebase Realtime Database with offline sync
 - **Environment Variables**: Firebase configuration keys required
+- **PWA Features**: Service workers, web manifest, offline storage, installable app
 
 ### File Structure
 - `client/`: React frontend application

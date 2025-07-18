@@ -1,6 +1,7 @@
 import { Menu, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import SyncButton from "@/components/PWA/SyncButton";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -31,6 +32,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </div>
           
           <div className="flex items-center space-x-4">
+            <SyncButton />
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>

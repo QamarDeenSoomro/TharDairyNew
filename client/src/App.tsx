@@ -12,6 +12,9 @@ import MilkReceiving from "@/pages/MilkReceiving";
 import MilkSending from "@/pages/MilkSending";
 import Payments from "@/pages/Payments";
 import Reports from "@/pages/Reports";
+import PWAInstallPrompt from "@/components/PWA/PWAInstallPrompt";
+import OfflineIndicator from "@/components/PWA/OfflineIndicator";
+import usePWA from "@/hooks/usePWA";
 
 function Router() {
   return (
@@ -29,10 +32,15 @@ function Router() {
 }
 
 function App() {
+  // Initialize PWA hooks
+  usePWA();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        <OfflineIndicator />
+        <PWAInstallPrompt />
         <AppLayout>
           <Router />
         </AppLayout>
