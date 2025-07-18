@@ -26,9 +26,9 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
       vendorId: "",
       customerId: null,
       milkType: "cow",
-      quantity: 0,
-      rate: 0,
-      totalAmount: 0,
+      quantity: "",
+      rate: "",
+      totalAmount: "",
       date: new Date(),
     },
   });
@@ -38,10 +38,11 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
   useEffect(() => {
     if (selectedVendor && watchedFields.milkType && watchedFields.quantity) {
       const rate = watchedFields.milkType === 'cow' ? selectedVendor.cowRate : selectedVendor.buffaloRate;
-      const amount = watchedFields.quantity * rate;
+      const quantity = parseFloat(watchedFields.quantity) || 0;
+      const amount = quantity * rate;
       
-      form.setValue('rate', rate);
-      form.setValue('totalAmount', amount);
+      form.setValue('rate', rate.toString());
+      form.setValue('totalAmount', amount.toString());
       setTotalAmount(amount);
     }
   }, [selectedVendor, watchedFields.milkType, watchedFields.quantity, form]);
@@ -50,7 +51,17 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
     try {
       setLoading(true);
       
-      await transactionService.create(data);
+      // Transform the data to ensure correct types
+      const transformedData = {
+        ...data,
+        vendorId: data.vendorId || null,
+        customerId: null, // Always null for receive transactions
+        quantity: Number(data.quantity),
+        rate: Number(data.rate),
+        totalAmount: Number(data.totalAmount),
+      };
+      
+      await transactionService.create(transformedData);
       toast({
         title: "Success",
         description: "Milk receipt recorded successfully",
@@ -121,7 +132,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
             id="quantity"
             type="number"
             step="0.01"
-            {...form.register("quantity", { valueAsNumber: true })}
+            {...form.register("quantity")}
             placeholder="50"
             className="mt-1"
           />

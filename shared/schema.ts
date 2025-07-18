@@ -62,6 +62,12 @@ export const insertCustomerSchema = createInsertSchema(customers).omit({
 export const insertMilkTransactionSchema = createInsertSchema(milkTransactions).omit({
   id: true,
   createdAt: true,
+}).extend({
+  vendorId: z.string().optional().nullable().transform(val => val ? parseInt(val, 10) : null),
+  customerId: z.string().optional().nullable().transform(val => val ? parseInt(val, 10) : null),
+  quantity: z.number().or(z.string().transform(val => parseFloat(val))),
+  rate: z.number().or(z.string().transform(val => parseFloat(val))),
+  totalAmount: z.number().or(z.string().transform(val => parseFloat(val))),
 });
 
 export const insertPaymentSchema = createInsertSchema(payments).omit({
