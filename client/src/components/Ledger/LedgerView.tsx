@@ -173,25 +173,21 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
       const message = generateLedgerText();
       const phoneNumber = entity.contact.replace(/[^0-9]/g, "");
       
-      // For SMS, we'll use the browser's SMS capability or show instructions
+      // Create SMS URL to open device's SMS app
+      const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+      
+      // On mobile devices, use window.location.href
+      // On desktop, use window.open as fallback
       if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i)) {
-        // On mobile devices, try to open SMS app
-        const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
         window.location.href = smsUrl;
-        
-        toast({
-          title: "SMS App Opened",
-          description: "SMS app opened with ledger message",
-        });
       } else {
-        // On desktop, copy to clipboard and show instructions
-        await navigator.clipboard.writeText(`Phone: ${phoneNumber}\n\nMessage:\n${message}`);
-        
-        toast({
-          title: "SMS Details Copied",
-          description: "Phone number and message copied to clipboard. Use your SMS service to send.",
-        });
+        window.open(smsUrl, "_self");
       }
+      
+      toast({
+        title: "SMS App Opened",
+        description: "Your device's SMS app opened with the ledger message",
+      });
     } catch (error) {
       // Fallback: copy to clipboard
       try {
@@ -201,13 +197,12 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
         
         toast({
           title: "SMS Details Copied",
-          description: "Phone number and message copied to clipboard",
+          description: "Phone number and message copied to clipboard. Paste in your SMS app.",
         });
       } catch (clipboardError) {
         toast({
-          title: "Error",
-          description: "Failed to prepare SMS. Please copy the ledger manually.",
-          variant: "destructive",
+          title: "SMS Ready",
+          description: `Send SMS to ${phoneNumber} with the ledger details shown above.`,
         });
       }
     } finally {
@@ -328,11 +323,26 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
           </Card>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={sendViaWhatsApp} disabled={isSending} className="flex items-center gap-2">
-              <Send className="h-4 w-4" />
-              {isSending ? "Opening WhatsApp..." : "Send via WhatsApp"}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              onClick={sendViaWhatsApp} 
+              disabled={isSendingWhatsApp} 
+              className="flex items-center gap-2"
+            >
+              <MessageSquare className="h-4 w-4" />
+              {isSendingWhatsApp ? "Opening WhatsApp..." : "Send via WhatsApp"}
             </Button>
+            
+            <Button 
+              onClick={sendViaSMS} 
+              disabled={isSendingSMS} 
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Smartphone className="h-4 w-4" />
+              {isSendingSMS ? "Opening SMS..." : "Send via SMS"}
+            </Button>
+            
             <Button variant="outline" onClick={downloadLedger} className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Download Ledger
