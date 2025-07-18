@@ -48,7 +48,8 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -123,6 +124,76 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {vendors.map((vendor) => (
+          <div key={vendor.id} className="bg-card border rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <span className="text-primary font-medium text-sm">
+                    {getInitials(vendor.name)}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-medium text-foreground">{vendor.name}</div>
+                  <div className="text-sm text-muted-foreground">{vendor.contact}</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setEditingVendor(vendor);
+                    setDialogOpen(true);
+                  }}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete {vendor.name}? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDelete(vendor.id)}>
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs text-muted-foreground">Cow Rate</div>
+                <Badge variant="secondary">₹{vendor.cowRate}/L</Badge>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Buffalo Rate</div>
+                <Badge variant="secondary">₹{vendor.buffaloRate}/L</Badge>
+              </div>
+            </div>
+            {vendor.location && (
+              <div>
+                <div className="text-xs text-muted-foreground">Location</div>
+                <div className="text-sm">{vendor.location}</div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

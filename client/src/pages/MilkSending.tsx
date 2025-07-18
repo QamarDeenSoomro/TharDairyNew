@@ -29,19 +29,19 @@ export default function MilkSending() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="mb-8">
+    <div className="space-y-6">
+      <div className="mb-6">
         <h2 className="text-2xl font-semibold text-foreground mb-2">Milk Sending</h2>
         <p className="text-muted-foreground">Record milk sent to customers</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sending Form */}
         <Card>
           <CardHeader>
             <CardTitle>Add Milk Delivery</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6">
             <MilkSendForm customers={customers} />
           </CardContent>
         </Card>
@@ -51,7 +51,7 @@ export default function MilkSending() {
           <CardHeader>
             <CardTitle>Recent Deliveries</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6">
             <div className="space-y-4">
               {recentSends.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">No recent deliveries</p>
@@ -59,16 +59,16 @@ export default function MilkSending() {
                 recentSends.map((send) => {
                   const customer = customers.find(c => c.id === send.customerId);
                   return (
-                    <div key={send.id} className="border border-border rounded-md p-4">
-                      <div className="flex items-center justify-between mb-2">
+                    <div key={send.id} className="border border-border rounded-md p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                         <span className="text-sm font-medium text-foreground">
                           {customer?.name || 'Unknown Customer'}
                         </span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-xs sm:text-sm text-muted-foreground">
                           {formatDistanceToNow(new Date(send.date!), { addSuffix: true })}
                         </span>
                       </div>
-                      <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
                         <div>
                           <span className="text-muted-foreground">Type:</span>
                           <span className="text-foreground ml-1 capitalize">{send.milkType}</span>
@@ -77,7 +77,7 @@ export default function MilkSending() {
                           <span className="text-muted-foreground">Qty:</span>
                           <span className="text-foreground ml-1">{send.quantity}L</span>
                         </div>
-                        <div>
+                        <div className="col-span-2 sm:col-span-1">
                           <span className="text-muted-foreground">Amount:</span>
                           <span className="text-foreground ml-1">₹{send.totalAmount}</span>
                         </div>

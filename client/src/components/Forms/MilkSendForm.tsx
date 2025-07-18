@@ -71,7 +71,7 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
       <div>
         <Label htmlFor="customerId">Customer</Label>
         <Select
@@ -98,7 +98,7 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="milkType">Milk Type</Label>
           <Select
