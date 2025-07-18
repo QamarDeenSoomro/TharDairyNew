@@ -217,6 +217,8 @@ export const transactionService = {
     const newTransactionRef = push(transactionsRef);
     const data = {
       ...transactionData,
+      fat: null, // Set to null since we removed the field
+      snf: null, // Set to null since we removed the field
       date: transactionData.date ? new Date(transactionData.date).toISOString() : new Date().toISOString(),
       createdAt: new Date().toISOString(),
     };

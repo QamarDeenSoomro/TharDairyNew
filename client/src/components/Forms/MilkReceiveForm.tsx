@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
-import { calculateMilkAmount } from "@/utils/calculations";
 import { transactionService, type FirebaseVendor } from "@/services/firebase-realtime";
 
 interface MilkReceiveFormProps {
@@ -28,8 +27,6 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
       customerId: null,
       milkType: "cow",
       quantity: 0,
-      fat: 0,
-      snf: 0,
       rate: 0,
       totalAmount: 0,
       date: new Date(),
@@ -41,13 +38,13 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
   useEffect(() => {
     if (selectedVendor && watchedFields.milkType && watchedFields.quantity) {
       const rate = watchedFields.milkType === 'cow' ? selectedVendor.cowRate : selectedVendor.buffaloRate;
-      const amount = calculateMilkAmount(watchedFields.quantity, rate, watchedFields.fat, watchedFields.snf);
+      const amount = watchedFields.quantity * rate;
       
       form.setValue('rate', rate);
       form.setValue('totalAmount', amount);
       setTotalAmount(amount);
     }
-  }, [selectedVendor, watchedFields.milkType, watchedFields.quantity, watchedFields.fat, watchedFields.snf, form]);
+  }, [selectedVendor, watchedFields.milkType, watchedFields.quantity, form]);
 
   const onSubmit = async (data: InsertMilkTransaction) => {
     try {
@@ -134,31 +131,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="fat">Fat %</Label>
-          <Input
-            id="fat"
-            type="number"
-            step="0.1"
-            {...form.register("fat", { valueAsNumber: true })}
-            placeholder="4.5"
-            className="mt-1"
-          />
-        </div>
 
-        <div>
-          <Label htmlFor="snf">SNF %</Label>
-          <Input
-            id="snf"
-            type="number"
-            step="0.1"
-            {...form.register("snf", { valueAsNumber: true })}
-            placeholder="8.5"
-            className="mt-1"
-          />
-        </div>
-      </div>
 
       <div className="bg-muted p-4 rounded-md">
         <div className="flex justify-between items-center">
