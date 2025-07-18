@@ -37,3 +37,28 @@ author = "agent"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "ddd"
+mode = "sequential"
+author = 45208334
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git config user.name \"QamarDeenSoomro\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git config user.email \"qamersoomro1993@gmail.com\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git init"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git add ."
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git commit -m \"Initial commit\""
