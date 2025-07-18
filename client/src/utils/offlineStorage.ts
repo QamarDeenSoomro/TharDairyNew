@@ -152,13 +152,18 @@ class OfflineStorage {
   }
 
   async getDataCount(): Promise<{ total: number; unsynced: number }> {
-    const allData = await this.getOfflineData();
-    const unsyncedData = await this.getUnsyncedData();
-    
-    return {
-      total: allData.length,
-      unsynced: unsyncedData.length
-    };
+    try {
+      const allData = await this.getOfflineData();
+      const unsyncedData = await this.getUnsyncedData();
+      
+      return {
+        total: allData.length,
+        unsynced: unsyncedData.length
+      };
+    } catch (error) {
+      console.error('Error getting data count:', error);
+      return { total: 0, unsynced: 0 };
+    }
   }
 }
 

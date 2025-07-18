@@ -73,6 +73,11 @@ export const usePWA = () => {
       }));
     } catch (error) {
       console.error('Failed to update offline data count:', error);
+      // Set count to 0 on error to prevent UI issues
+      setStatus(prev => ({
+        ...prev,
+        offlineDataCount: 0
+      }));
     }
   };
 

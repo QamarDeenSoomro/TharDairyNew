@@ -1,5 +1,5 @@
 // Firebase integration for offline sync functionality
-import { vendorService, customerService, milkTransactionService, paymentService } from '@/services/firebase-realtime';
+import { vendorService, customerService, transactionService, paymentService } from '@/services/firebase-realtime';
 import { offlineStorage } from './offlineStorage';
 import { InsertVendor, InsertCustomer, InsertMilkTransaction, InsertPayment } from '@shared/schema';
 
@@ -24,7 +24,7 @@ export const syncItemWithFirebase = async (item: OfflineDataItem): Promise<void>
         break;
         
       case 'transaction':
-        await milkTransactionService.create(item.data as InsertMilkTransaction);
+        await transactionService.create(item.data as InsertMilkTransaction);
         break;
         
       case 'payment':
@@ -110,7 +110,7 @@ export const createCustomerWithOfflineSupport = async (customerData: InsertCusto
 
 export const createTransactionWithOfflineSupport = async (transactionData: InsertMilkTransaction): Promise<string> => {
   try {
-    return await milkTransactionService.create(transactionData);
+    return await transactionService.create(transactionData);
   } catch (error) {
     if (shouldUseOfflineStorage()) {
       console.log('Saving transaction offline due to network issue');
