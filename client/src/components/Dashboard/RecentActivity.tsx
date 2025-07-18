@@ -1,21 +1,37 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
 import type { MilkTransaction, Payment } from "@shared/schema";
+import type { FirebaseVendor, FirebaseCustomer } from "@/services/firebase-realtime";
 
 interface RecentActivityProps {
   transactions: MilkTransaction[];
   payments: Payment[];
+  vendors: FirebaseVendor[];
+  customers: FirebaseCustomer[];
 }
 
-export default function RecentActivity({ transactions, payments }: RecentActivityProps) {
+export default function RecentActivity({ transactions, payments, vendors, customers }: RecentActivityProps) {
+  // Helper functions to get names
+  const getVendorName = (vendorId: number | null) => {
+    if (!vendorId) return 'Unknown Vendor';
+    const vendor = vendors.find(v => v.id === vendorId.toString());
+    return vendor?.name || 'Unknown Vendor';
+  };
+
+  const getCustomerName = (customerId: number | null) => {
+    if (!customerId) return 'Unknown Customer';
+    const customer = customers.find(c => c.id === customerId.toString());
+    return customer?.name || 'Unknown Customer';
+  };
+
   // Combine and sort activities
   const activities = [
     ...transactions.map(t => ({
       id: `transaction-${t.id}`,
       type: t.type === 'receive' ? 'receive' : 'send',
       description: t.type === 'receive' 
-        ? `Received ${t.quantity}L from vendor` 
-        : `Sent ${t.quantity}L to customer`,
+        ? `Received ${t.quantity}L from ${getVendorName(t.vendorId)}` 
+        : `Sent ${t.quantity}L to ${getCustomerName(t.customerId)}`,
       timestamp: new Date(t.date!),
       icon: t.type === 'receive' ? 'move_down' : 'move_up',
       color: t.type === 'receive' ? 'primary' : 'secondary',
@@ -24,8 +40,8 @@ export default function RecentActivity({ transactions, payments }: RecentActivit
       id: `payment-${p.id}`,
       type: p.type,
       description: p.type === 'received' 
-        ? `Payment received ₹${p.amount}` 
-        : `Payment made ₹${p.amount}`,
+        ? `Payment received ₹${p.amount} from ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}` 
+        : `Payment made ₹${p.amount} to ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}`,
       timestamp: new Date(p.date!),
       icon: 'payment',
       color: 'success',

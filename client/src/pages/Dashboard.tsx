@@ -1,4 +1,4 @@
-import { useTransactions, usePayments, useDashboard } from "@/hooks/useFirestore";
+import { useTransactions, usePayments, useDashboard, useVendors, useCustomers } from "@/hooks/useFirestore";
 import StatsCard from "@/components/Dashboard/StatsCard";
 import RecentActivity from "@/components/Dashboard/RecentActivity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,8 +8,10 @@ export default function Dashboard() {
   const { transactions, loading: transactionsLoading } = useTransactions();
   const { payments, loading: paymentsLoading } = usePayments();
   const { stats, loading: statsLoading } = useDashboard();
+  const { vendors, loading: vendorsLoading } = useVendors();
+  const { customers, loading: customersLoading } = useCustomers();
 
-  if (statsLoading || transactionsLoading || paymentsLoading) {
+  if (statsLoading || transactionsLoading || paymentsLoading || vendorsLoading || customersLoading) {
     return (
       <div className="space-y-8">
         <div>
@@ -79,6 +81,8 @@ export default function Dashboard() {
         <RecentActivity 
           transactions={recentTransactions}
           payments={recentPayments}
+          vendors={vendors}
+          customers={customers}
         />
       </div>
     </div>
