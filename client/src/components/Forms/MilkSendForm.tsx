@@ -1,9 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { createTransaction } from "@/store/slices/transactionSlice";
-import { insertMilkTransactionSchema, type InsertMilkTransaction, type Customer } from "@shared/schema";
+import { insertMilkTransactionSchema, type InsertMilkTransaction } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,32 +8,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { calculateMilkAmount } from "@/utils/calculations";
+import { transactionService, type FirebaseCustomer } from "@/services/firebase-realtime";
 
 interface MilkSendFormProps {
-  customers: Customer[];
+  customers: FirebaseCustomer[];
 }
 
 export default function MilkSendForm({ customers }: MilkSendFormProps) {
-  const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<FirebaseCustomer | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
 
   const form = useForm<InsertMilkTransaction>({
-    resolver: zodResolver(insertMilkTransactionSchema.extend({
-      customerId: insertMilkTransactionSchema.shape.customerId.refine(val => val !== null),
-    })),
+    resolver: zodResolver(insertMilkTransactionSchema),
     defaultValues: {
       type: "send",
       vendorId: null,
-      customerId: null,
+      customerId: "",
       milkType: "cow",
       quantity: 0,
       fat: 0,
       snf: 0,
       rate: 0,
       totalAmount: 0,
+      date: new Date(),
     },
   });
 
@@ -57,7 +53,7 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
     try {
       setLoading(true);
       
-      await dispatch(createTransaction(data)).unwrap();
+      await transactionService.create(data);
       toast({
         title: "Success",
         description: "Milk delivery recorded successfully",
@@ -69,7 +65,7 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to record milk delivery",
+        description: error instanceof Error ? error.message : "Failed to record milk delivery",
         variant: "destructive",
       });
     } finally {
@@ -82,11 +78,11 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
       <div>
         <Label htmlFor="customerId">Customer</Label>
         <Select
-          value={watchedFields.customerId?.toString() || ""}
+          value={watchedFields.customerId || ""}
           onValueChange={(value) => {
-            const customer = customers.find(c => c.id === parseInt(value));
+            const customer = customers.find(c => c.id === value);
             setSelectedCustomer(customer || null);
-            form.setValue('customerId', parseInt(value));
+            form.setValue('customerId', value);
           }}
         >
           <SelectTrigger className="mt-1">
@@ -94,7 +90,7 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
           </SelectTrigger>
           <SelectContent>
             {customers.map((customer) => (
-              <SelectItem key={customer.id} value={customer.id.toString()}>
+              <SelectItem key={customer.id} value={customer.id}>
                 {customer.name}
               </SelectItem>
             ))}

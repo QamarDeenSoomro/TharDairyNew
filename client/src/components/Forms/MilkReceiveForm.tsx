@@ -1,9 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { createTransaction } from "@/store/slices/transactionSlice";
-import { insertMilkTransactionSchema, type InsertMilkTransaction, type Vendor } from "@shared/schema";
+import { insertMilkTransactionSchema, type InsertMilkTransaction } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,25 +8,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { calculateMilkAmount } from "@/utils/calculations";
+import { transactionService, type FirebaseVendor } from "@/services/firebase-realtime";
 
 interface MilkReceiveFormProps {
-  vendors: Vendor[];
+  vendors: FirebaseVendor[];
 }
 
 export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
-  const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [selectedVendor, setSelectedVendor] = useState<FirebaseVendor | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
 
   const form = useForm<InsertMilkTransaction>({
-    resolver: zodResolver(insertMilkTransactionSchema.extend({
-      vendorId: insertMilkTransactionSchema.shape.vendorId.refine(val => val !== null),
-    })),
+    resolver: zodResolver(insertMilkTransactionSchema),
     defaultValues: {
       type: "receive",
-      vendorId: null,
+      vendorId: "",
       customerId: null,
       milkType: "cow",
       quantity: 0,
@@ -37,6 +32,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
       snf: 0,
       rate: 0,
       totalAmount: 0,
+      date: new Date(),
     },
   });
 
@@ -57,7 +53,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
     try {
       setLoading(true);
       
-      await dispatch(createTransaction(data)).unwrap();
+      await transactionService.create(data);
       toast({
         title: "Success",
         description: "Milk receipt recorded successfully",
@@ -69,7 +65,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to record milk receipt",
+        description: error instanceof Error ? error.message : "Failed to record milk receipt",
         variant: "destructive",
       });
     } finally {
@@ -82,11 +78,11 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
       <div>
         <Label htmlFor="vendorId">Vendor</Label>
         <Select
-          value={watchedFields.vendorId?.toString() || ""}
+          value={watchedFields.vendorId || ""}
           onValueChange={(value) => {
-            const vendor = vendors.find(v => v.id === parseInt(value));
+            const vendor = vendors.find(v => v.id === value);
             setSelectedVendor(vendor || null);
-            form.setValue('vendorId', parseInt(value));
+            form.setValue('vendorId', value);
           }}
         >
           <SelectTrigger className="mt-1">
@@ -94,7 +90,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
           </SelectTrigger>
           <SelectContent>
             {vendors.map((vendor) => (
-              <SelectItem key={vendor.id} value={vendor.id.toString()}>
+              <SelectItem key={vendor.id} value={vendor.id}>
                 {vendor.name}
               </SelectItem>
             ))}

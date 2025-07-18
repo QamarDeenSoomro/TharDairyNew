@@ -70,3 +70,37 @@ args = "git remote add origin https://github.com/QamarDeenSoomro/TharDairyNew.gi
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "git push -u origin main"
+
+[[workflows.workflow]]
+name = "git push origin main"
+mode = "sequential"
+author = 45208334
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git push"
+
+[[workflows.workflow]]
+name = "Pull and push"
+mode = "sequential"
+author = 45208334
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git add ."
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git commit -m \"Backup of current work\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git checkout main"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git pull origin main"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git push --force origin main"
