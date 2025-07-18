@@ -1,22 +1,13 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchCustomers } from "@/store/slices/customerSlice";
-import { fetchTransactions } from "@/store/slices/transactionSlice";
+import { useState } from "react";
+import { useCustomers, useTransactions } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MilkSendForm from "@/components/Forms/MilkSendForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 
 export default function MilkSending() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { customers, loading: customersLoading } = useSelector((state: RootState) => state.customers);
-  const { transactions, loading: transactionsLoading } = useSelector((state: RootState) => state.transactions);
-
-  useEffect(() => {
-    dispatch(fetchCustomers());
-    dispatch(fetchTransactions());
-  }, [dispatch]);
+  const { customers, loading: customersLoading } = useCustomers();
+  const { transactions, loading: transactionsLoading } = useTransactions();
 
   const recentSends = transactions
     .filter(t => t.type === 'send')

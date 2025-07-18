@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchCustomers } from "@/store/slices/customerSlice";
+import { useState } from "react";
+import { useCustomers } from "@/hooks/useFirestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Search } from "lucide-react";
@@ -10,16 +8,47 @@ import CustomerTable from "@/components/Tables/CustomerTable";
 import CustomerForm from "@/components/Forms/CustomerForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { InsertCustomer } from "@shared/schema";
 
 export default function Customers() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { customers, loading, error } = useSelector((state: RootState) => state.customers);
+  const { customers, loading, error, createCustomer, updateCustomer, deleteCustomer } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    dispatch(fetchCustomers());
-  }, [dispatch]);
+  const handleAddCustomer = async (customerData: InsertCustomer) => {
+    try {
+      await createCustomer(customerData);
+      setDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Customer added successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add customer",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteCustomer = async (id: string) => {
+    try {
+      await deleteCustomer(id);
+      toast({
+        title: "Success",
+        description: "Customer deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete customer",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredCustomers = customers.filter(customer =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,7 +94,7 @@ export default function Customers() {
             <DialogHeader>
               <DialogTitle>Add New Customer</DialogTitle>
             </DialogHeader>
-            <CustomerForm onSuccess={() => setDialogOpen(false)} />
+            <CustomerForm onSuccess={handleAddCustomer} />
           </DialogContent>
         </Dialog>
       </div>
@@ -88,7 +117,7 @@ export default function Customers() {
           </div>
         </CardHeader>
         <CardContent>
-          <CustomerTable customers={filteredCustomers} />
+          <CustomerTable customers={filteredCustomers} onDelete={handleDeleteCustomer} />
         </CardContent>
       </Card>
     </div>

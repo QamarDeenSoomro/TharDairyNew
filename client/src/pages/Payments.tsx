@@ -1,9 +1,5 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchPayments } from "@/store/slices/paymentSlice";
-import { fetchVendors } from "@/store/slices/vendorSlice";
-import { fetchCustomers } from "@/store/slices/customerSlice";
+import { useState } from "react";
+import { usePayments, useVendors, useCustomers } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PaymentForm from "@/components/Forms/PaymentForm";
 import PaymentTable from "@/components/Tables/PaymentTable";
@@ -11,16 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
 export default function Payments() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { payments, loading: paymentsLoading } = useSelector((state: RootState) => state.payments);
-  const { vendors, loading: vendorsLoading } = useSelector((state: RootState) => state.vendors);
-  const { customers, loading: customersLoading } = useSelector((state: RootState) => state.customers);
-
-  useEffect(() => {
-    dispatch(fetchPayments());
-    dispatch(fetchVendors());
-    dispatch(fetchCustomers());
-  }, [dispatch]);
+  const { payments, loading: paymentsLoading } = usePayments();
+  const { vendors, loading: vendorsLoading } = useVendors();
+  const { customers, loading: customersLoading } = useCustomers();
 
   const loading = paymentsLoading || vendorsLoading || customersLoading;
 

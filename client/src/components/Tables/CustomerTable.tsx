@@ -1,7 +1,4 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { deleteCustomer } from "@/store/slices/customerSlice";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -10,25 +7,23 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CustomerForm from "@/components/Forms/CustomerForm";
-import type { Customer } from "@shared/schema";
+import type { FirebaseCustomer } from "@/services/firebase-realtime";
 
 interface CustomerTableProps {
-  customers: Customer[];
+  customers: FirebaseCustomer[];
+  onDelete?: (id: string) => void;
 }
 
-export default function CustomerTable({ customers }: CustomerTableProps) {
-  const dispatch = useDispatch<AppDispatch>();
+export default function CustomerTable({ customers, onDelete }: CustomerTableProps) {
   const { toast } = useToast();
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [editingCustomer, setEditingCustomer] = useState<FirebaseCustomer | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
-      await dispatch(deleteCustomer(id)).unwrap();
-      toast({
-        title: "Success",
-        description: "Customer deleted successfully",
-      });
+      if (onDelete) {
+        await onDelete(id);
+      }
     } catch (error) {
       toast({
         title: "Error",

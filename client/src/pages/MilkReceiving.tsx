@@ -1,22 +1,13 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchVendors } from "@/store/slices/vendorSlice";
-import { fetchTransactions } from "@/store/slices/transactionSlice";
+import { useState } from "react";
+import { useVendors, useTransactions } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MilkReceiveForm from "@/components/Forms/MilkReceiveForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 
 export default function MilkReceiving() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { vendors, loading: vendorsLoading } = useSelector((state: RootState) => state.vendors);
-  const { transactions, loading: transactionsLoading } = useSelector((state: RootState) => state.transactions);
-
-  useEffect(() => {
-    dispatch(fetchVendors());
-    dispatch(fetchTransactions());
-  }, [dispatch]);
+  const { vendors, loading: vendorsLoading } = useVendors();
+  const { transactions, loading: transactionsLoading } = useTransactions();
 
   const recentReceipts = transactions
     .filter(t => t.type === 'receive')

@@ -1,22 +1,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { createCustomer, updateCustomer } from "@/store/slices/customerSlice";
-import { insertCustomerSchema, type InsertCustomer, type Customer } from "@shared/schema";
+import { insertCustomerSchema, type InsertCustomer } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import type { FirebaseCustomer } from "@/services/firebase-realtime";
 
 interface CustomerFormProps {
-  customer?: Customer;
-  onSuccess?: () => void;
+  customer?: FirebaseCustomer;
+  onSuccess?: (data: InsertCustomer) => void;
 }
 
 export default function CustomerForm({ customer, onSuccess }: CustomerFormProps) {
-  const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -35,22 +32,11 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
     try {
       setLoading(true);
       
-      if (customer) {
-        await dispatch(updateCustomer({ id: customer.id, customer: data })).unwrap();
-        toast({
-          title: "Success",
-          description: "Customer updated successfully",
-        });
-      } else {
-        await dispatch(createCustomer(data)).unwrap();
-        toast({
-          title: "Success",
-          description: "Customer created successfully",
-        });
+      if (onSuccess) {
+        await onSuccess(data);
       }
       
       form.reset();
-      onSuccess?.();
     } catch (error) {
       toast({
         title: "Error",

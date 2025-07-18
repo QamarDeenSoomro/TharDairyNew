@@ -94,7 +94,7 @@ export default function Vendors() {
             <DialogHeader>
               <DialogTitle>Add New Vendor</DialogTitle>
             </DialogHeader>
-            <VendorForm onSubmit={handleAddVendor} onSuccess={() => setDialogOpen(false)} />
+            <VendorForm onSuccess={handleAddVendor} />
           </DialogContent>
         </Dialog>
       </div>

@@ -1,22 +1,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { createVendor, updateVendor } from "@/store/slices/vendorSlice";
-import { insertVendorSchema, type InsertVendor, type Vendor } from "@shared/schema";
+import { insertVendorSchema, type InsertVendor } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import type { FirebaseVendor } from "@/services/firebase-realtime";
 
 interface VendorFormProps {
-  vendor?: Vendor;
-  onSuccess?: () => void;
+  vendor?: FirebaseVendor;
+  onSuccess?: (data: InsertVendor) => void;
 }
 
 export default function VendorForm({ vendor, onSuccess }: VendorFormProps) {
-  const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -35,22 +32,11 @@ export default function VendorForm({ vendor, onSuccess }: VendorFormProps) {
     try {
       setLoading(true);
       
-      if (vendor) {
-        await dispatch(updateVendor({ id: vendor.id, vendor: data })).unwrap();
-        toast({
-          title: "Success",
-          description: "Vendor updated successfully",
-        });
-      } else {
-        await dispatch(createVendor(data)).unwrap();
-        toast({
-          title: "Success",
-          description: "Vendor created successfully",
-        });
+      if (onSuccess) {
+        await onSuccess(data);
       }
       
       form.reset();
-      onSuccess?.();
     } catch (error) {
       toast({
         title: "Error",
