@@ -1,8 +1,5 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { createPayment } from "@/store/slices/paymentSlice";
 import { insertPaymentSchema, type InsertPayment, type Vendor, type Customer } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { paymentService } from "@/services/firebase-realtime";
 
 interface PaymentFormProps {
   vendors: Vendor[];
@@ -18,7 +16,6 @@ interface PaymentFormProps {
 }
 
 export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFormProps) {
-  const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -41,7 +38,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       setLoading(true);
       
       console.log('PaymentForm - Creating payment with data:', data);
-      await dispatch(createPayment(data)).unwrap();
+      await paymentService.create(data);
       toast({
         title: "Success",
         description: "Payment recorded successfully",
