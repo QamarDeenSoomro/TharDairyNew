@@ -62,3 +62,7 @@ args = "git add ."
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "git commit -m \"Initial commit\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git push -u origin main"
