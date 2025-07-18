@@ -88,13 +88,13 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       <div>
         <Label htmlFor="party">Party</Label>
         <Select
-          value={form.watch(partyKey)?.toString() || ""}
+          value={form.watch(partyKey) || ""}
           onValueChange={(value) => {
             if (watchedType === "received") {
-              form.setValue("customerId", parseInt(value));
+              form.setValue("customerId", value);
               form.setValue("vendorId", null);
             } else {
-              form.setValue("vendorId", parseInt(value));
+              form.setValue("vendorId", value);
               form.setValue("customerId", null);
             }
           }}
@@ -104,7 +104,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
           </SelectTrigger>
           <SelectContent>
             {availableParties.map((party) => (
-              <SelectItem key={party.id} value={party.id.toString()}>
+              <SelectItem key={party.id} value={party.id}>
                 {party.name} ({watchedType === "received" ? "Customer" : "Vendor"})
               </SelectItem>
             ))}
