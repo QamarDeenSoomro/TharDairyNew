@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, enableNetwork, disableNetwork } from 'firebase/firestore';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -29,5 +29,12 @@ export const auth = getAuth(app);
 //     // Emulators already connected
 //   }
 // }
+
+// Enable offline persistence and better error handling
+try {
+  enableNetwork(db);
+} catch (error) {
+  console.warn('Firebase offline persistence not available:', error);
+}
 
 export default app;

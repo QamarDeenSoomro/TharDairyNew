@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchVendors } from "@/store/slices/vendorSlice";
+import { useState } from "react";
+import { useVendors } from "@/hooks/useFirestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Search } from "lucide-react";
@@ -10,16 +8,47 @@ import VendorTable from "@/components/Tables/VendorTable";
 import VendorForm from "@/components/Forms/VendorForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { InsertVendor } from "@shared/schema";
 
 export default function Vendors() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { vendors, loading, error } = useSelector((state: RootState) => state.vendors);
+  const { vendors, loading, error, createVendor, updateVendor, deleteVendor } = useVendors();
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    dispatch(fetchVendors());
-  }, [dispatch]);
+  const handleAddVendor = async (vendorData: InsertVendor) => {
+    try {
+      await createVendor(vendorData);
+      setDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Vendor added successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add vendor",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteVendor = async (id: string) => {
+    try {
+      await deleteVendor(id);
+      toast({
+        title: "Success",
+        description: "Vendor deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete vendor",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredVendors = vendors.filter(vendor =>
     vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,7 +94,7 @@ export default function Vendors() {
             <DialogHeader>
               <DialogTitle>Add New Vendor</DialogTitle>
             </DialogHeader>
-            <VendorForm onSuccess={() => setDialogOpen(false)} />
+            <VendorForm onSubmit={handleAddVendor} onSuccess={() => setDialogOpen(false)} />
           </DialogContent>
         </Dialog>
       </div>
@@ -88,7 +117,7 @@ export default function Vendors() {
           </div>
         </CardHeader>
         <CardContent>
-          <VendorTable vendors={filteredVendors} />
+          <VendorTable vendors={filteredVendors} onDelete={handleDeleteVendor} />
         </CardContent>
       </Card>
     </div>

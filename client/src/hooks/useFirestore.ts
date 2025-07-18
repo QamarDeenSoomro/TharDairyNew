@@ -71,7 +71,15 @@ export const useVendors = () => {
     const unsubscribe = vendorService.subscribe((vendorList) => {
       setVendors(vendorList);
       setLoading(false);
+      setError(null);
     });
+
+    // Handle connection errors
+    const handleError = (error: Error) => {
+      console.warn('Firebase connection error:', error);
+      setError(error.message);
+      setLoading(false);
+    };
 
     return () => unsubscribe();
   }, []);
