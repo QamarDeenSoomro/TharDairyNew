@@ -308,10 +308,21 @@ export const transactionService = {
       if (snapshot.exists()) {
         const data = snapshot.val();
         Object.keys(data).forEach(key => {
-          transactions.push({
+          const transaction = {
             id: key,
-            ...data[key]
-          });
+            type: data[key].type,
+            vendorId: data[key].vendorId || null,
+            customerId: data[key].customerId || null,
+            milkType: data[key].milkType,
+            quantity: data[key].quantity,
+            rate: data[key].rate,
+            totalAmount: data[key].totalAmount,
+            fat: data[key].fat || null,
+            snf: data[key].snf || null,
+            date: data[key].date,
+            createdAt: data[key].createdAt
+          };
+          transactions.push(transaction);
         });
       }
       // Sort by date descending
