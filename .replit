@@ -65,4 +65,8 @@ args = "git commit -m \"Initial commit\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
+args = "git remote add origin https://github.com/QamarDeenSoomro/TharDairyNew.git"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
 args = "git push -u origin main"
