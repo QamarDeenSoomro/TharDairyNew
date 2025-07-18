@@ -86,13 +86,21 @@ Preferred communication style: Simple, everyday language.
 
 ### Build Process
 - Frontend: Vite builds optimized static assets to `dist/public`
-- Backend: esbuild bundles server code to `dist/index.js`
-- Database: Drizzle pushes schema changes to PostgreSQL
+- Backend: No server required - pure static hosting
+- Database: Firebase Realtime Database (cloud-hosted)
 
 ### Environment Configuration
-- Database connection via `DATABASE_URL` environment variable
+- Firebase configuration via `VITE_FIREBASE_*` environment variables
 - Development vs production modes handled via `NODE_ENV`
-- Replit-specific integrations for development environment
+- Vercel deployment ready with `vercel.json` configuration
+
+### Vercel Deployment
+- **Status**: Ready for deployment
+- **Build Command**: `vite build`
+- **Output Directory**: `dist/public`
+- **Architecture**: JAMstack (JavaScript, APIs, Markup)
+- **Database**: Firebase Realtime Database
+- **Environment Variables**: Firebase configuration keys required
 
 ### File Structure
 - `client/`: React frontend application
