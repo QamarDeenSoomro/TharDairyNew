@@ -158,6 +158,11 @@ class OfflineStorage {
 
   async getDataCount(): Promise<{ total: number; unsynced: number }> {
     try {
+      if (!this.db) {
+        console.log('Database not initialized yet');
+        return { total: 0, unsynced: 0 };
+      }
+      
       const allData = await this.getOfflineData();
       const unsyncedData = await this.getUnsyncedData();
       

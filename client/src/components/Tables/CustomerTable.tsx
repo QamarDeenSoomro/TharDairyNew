@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import CustomerForm from "@/components/Forms/CustomerForm";
 import LedgerView from "@/components/Ledger/LedgerView";
 import type { FirebaseCustomer } from "@/services/firebase-realtime";
+import { useTransactions, usePayments } from "@/hooks/useFirestore";
+import { calculateCustomerBalance } from "@/utils/calculateBalance";
 
 interface CustomerTableProps {
   customers: FirebaseCustomer[];
@@ -21,6 +23,8 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
   const [dialogOpen, setDialogOpen] = useState(false);
   const [ledgerCustomer, setLedgerCustomer] = useState<FirebaseCustomer | null>(null);
   const [ledgerOpen, setLedgerOpen] = useState(false);
+  const { transactions } = useTransactions();
+  const { payments } = usePayments();
 
   const handleDelete = async (id: string) => {
     try {
@@ -60,6 +64,7 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
               <TableHead>Contact</TableHead>
               <TableHead>Cow Rate</TableHead>
               <TableHead>Buffalo Rate</TableHead>
+              <TableHead>Balance</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -86,6 +91,11 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary">₹{customer.buffaloRate}/L</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={calculateCustomerBalance(customer.id, transactions, payments) > 0 ? "destructive" : "secondary"}>
+                    ₹{calculateCustomerBalance(customer.id, transactions, payments).toFixed(2)}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{customer.location}</TableCell>
                 <TableCell>
@@ -210,6 +220,12 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
                 <div className="text-xs text-muted-foreground">Buffalo Rate</div>
                 <Badge variant="secondary">₹{customer.buffaloRate}/L</Badge>
               </div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Balance</div>
+              <Badge variant={calculateCustomerBalance(customer.id, transactions, payments) > 0 ? "destructive" : "secondary"}>
+                ₹{calculateCustomerBalance(customer.id, transactions, payments).toFixed(2)}
+              </Badge>
             </div>
             {customer.location && (
               <div>

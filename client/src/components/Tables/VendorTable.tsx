@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import VendorForm from "@/components/Forms/VendorForm";
 import LedgerView from "@/components/Ledger/LedgerView";
 import type { FirebaseVendor } from "@/services/firebase-realtime";
+import { useTransactions, usePayments } from "@/hooks/useFirestore";
+import { calculateVendorBalance } from "@/utils/calculateBalance";
 
 interface VendorTableProps {
   vendors: FirebaseVendor[];
@@ -21,6 +23,8 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [ledgerVendor, setLedgerVendor] = useState<FirebaseVendor | null>(null);
   const [ledgerOpen, setLedgerOpen] = useState(false);
+  const { transactions } = useTransactions();
+  const { payments } = usePayments();
 
   const handleDelete = async (id: string) => {
     try {
@@ -60,6 +64,7 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
               <TableHead>Contact</TableHead>
               <TableHead>Cow Rate</TableHead>
               <TableHead>Buffalo Rate</TableHead>
+              <TableHead>Balance</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -86,6 +91,11 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary">₹{vendor.buffaloRate}/L</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={calculateVendorBalance(vendor.id, transactions, payments) > 0 ? "destructive" : "secondary"}>
+                    ₹{calculateVendorBalance(vendor.id, transactions, payments).toFixed(2)}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{vendor.location}</TableCell>
                 <TableCell>
@@ -210,6 +220,12 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
                 <div className="text-xs text-muted-foreground">Buffalo Rate</div>
                 <Badge variant="secondary">₹{vendor.buffaloRate}/L</Badge>
               </div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Balance</div>
+              <Badge variant={calculateVendorBalance(vendor.id, transactions, payments) > 0 ? "destructive" : "secondary"}>
+                ₹{calculateVendorBalance(vendor.id, transactions, payments).toFixed(2)}
+              </Badge>
             </div>
             {vendor.location && (
               <div>

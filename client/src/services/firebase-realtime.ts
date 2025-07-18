@@ -216,7 +216,13 @@ export const transactionService = {
     const transactionsRef = ref(db, PATHS.MILK_TRANSACTIONS);
     const newTransactionRef = push(transactionsRef);
     const data = {
-      ...transactionData,
+      type: transactionData.type,
+      vendorId: transactionData.vendorId || null,
+      customerId: transactionData.customerId || null,
+      milkType: transactionData.milkType,
+      quantity: transactionData.quantity,
+      rate: transactionData.rate,
+      totalAmount: transactionData.totalAmount,
       fat: null, // Set to null since we removed the field
       snf: null, // Set to null since we removed the field
       date: transactionData.date ? new Date(transactionData.date).toISOString() : new Date().toISOString(),
