@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowDown, ArrowUp, Package2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { MilkTransaction, Vendor, Customer } from "@shared/schema";
+import { formatCurrency } from "@/lib/utils";
 
 interface TransactionTableProps {
   transactions: MilkTransaction[];
@@ -90,8 +91,8 @@ export default function TransactionTable({ transactions, vendors, customers }: T
                 </Badge>
               </TableCell>
               <TableCell className="font-medium">{transaction.quantity}L</TableCell>
-              <TableCell>₹{transaction.rate}/L</TableCell>
-              <TableCell className="font-medium">₹{transaction.totalAmount.toLocaleString()}</TableCell>
+              <TableCell>{formatCurrency(transaction.rate)}/L</TableCell>
+              <TableCell className="font-medium">{formatCurrency(transaction.totalAmount)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowDown, ArrowUp, Receipt } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { Payment, Vendor, Customer } from "@shared/schema";
+import { formatCurrency } from "@/lib/utils";
 
 interface PaymentTableProps {
   payments: Payment[];
@@ -110,7 +111,7 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
               </TableCell>
               <TableCell className="font-medium">
                 <span className={payment.type === 'received' ? 'text-green-600' : 'text-orange-600'}>
-                  {payment.type === 'received' ? '+' : '-'}₹{payment.amount.toLocaleString()}
+                  {payment.type === 'received' ? '+' : '-'}{formatCurrency(payment.amount)}
                 </span>
               </TableCell>
               <TableCell className="text-muted-foreground">

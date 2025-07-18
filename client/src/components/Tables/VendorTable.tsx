@@ -11,6 +11,7 @@ import LedgerView from "@/components/Ledger/LedgerView";
 import type { FirebaseVendor } from "@/services/firebase-realtime";
 import { useTransactions, usePayments } from "@/hooks/useFirestore";
 import { calculateVendorBalance } from "@/utils/calculateBalance";
+import { formatCurrency } from "@/lib/utils";
 
 interface VendorTableProps {
   vendors: FirebaseVendor[];
@@ -87,14 +88,14 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
                 </TableCell>
                 <TableCell className="text-muted-foreground">{vendor.contact}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary">₹{vendor.cowRate}/L</Badge>
+                  <Badge variant="secondary">{formatCurrency(vendor.cowRate)}/L</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary">₹{vendor.buffaloRate}/L</Badge>
+                  <Badge variant="secondary">{formatCurrency(vendor.buffaloRate)}/L</Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={calculateVendorBalance(vendor.id, transactions, payments) > 0 ? "destructive" : "secondary"}>
-                    ₹{calculateVendorBalance(vendor.id, transactions, payments).toFixed(2)}
+                    {formatCurrency(calculateVendorBalance(vendor.id, transactions, payments))}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{vendor.location}</TableCell>
@@ -214,17 +215,17 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-muted-foreground">Cow Rate</div>
-                <Badge variant="secondary">₹{vendor.cowRate}/L</Badge>
+                <Badge variant="secondary">{formatCurrency(vendor.cowRate)}/L</Badge>
               </div>
               <div>
                 <div className="text-xs text-muted-foreground">Buffalo Rate</div>
-                <Badge variant="secondary">₹{vendor.buffaloRate}/L</Badge>
+                <Badge variant="secondary">{formatCurrency(vendor.buffaloRate)}/L</Badge>
               </div>
             </div>
             <div>
               <div className="text-xs text-muted-foreground">Balance</div>
               <Badge variant={calculateVendorBalance(vendor.id, transactions, payments) > 0 ? "destructive" : "secondary"}>
-                ₹{calculateVendorBalance(vendor.id, transactions, payments).toFixed(2)}
+                {formatCurrency(calculateVendorBalance(vendor.id, transactions, payments))}
               </Badge>
             </div>
             {vendor.location && (

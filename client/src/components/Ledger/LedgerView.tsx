@@ -11,6 +11,7 @@ import { useTransactions, usePayments } from "@/hooks/useFirestore";
 import { formatDistanceToNow, format, isWithinInterval } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import type { FirebaseVendor, FirebaseCustomer } from "@/services/firebase-realtime";
+import { formatCurrency } from "@/lib/utils";
 
 interface LedgerViewProps {
   entity: FirebaseVendor | FirebaseCustomer;
@@ -31,18 +32,11 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
 
   // Filter transactions for this entity
   const entityTransactions = useMemo(() => {
-    console.log(`Filtering transactions for ${entityType} ${entity.name} (ID: ${entity.id})`);
-    console.log('All transactions:', transactions);
-    
     const filtered = transactions.filter(t => {
       if (entityType === "vendor") {
-        const matches = t.vendorId === entity.id && t.type === "receive";
-        console.log(`Transaction ${t.id}: vendorId="${t.vendorId}" vs entity.id="${entity.id}", type="${t.type}", matches=${matches}`);
-        return matches;
+        return t.vendorId === entity.id && t.type === "receive";
       } else {
-        const matches = t.customerId === entity.id && t.type === "send";
-        console.log(`Transaction ${t.id}: customerId="${t.customerId}" vs entity.id="${entity.id}", type="${t.type}", matches=${matches}`);
-        return matches;
+        return t.customerId === entity.id && t.type === "send";
       }
     });
 
@@ -63,18 +57,11 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
 
   // Filter payments for this entity
   const entityPayments = useMemo(() => {
-    console.log(`Filtering payments for ${entityType} ${entity.name} (ID: ${entity.id})`);
-    console.log('All payments:', payments);
-    
     const filtered = payments.filter(p => {
       if (entityType === "vendor") {
-        const matches = p.vendorId === entity.id && p.type === "paid";
-        console.log(`Payment ${p.id}: vendorId="${p.vendorId}" vs entity.id="${entity.id}", type="${p.type}", matches=${matches}`);
-        return matches;
+        return p.vendorId === entity.id && p.type === "paid";
       } else {
-        const matches = p.customerId === entity.id && p.type === "received";
-        console.log(`Payment ${p.id}: customerId="${p.customerId}" vs entity.id="${entity.id}", type="${p.type}", matches=${matches}`);
-        return matches;
+        return p.customerId === entity.id && p.type === "received";
       }
     });
 
@@ -126,9 +113,9 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
       text += `*${entityType === "vendor" ? "MILK RECEIVED" : "MILK DELIVERED"}:*\n`;
       entityTransactions.forEach(t => {
         const date = format(new Date(t.date!), "dd/MM/yyyy");
-        text += `${date} - ${t.quantity}L ${t.milkType} - ₹${t.totalAmount}\n`;
+        text += `${date} - ${t.quantity}L ${t.milkType} - ${formatCurrency(t.totalAmount)}\n`;
       });
-      text += `Subtotal: ₹${totals.transactions}\n\n`;
+      text += `Subtotal: ${formatCurrency(totals.transactions)}\n\n`;
     }
     
     // Add payments
@@ -136,13 +123,13 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
       text += `*PAYMENTS:*\n`;
       entityPayments.forEach(p => {
         const date = format(new Date(p.date!), "dd/MM/yyyy");
-        text += `${date} - ₹${p.amount}${p.notes ? ` (${p.notes})` : ""}\n`;
+        text += `${date} - ${formatCurrency(p.amount)}${p.notes ? ` (${p.notes})` : ""}\n`;
       });
-      text += `Subtotal: ₹${totals.payments}\n\n`;
+      text += `Subtotal: ${formatCurrency(totals.payments)}\n\n`;
     }
     
     text += `━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `*BALANCE: ₹${Math.abs(totals.balance)}*\n`;
+    text += `*BALANCE: ${formatCurrency(Math.abs(totals.balance))}*\n`;
     text += totals.balance > 0 
       ? `Status: ${entityType === "vendor" ? "Amount Due" : "Credit Balance"}\n`
       : totals.balance < 0 
@@ -313,16 +300,16 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
                   <div className="text-sm text-muted-foreground">
                     {entityType === "vendor" ? "Milk Purchased" : "Milk Sold"}
                   </div>
-                  <div className="text-2xl font-bold text-blue-600">₹{totals.transactions}</div>
+                  <div className="text-2xl font-bold text-blue-600">{formatCurrency(totals.transactions)}</div>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <div className="text-sm text-muted-foreground">Payments</div>
-                  <div className="text-2xl font-bold text-green-600">₹{totals.payments}</div>
+                  <div className="text-2xl font-bold text-green-600">{formatCurrency(totals.payments)}</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-sm text-muted-foreground">Balance</div>
                   <div className={`text-2xl font-bold ${totals.balance > 0 ? "text-red-600" : totals.balance < 0 ? "text-green-600" : "text-gray-600"}`}>
-                    ₹{Math.abs(totals.balance)}
+                    {formatCurrency(Math.abs(totals.balance))}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {totals.balance > 0 
@@ -405,8 +392,8 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
                             </Badge>
                           </TableCell>
                           <TableCell>{transaction.quantity}L</TableCell>
-                          <TableCell>₹{transaction.rate}/L</TableCell>
-                          <TableCell className="font-medium">₹{transaction.totalAmount}</TableCell>
+                          <TableCell>{formatCurrency(transaction.rate)}/L</TableCell>
+                          <TableCell className="font-medium">{formatCurrency(transaction.totalAmount)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -448,7 +435,7 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="font-medium">₹{payment.amount}</TableCell>
+                          <TableCell className="font-medium">{formatCurrency(payment.amount)}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="capitalize">
                               {payment.method}
