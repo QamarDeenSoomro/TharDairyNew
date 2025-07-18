@@ -5,61 +5,21 @@ import {
   transactionService, 
   paymentService, 
   dashboardService 
-} from '@/services/firestore';
+} from '@/services/firebase-realtime';
 import type { 
   InsertVendor, 
   InsertCustomer, 
   InsertMilkTransaction, 
   InsertPayment 
 } from '@shared/schema';
+import type {
+  FirebaseVendor,
+  FirebaseCustomer,
+  FirebaseMilkTransaction,
+  FirebasePayment
+} from '@/services/firebase-realtime';
 
-// Firebase-compatible types with string IDs
-type FirebaseVendor = {
-  id: string;
-  name: string;
-  contact: string;
-  location: string | null;
-  cowRate: number;
-  buffaloRate: number;
-  createdAt: Date | null;
-};
-
-type FirebaseCustomer = {
-  id: string;
-  name: string;
-  contact: string;
-  location: string | null;
-  cowRate: number;
-  buffaloRate: number;
-  createdAt: Date | null;
-};
-
-type FirebaseMilkTransaction = {
-  id: string;
-  type: string;
-  vendorId: string | null;
-  customerId: string | null;
-  milkType: string;
-  quantity: number;
-  fat: number | null;
-  snf: number | null;
-  rate: number;
-  totalAmount: number;
-  date: Date | null;
-  createdAt: Date | null;
-};
-
-type FirebasePayment = {
-  id: string;
-  type: string;
-  vendorId: string | null;
-  customerId: string | null;
-  amount: number;
-  method: string;
-  reference: string | null;
-  date: Date | null;
-  createdAt: Date | null;
-};
+// Types are now imported from the service file
 
 // Vendors hook
 export const useVendors = () => {
