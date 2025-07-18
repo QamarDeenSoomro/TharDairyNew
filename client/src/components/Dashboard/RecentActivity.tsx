@@ -1,26 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
-import type { MilkTransaction, Payment } from "@shared/schema";
-import type { FirebaseVendor, FirebaseCustomer } from "@/services/firebase-realtime";
+import type { FirebaseVendor, FirebaseCustomer, FirebaseMilkTransaction, FirebasePayment } from "@/services/firebase-realtime";
 
 interface RecentActivityProps {
-  transactions: MilkTransaction[];
-  payments: Payment[];
+  transactions: FirebaseMilkTransaction[];
+  payments: FirebasePayment[];
   vendors: FirebaseVendor[];
   customers: FirebaseCustomer[];
 }
 
 export default function RecentActivity({ transactions, payments, vendors, customers }: RecentActivityProps) {
   // Helper functions to get names
-  const getVendorName = (vendorId: number | null) => {
+  const getVendorName = (vendorId: string | null) => {
     if (!vendorId) return 'Unknown Vendor';
-    const vendor = vendors.find(v => v.id === vendorId.toString());
+    const vendor = vendors.find(v => v.id === vendorId);
     return vendor?.name || 'Unknown Vendor';
   };
 
-  const getCustomerName = (customerId: number | null) => {
+  const getCustomerName = (customerId: string | null) => {
     if (!customerId) return 'Unknown Customer';
-    const customer = customers.find(c => c.id === customerId.toString());
+    const customer = customers.find(c => c.id === customerId);
     return customer?.name || 'Unknown Customer';
   };
 
@@ -67,12 +66,12 @@ export default function RecentActivity({ transactions, payments, vendors, custom
                   activity.color === 'secondary' ? 'bg-secondary/10' :
                   'bg-green-50 dark:bg-green-900/20'
                 }`}>
-                  <span className={`material-icons text-sm ${
+                  <span className={`text-sm ${
                     activity.color === 'primary' ? 'text-primary' :
                     activity.color === 'secondary' ? 'text-secondary' :
                     'text-green-600'
                   }`}>
-                    {activity.icon}
+                    {activity.type === 'receive' ? '📥' : activity.type === 'send' ? '📤' : '💰'}
                   </span>
                 </div>
                 <div className="flex-1">
