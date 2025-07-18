@@ -408,10 +408,18 @@ export const paymentService = {
       if (snapshot.exists()) {
         const data = snapshot.val();
         Object.keys(data).forEach(key => {
-          payments.push({
+          const payment = {
             id: key,
-            ...data[key]
-          });
+            type: data[key].type,
+            vendorId: data[key].vendorId || null,
+            customerId: data[key].customerId || null,
+            amount: data[key].amount,
+            method: data[key].method,
+            reference: data[key].reference || null,
+            date: data[key].date,
+            createdAt: data[key].createdAt
+          };
+          payments.push(payment);
         });
       }
       // Sort by date descending

@@ -12,6 +12,7 @@ import MilkReceiving from "@/pages/MilkReceiving";
 import MilkSending from "@/pages/MilkSending";
 import Payments from "@/pages/Payments";
 import Reports from "@/pages/Reports";
+import DatabaseManagement from "@/pages/DatabaseManagement";
 import PWAInstallPrompt from "@/components/PWA/PWAInstallPrompt";
 import OfflineIndicator from "@/components/PWA/OfflineIndicator";
 import usePWA from "@/hooks/usePWA";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/milk-sending" component={MilkSending} />
       <Route path="/payments" component={Payments} />
       <Route path="/reports" component={Reports} />
+      <Route path="/database" component={DatabaseManagement} />
       <Route component={NotFound} />
     </Switch>
   );

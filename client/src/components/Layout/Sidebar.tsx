@@ -18,6 +18,7 @@ const navigationItems = [
   { name: "Milk Sending", href: "/milk-sending", icon: "move_up" },
   { name: "Payments", href: "/payments", icon: "payment" },
   { name: "Reports", href: "/reports", icon: "assessment" },
+  { name: "Database", href: "/database", icon: "storage" },
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {

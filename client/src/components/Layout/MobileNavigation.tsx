@@ -6,7 +6,7 @@ const navigationItems = [
   { name: "Dashboard", href: "/", icon: "dashboard" },
   { name: "Vendors", href: "/vendors", icon: "agriculture" },
   { name: "Customers", href: "/customers", icon: "people" },
-  { name: "Reports", href: "/reports", icon: "assessment" },
+  { name: "Database", href: "/database", icon: "storage" },
 ];
 
 export default function MobileNavigation() {
