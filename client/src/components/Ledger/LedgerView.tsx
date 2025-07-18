@@ -32,14 +32,16 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
   // Filter transactions for this entity
   const entityTransactions = useMemo(() => {
     console.log(`Filtering transactions for ${entityType} ${entity.id}:`, transactions);
+    console.log('All transactions:', transactions.map(t => ({ id: t.id, vendorId: t.vendorId, customerId: t.customerId, type: t.type })));
+    
     const filtered = transactions.filter(t => {
       if (entityType === "vendor") {
         const matches = t.vendorId === entity.id && t.type === "receive";
-        console.log(`Transaction ${t.id}: vendorId=${t.vendorId}, entity.id=${entity.id}, type=${t.type}, matches=${matches}`);
+        console.log(`Transaction ${t.id}: vendorId="${t.vendorId}", entity.id="${entity.id}", type="${t.type}", matches=${matches}`);
         return matches;
       } else {
         const matches = t.customerId === entity.id && t.type === "send";
-        console.log(`Transaction ${t.id}: customerId=${t.customerId}, entity.id=${entity.id}, type=${t.type}, matches=${matches}`);
+        console.log(`Transaction ${t.id}: customerId="${t.customerId}", entity.id="${entity.id}", type="${t.type}", matches=${matches}`);
         return matches;
       }
     });

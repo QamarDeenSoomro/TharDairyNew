@@ -51,10 +51,20 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
     try {
       setLoading(true);
       
+      // Validate that we have a vendor selected
+      if (!data.vendorId || data.vendorId.trim() === '') {
+        toast({
+          title: "Error",
+          description: "Please select a vendor",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Transform the data to ensure correct types
       const transformedData = {
         ...data,
-        vendorId: data.vendorId || null,
+        vendorId: data.vendorId,
         customerId: null, // Always null for receive transactions
         quantity: Number(data.quantity),
         rate: Number(data.rate),
@@ -93,6 +103,9 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
             const vendor = vendors.find(v => v.id === value);
             setSelectedVendor(vendor || null);
             form.setValue('vendorId', value);
+            // Clear previous calculations when vendor changes
+            form.setValue('rate', '');
+            form.setValue('totalAmount', '');
           }}
         >
           <SelectTrigger className="mt-1">

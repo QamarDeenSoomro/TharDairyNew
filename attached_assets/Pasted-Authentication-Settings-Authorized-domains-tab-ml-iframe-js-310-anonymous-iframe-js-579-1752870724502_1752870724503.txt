@@ -1,0 +1,131 @@
+Authentication -> Settings -> Authorized domains tab.
+ml @ iframe.js:310
+(anonymous) @ iframe.js:579
+a @ iframe.js:155
+(anonymous) @ iframe.js:155
+c @ iframe.js:155
+e.vd @ iframe.js:163
+lg @ iframe.js:166
+hg @ iframe.js:166
+F.zk @ iframe.js:165
+a @ iframe.js:155
+(anonymous) @ iframe.js:155
+c @ iframe.js:155
+Qf @ iframe.js:156
+a
+Jf @ iframe.js:156
+cg @ iframe.js:162
+k.l @ iframe.js:160
+os @ iframe.js:578
+(anonymous) @ iframe.js:579
+aj @ iframe.js:240
+b @ iframe.js:238Understand this warning
+offlineStorage.ts:164 Error getting data count: DataError: Failed to execute 'getAll' on 'IDBIndex': The parameter is not a valid key.
+    at offlineStorage.ts:89:29
+    at new Promise (<anonymous>)
+    at OfflineStorage.getUnsyncedData (offlineStorage.ts:85:12)
+    at OfflineStorage.getDataCount (offlineStorage.ts:157:39)
+    at async updatePendingCount (OfflineIndicator.tsx:18:24)
+getDataCount @ offlineStorage.ts:164
+await in getDataCount
+updatePendingCount @ OfflineIndicator.tsx:18
+setInterval
+(anonymous) @ OfflineIndicator.tsx:28
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=31baaaa3:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=31baaaa3:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=31baaaa3:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=31baaaa3:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=31baaaa3:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=31baaaa3:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=31baaaa3:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19432
+commitRoot @ chunk-RPCDYKBN.js?v=31baaaa3:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=31baaaa3:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18718
+workLoop @ chunk-RPCDYKBN.js?v=31baaaa3:197
+flushWork @ chunk-RPCDYKBN.js?v=31baaaa3:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=31baaaa3:384Understand this error
+2offlineStorage.ts:164 Error getting data count: DataError: Failed to execute 'getAll' on 'IDBIndex': The parameter is not a valid key.
+    at offlineStorage.ts:89:29
+    at new Promise (<anonymous>)
+    at OfflineStorage.getUnsyncedData (offlineStorage.ts:85:12)
+    at OfflineStorage.getDataCount (offlineStorage.ts:157:39)
+    at async updateOfflineDataCount (usePWA.ts:69:22)
+getDataCount @ offlineStorage.ts:164
+await in getDataCount
+updateOfflineDataCount @ usePWA.ts:69
+setInterval
+(anonymous) @ usePWA.ts:59
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=31baaaa3:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=31baaaa3:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=31baaaa3:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=31baaaa3:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=31baaaa3:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=31baaaa3:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=31baaaa3:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19432
+commitRoot @ chunk-RPCDYKBN.js?v=31baaaa3:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=31baaaa3:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18718
+workLoop @ chunk-RPCDYKBN.js?v=31baaaa3:197
+flushWork @ chunk-RPCDYKBN.js?v=31baaaa3:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=31baaaa3:384Understand this error
+offlineStorage.ts:164 Error getting data count: DataError: Failed to execute 'getAll' on 'IDBIndex': The parameter is not a valid key.
+    at offlineStorage.ts:89:29
+    at new Promise (<anonymous>)
+    at OfflineStorage.getUnsyncedData (offlineStorage.ts:85:12)
+    at OfflineStorage.getDataCount (offlineStorage.ts:157:39)
+    at async updatePendingCount (OfflineIndicator.tsx:18:24)
+getDataCount @ offlineStorage.ts:164
+await in getDataCount
+updatePendingCount @ OfflineIndicator.tsx:18
+setInterval
+(anonymous) @ OfflineIndicator.tsx:28
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=31baaaa3:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=31baaaa3:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=31baaaa3:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=31baaaa3:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=31baaaa3:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=31baaaa3:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=31baaaa3:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19432
+commitRoot @ chunk-RPCDYKBN.js?v=31baaaa3:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=31baaaa3:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18718
+workLoop @ chunk-RPCDYKBN.js?v=31baaaa3:197
+flushWork @ chunk-RPCDYKBN.js?v=31baaaa3:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=31baaaa3:384Understand this error
+2offlineStorage.ts:164 Error getting data count: DataError: Failed to execute 'getAll' on 'IDBIndex': The parameter is not a valid key.
+    at offlineStorage.ts:89:29
+    at new Promise (<anonymous>)
+    at OfflineStorage.getUnsyncedData (offlineStorage.ts:85:12)
+    at OfflineStorage.getDataCount (offlineStorage.ts:157:39)
+    at async updateOfflineDataCount (usePWA.ts:69:22)
+getDataCount @ offlineStorage.ts:164
+await in getDataCount
+updateOfflineDataCount @ usePWA.ts:69
+setInterval
+(anonymous) @ usePWA.ts:59
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=31baaaa3:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=31baaaa3:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=31baaaa3:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=31baaaa3:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=31baaaa3:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=31baaaa3:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=31baaaa3:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=31baaaa3:19432
+commitRoot @ chunk-RPCDYKBN.js?v=31baaaa3:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=31baaaa3:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=31baaaa3:18718
+workLoop @ chunk-RPCDYKBN.js?v=31baaaa3:197
+flushWork @ chunk-RPCDYKBN.js?v=31baaaa3:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=31baaaa3:384Understand this error
+MilkReceiveForm.tsx:64 Creating milk receive transaction: {type: 'receive', vendorId: null, customerId: null, milkType: 'cow', quantity: 0.98, …}

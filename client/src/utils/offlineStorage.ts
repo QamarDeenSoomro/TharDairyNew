@@ -10,7 +10,7 @@ interface OfflineData {
 
 class OfflineStorage {
   private dbName = 'MilkSupplyOfflineDB';
-  private version = 1;
+  private version = 2; // Increment version to trigger onupgradeneeded
   private db: IDBDatabase | null = null;
 
   async init(): Promise<void> {
@@ -31,7 +31,6 @@ class OfflineStorage {
           const store = db.createObjectStore('offlineData', { keyPath: 'id' });
           store.createIndex('type', 'type', { unique: false });
           store.createIndex('timestamp', 'timestamp', { unique: false });
-          store.createIndex('synced', 'synced', { unique: false });
         }
       };
     });
@@ -85,10 +84,13 @@ class OfflineStorage {
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['offlineData'], 'readonly');
       const store = transaction.objectStore('offlineData');
-      const index = store.index('synced');
-      const request = index.getAll(false);
+      const request = store.getAll();
 
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => {
+        const allData = request.result;
+        const unsyncedData = allData.filter(item => !item.synced);
+        resolve(unsyncedData);
+      };
       request.onerror = () => reject(request.error);
     });
   }
@@ -143,10 +145,13 @@ class OfflineStorage {
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['offlineData'], 'readonly');
       const store = transaction.objectStore('offlineData');
-      const index = store.index('synced');
-      const request = index.getAll(true);
+      const request = store.getAll();
 
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => {
+        const allData = request.result;
+        const syncedData = allData.filter(item => item.synced === true);
+        resolve(syncedData);
+      };
       request.onerror = () => reject(request.error);
     });
   }

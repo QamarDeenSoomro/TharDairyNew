@@ -51,11 +51,21 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
     try {
       setLoading(true);
       
+      // Validate that we have a customer selected
+      if (!data.customerId || data.customerId.trim() === '') {
+        toast({
+          title: "Error",
+          description: "Please select a customer",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Transform the data to ensure correct types
       const transformedData = {
         ...data,
         vendorId: null, // Always null for send transactions
-        customerId: data.customerId || null,
+        customerId: data.customerId,
         quantity: Number(data.quantity),
         rate: Number(data.rate),
         totalAmount: Number(data.totalAmount),
@@ -93,6 +103,9 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
             const customer = customers.find(c => c.id === value);
             setSelectedCustomer(customer || null);
             form.setValue('customerId', value);
+            // Clear previous calculations when customer changes
+            form.setValue('rate', '');
+            form.setValue('totalAmount', '');
           }}
         >
           <SelectTrigger className="mt-1">
