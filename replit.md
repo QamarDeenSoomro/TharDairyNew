@@ -9,6 +9,7 @@ This is a full-stack web application for managing milk supply chain operations. 
 - Preferred communication style: Simple, everyday language
 - Remove Fat% and SNF% fields from milk forms (completed)
 - Make application mobile responsive (completed)
+- Add ledger functionality with WhatsApp sharing for vendors and customers (completed)
 
 ## System Architecture
 
@@ -53,6 +54,7 @@ This is a full-stack web application for managing milk supply chain operations. 
 - **Layout**: Responsive layout with sidebar navigation and mobile support
 - **UI Components**: Complete shadcn/ui component library with mobile responsiveness
 - **Mobile Design**: Responsive card layouts for tables, adaptive form grids, flexible navigation
+- **Ledger System**: Individual ledgers for vendors/customers with date filtering and WhatsApp sharing
 
 ### Backend Services
 - **Storage Layer**: Abstract storage interface with in-memory implementation

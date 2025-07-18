@@ -4,9 +4,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Users } from "lucide-react";
+import { Edit, Trash2, Users, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CustomerForm from "@/components/Forms/CustomerForm";
+import LedgerView from "@/components/Ledger/LedgerView";
 import type { FirebaseCustomer } from "@/services/firebase-realtime";
 
 interface CustomerTableProps {
@@ -18,6 +19,8 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
   const { toast } = useToast();
   const [editingCustomer, setEditingCustomer] = useState<FirebaseCustomer | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [ledgerCustomer, setLedgerCustomer] = useState<FirebaseCustomer | null>(null);
+  const [ledgerOpen, setLedgerOpen] = useState(false);
 
   const handleDelete = async (id: string) => {
     try {
@@ -91,6 +94,17 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
                       variant="ghost"
                       size="sm"
                       onClick={() => {
+                        setLedgerCustomer(customer);
+                        setLedgerOpen(true);
+                      }}
+                      title="View Ledger"
+                    >
+                      <FileText className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
                         setEditingCustomer(customer);
                         setDialogOpen(true);
                       }}
@@ -143,6 +157,17 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
                 </div>
               </div>
               <div className="flex items-center space-x-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setLedgerCustomer(customer);
+                    setLedgerOpen(true);
+                  }}
+                  title="View Ledger"
+                >
+                  <FileText className="h-4 w-4" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -210,6 +235,18 @@ export default function CustomerTable({ customers, onDelete }: CustomerTableProp
           />
         </DialogContent>
       </Dialog>
+
+      {ledgerCustomer && (
+        <LedgerView
+          entity={ledgerCustomer}
+          entityType="customer"
+          isOpen={ledgerOpen}
+          onClose={() => {
+            setLedgerOpen(false);
+            setLedgerCustomer(null);
+          }}
+        />
+      )}
     </>
   );
 }
