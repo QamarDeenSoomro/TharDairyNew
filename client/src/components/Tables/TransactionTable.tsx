@@ -62,6 +62,7 @@ export default function TransactionTable({ transactions, vendors, customers }: T
             <TableHead>Party</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Milk Type</TableHead>
+            <TableHead>Time</TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>Rate</TableHead>
             <TableHead>Amount</TableHead>
@@ -88,6 +89,11 @@ export default function TransactionTable({ transactions, vendors, customers }: T
               <TableCell>
                 <Badge variant="secondary" className="capitalize">
                   {transaction.milkType}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline" className="capitalize">
+                  {(transaction as any).time || 'morning'}
                 </Badge>
               </TableCell>
               <TableCell className="font-medium">{transaction.quantity}L</TableCell>

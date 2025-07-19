@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { transactionService, type FirebaseVendor } from "@/services/firebase-realtime";
@@ -31,6 +32,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
       rate: "",
       totalAmount: "",
       handlerPerson: "",
+      time: "morning",
       date: new Date(),
     },
   });
@@ -90,6 +92,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
               milkType: data.milkType,
               rate: Number(data.rate),
               totalAmount: Number(data.totalAmount),
+              time: data.time,
               date: new Date().toISOString(),
             }
           );
@@ -179,6 +182,27 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
             <p className="text-sm text-destructive mt-1">{form.formState.errors.quantity.message}</p>
           )}
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor="time">Time</Label>
+        <RadioGroup
+          value={watchedFields.time || "morning"}
+          onValueChange={(value: 'morning' | 'evening') => form.setValue('time', value)}
+          className="flex gap-6 mt-2"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="morning" id="morning" />
+            <Label htmlFor="morning" className="font-normal cursor-pointer">Morning</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="evening" id="evening" />
+            <Label htmlFor="evening" className="font-normal cursor-pointer">Evening</Label>
+          </div>
+        </RadioGroup>
+        {form.formState.errors.time && (
+          <p className="text-sm text-destructive mt-1">{form.formState.errors.time.message}</p>
+        )}
       </div>
 
       <div>

@@ -46,6 +46,7 @@ class SMSService {
       milkType: string;
       rate: number;
       totalAmount: number;
+      time?: string;
       date: string;
     }
   ): Promise<boolean> {
@@ -60,9 +61,10 @@ class SMSService {
         `• Quantity: ${data.quantity} liters\n` +
         `• Rate: ${data.rate}/liter\n` +
         `• Total Amount: ${data.totalAmount}\n` +
+        `• Time: ${data.time ? data.time.charAt(0).toUpperCase() + data.time.slice(1) : 'Morning'}\n` +
         `• Date: ${new Date(data.date).toLocaleDateString()}\n\n` +
         `Thank you for your business!\n` +
-        `- Thar Dairy Management`;
+        `- Thar Dairy`;
 
       return this.sendSMS({
         to: contact,
@@ -98,7 +100,7 @@ class SMSService {
         `${data.reference ? `• Reference: ${data.reference}\n` : ''}` +
         `• Date: ${new Date(data.date).toLocaleDateString()}\n\n` +
         `Thank you for your business!\n` +
-        `- Thar Dairy Management`;
+        `- Thar Dairy`;
 
       return this.sendSMS({
         to: contact,
@@ -133,7 +135,7 @@ class SMSService {
         `• Balance: ${Math.abs(data.balance)} (${balanceStatus})\n\n` +
         `For detailed statement, please contact us.\n\n` +
         `Thank you for your business!\n` +
-        `- Thar Dairy Management`;
+        `- Thar Dairy`;
 
       // Open WhatsApp with pre-filled message
       const whatsappURL = this.createWhatsAppURL(contact, message);

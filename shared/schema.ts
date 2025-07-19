@@ -34,6 +34,7 @@ export const milkTransactions = pgTable("milk_transactions", {
   rate: real("rate").notNull(),
   totalAmount: real("total_amount").notNull(),
   handlerPerson: text("handler_person"),
+  time: text("time").notNull().default("morning"), // 'morning' or 'evening'
   date: timestamp("date").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -79,6 +80,7 @@ export const insertMilkTransactionSchema = createInsertSchema(milkTransactions).
   quantity: z.number().or(z.string().transform(val => parseFloat(val))),
   rate: z.number().or(z.string().transform(val => parseFloat(val))),
   totalAmount: z.number().or(z.string().transform(val => parseFloat(val))),
+  time: z.enum(['morning', 'evening']).default('morning'),
 });
 
 export const insertPaymentSchema = createInsertSchema(payments).omit({
