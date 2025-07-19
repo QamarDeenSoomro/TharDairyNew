@@ -1,7 +1,7 @@
 // Firebase Realtime Database Services
 import { ref, push, set, get, remove, onValue, off, query, orderByChild, equalTo, limitToLast, update as updateDB } from 'firebase/database';
 import { db } from '@/lib/firebase';
-import { InsertVendor, InsertCustomer, InsertMilkTransaction, InsertPayment, InsertDailyExpense } from '@shared/schema';
+import { InsertVendor, InsertCustomer, InsertMilkTransaction, InsertPayment, InsertDailyExpense, InsertSettlement } from '@shared/schema';
 
 // Database paths
 const PATHS = {
@@ -9,7 +9,8 @@ const PATHS = {
   CUSTOMERS: 'customers',
   MILK_TRANSACTIONS: 'milk_transactions',
   PAYMENTS: 'payments',
-  DAILY_EXPENSES: 'daily_expenses'
+  DAILY_EXPENSES: 'daily_expenses',
+  SETTLEMENTS: 'settlements'
 };
 
 // Firebase-compatible types with string IDs
@@ -66,6 +67,17 @@ export type FirebaseDailyExpense = {
   amount: number;
   category: string;
   date: string;
+  createdAt: string;
+};
+
+export type FirebaseSettlement = {
+  id: string;
+  vendorId: string | null;
+  customerId: string | null;
+  entityType: string;
+  settlementDate: string;
+  finalBalance: number;
+  notes: string | null;
   createdAt: string;
 };
 
@@ -605,5 +617,102 @@ export const dashboardService = {
       todayProfit,
       pendingPayments,
     };
+  }
+};
+
+// Settlement service for archiving vendor/customer data
+export const settlementService = {
+  // Create settlement
+  async create(settlementData: InsertSettlement): Promise<string> {
+    const settlementsRef = ref(db, PATHS.SETTLEMENTS);
+    const newSettlementRef = push(settlementsRef);
+    const data = {
+      ...settlementData,
+      settlementDate: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    };
+    await set(newSettlementRef, data);
+    return newSettlementRef.key!;
+  },
+
+  // Get all settlements
+  async getAll(): Promise<FirebaseSettlement[]> {
+    const settlementsRef = ref(db, PATHS.SETTLEMENTS);
+    const snapshot = await get(settlementsRef);
+    if (!snapshot.exists()) return [];
+    
+    const data = snapshot.val();
+    return Object.keys(data).map(key => ({
+      id: key,
+      ...data[key]
+    })).sort((a, b) => new Date(b.settlementDate).getTime() - new Date(a.settlementDate).getTime());
+  },
+
+  // Get settlements by vendor
+  async getByVendor(vendorId: string): Promise<FirebaseSettlement[]> {
+    const settlements = await this.getAll();
+    return settlements.filter(s => s.vendorId === vendorId);
+  },
+
+  // Get settlements by customer
+  async getByCustomer(customerId: string): Promise<FirebaseSettlement[]> {
+    const settlements = await this.getAll();
+    return settlements.filter(s => s.customerId === customerId);
+  },
+
+  // Get latest settlement for entity
+  async getLatestSettlement(entityId: string, entityType: 'vendor' | 'customer'): Promise<FirebaseSettlement | null> {
+    const settlements = await this.getAll();
+    const entitySettlements = settlements.filter(s => 
+      s.entityType === entityType && 
+      (entityType === 'vendor' ? s.vendorId === entityId : s.customerId === entityId)
+    );
+    
+    if (entitySettlements.length === 0) return null;
+    
+    return entitySettlements.reduce((latest, current) => 
+      new Date(current.settlementDate) > new Date(latest.settlementDate) ? current : latest
+    );
+  },
+
+  // Archive entity data (mark as settled and create archive)
+  async archiveEntityData(
+    entityId: string, 
+    entityType: 'vendor' | 'customer', 
+    finalBalance: number,
+    notes?: string
+  ): Promise<string> {
+    // Create settlement record
+    const settlementData: InsertSettlement = {
+      vendorId: entityType === 'vendor' ? entityId : null,
+      customerId: entityType === 'customer' ? entityId : null,
+      entityType,
+      finalBalance,
+      notes: notes || null,
+    };
+
+    return await this.create(settlementData);
+  },
+
+  // Subscribe to settlements
+  subscribe(callback: (settlements: FirebaseSettlement[]) => void): () => void {
+    const settlementsRef = ref(db, PATHS.SETTLEMENTS);
+    
+    const unsubscribe = onValue(settlementsRef, (snapshot) => {
+      const settlements: FirebaseSettlement[] = [];
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        Object.keys(data).forEach(key => {
+          settlements.push({
+            id: key,
+            ...data[key]
+          });
+        });
+      }
+      settlements.sort((a, b) => new Date(b.settlementDate).getTime() - new Date(a.settlementDate).getTime());
+      callback(settlements);
+    });
+
+    return () => off(settlementsRef, 'value', unsubscribe);
   }
 };

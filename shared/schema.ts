@@ -61,6 +61,18 @@ export const dailyExpenses = pgTable("daily_expenses", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Settlement tracking for archiving vendor/customer data
+export const settlements = pgTable("settlements", {
+  id: serial("id").primaryKey(),
+  vendorId: text("vendor_id"),
+  customerId: text("customer_id"),
+  entityType: text("entity_type").notNull(), // 'vendor' or 'customer'
+  settlementDate: timestamp("settlement_date").defaultNow(),
+  finalBalance: real("final_balance").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertVendorSchema = createInsertSchema(vendors).omit({
   id: true,
   createdAt: true,
@@ -100,14 +112,23 @@ export const insertDailyExpenseSchema = createInsertSchema(dailyExpenses).omit({
   date: z.string().optional().transform(val => val ? new Date(val).toISOString() : new Date().toISOString()),
 });
 
+export const insertSettlementSchema = createInsertSchema(settlements).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  finalBalance: z.number().or(z.string().transform(val => parseFloat(val))),
+});
+
 export type InsertVendor = z.infer<typeof insertVendorSchema>;
 export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
 export type InsertMilkTransaction = z.infer<typeof insertMilkTransactionSchema>;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type InsertDailyExpense = z.infer<typeof insertDailyExpenseSchema>;
+export type InsertSettlement = z.infer<typeof insertSettlementSchema>;
 
 export type Vendor = typeof vendors.$inferSelect;
 export type Customer = typeof customers.$inferSelect;
 export type MilkTransaction = typeof milkTransactions.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type DailyExpense = typeof dailyExpenses.$inferSelect;
+export type Settlement = typeof settlements.$inferSelect;

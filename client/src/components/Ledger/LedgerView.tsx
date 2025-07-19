@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Send, Download, X, MessageSquare, Smartphone } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar, Send, Download, X, MessageSquare, Smartphone, Archive, History } from "lucide-react";
 import { useTransactions, usePayments } from "@/hooks/useFirestore";
+import { useSettlements } from "@/hooks/useSettlements";
 import { formatDistanceToNow, format, isWithinInterval } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import type { FirebaseVendor, FirebaseCustomer } from "@/services/firebase-realtime";
@@ -24,6 +26,7 @@ interface LedgerViewProps {
 export default function LedgerView({ entity, entityType, isOpen = true, onClose }: LedgerViewProps) {
   const { transactions } = useTransactions();
   const { payments } = usePayments();
+  const { settlements, createSettlement, getLatestSettlement, getEntitySettlements } = useSettlements();
   const { toast } = useToast();
   
   const [startDate, setStartDate] = useState("");
@@ -32,8 +35,22 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
   const [isSendingSMS, setIsSendingSMS] = useState(false);
   const [showWhatsAppConfirm, setShowWhatsAppConfirm] = useState(false);
   const [showSMSConfirm, setShowSMSConfirm] = useState(false);
+  const [showSettlementDialog, setShowSettlementDialog] = useState(false);
+  const [showArchiveView, setShowArchiveView] = useState(false);
+  const [settlementNotes, setSettlementNotes] = useState("");
+  const [latestSettlement, setLatestSettlement] = useState<any>(null);
 
-  // Filter transactions for this entity
+  // Get latest settlement for filtering
+  const entitySettlements = useMemo(() => {
+    return getEntitySettlements(entity.id, entityType);
+  }, [settlements, entity.id, entityType]);
+
+  const latestSettlementDate = useMemo(() => {
+    if (entitySettlements.length === 0) return null;
+    return entitySettlements[0].settlementDate; // Already sorted by date desc
+  }, [entitySettlements]);
+
+  // Filter transactions for this entity (only show after latest settlement if any)
   const entityTransactions = useMemo(() => {
     const filtered = transactions.filter(t => {
       if (entityType === "vendor") {
@@ -43,22 +60,29 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
       }
     });
 
+    // Filter out transactions before latest settlement
+    let afterSettlement = filtered;
+    if (latestSettlementDate) {
+      const settlementDate = new Date(latestSettlementDate);
+      afterSettlement = filtered.filter(t => new Date(t.date!) > settlementDate);
+    }
+
     // Apply date filter if dates are selected
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999); // Include full end date
       
-      return filtered.filter(t => {
+      return afterSettlement.filter(t => {
         const transactionDate = new Date(t.date!);
         return isWithinInterval(transactionDate, { start, end });
       });
     }
 
-    return filtered;
-  }, [transactions, entity.id, entityType, startDate, endDate]);
+    return afterSettlement;
+  }, [transactions, entity.id, entityType, startDate, endDate, latestSettlementDate]);
 
-  // Filter payments for this entity
+  // Filter payments for this entity (only show after latest settlement if any)
   const entityPayments = useMemo(() => {
     const filtered = payments.filter(p => {
       if (entityType === "vendor") {
@@ -68,20 +92,27 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
       }
     });
 
+    // Filter out payments before latest settlement
+    let afterSettlement = filtered;
+    if (latestSettlementDate) {
+      const settlementDate = new Date(latestSettlementDate);
+      afterSettlement = filtered.filter(p => new Date(p.date!) > settlementDate);
+    }
+
     // Apply date filter if dates are selected
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999);
       
-      return filtered.filter(p => {
+      return afterSettlement.filter(p => {
         const paymentDate = new Date(p.date!);
         return isWithinInterval(paymentDate, { start, end });
       });
     }
 
-    return filtered;
-  }, [payments, entity.id, entityType, startDate, endDate]);
+    return afterSettlement;
+  }, [payments, entity.id, entityType, startDate, endDate, latestSettlementDate]);
 
   // Calculate previous balance (before date filter)
   const previousBalance = useMemo(() => {
@@ -198,6 +229,29 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
       balance: lastSettlementBalance
     };
   }, [transactions, payments, entity.id, entityType]);
+
+  // Settlement handlers
+  const handleSettlement = async () => {
+    try {
+      await createSettlement(entity.id, entityType, totals.finalBalance, settlementNotes || undefined);
+      setShowSettlementDialog(false);
+      setSettlementNotes("");
+      toast({
+        title: "Settlement Created",
+        description: `${entityType === 'vendor' ? 'Vendor' : 'Customer'} data has been archived. Current ledger now shows only transactions after settlement.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create settlement. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleShowArchive = () => {
+    setShowArchiveView(true);
+  };
 
   // Generate ledger text for WhatsApp
   const generateLedgerText = () => {
@@ -439,6 +493,53 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                       Clear
                     </Button>
                   )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Settlement Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Archive className="h-5 w-5" />
+                Settlement & Archive
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  {latestSettlementDate && (
+                    <div className="text-sm text-muted-foreground mb-2">
+                      Last Settlement: {format(new Date(latestSettlementDate), "dd/MM/yyyy")}
+                    </div>
+                  )}
+                  <div className="text-sm">
+                    Current Balance: <span className={`font-medium ${totals.finalBalance > 0 ? 'text-green-600' : totals.finalBalance < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                      {formatCurrency(Math.abs(totals.finalBalance))}
+                    </span>
+                    {totals.finalBalance !== 0 && (
+                      <span className="ml-1 text-xs">
+                        ({totals.finalBalance > 0 ? (entityType === 'vendor' ? 'Due' : 'Credit') : (entityType === 'vendor' ? 'Advance' : 'Due')})
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {entitySettlements.length > 0 && (
+                    <Button variant="outline" onClick={handleShowArchive} className="flex items-center gap-2">
+                      <History className="h-4 w-4" />
+                      View Archive
+                    </Button>
+                  )}
+                  <Button 
+                    onClick={() => setShowSettlementDialog(true)}
+                    className="flex items-center gap-2"
+                    disabled={totals.finalBalance === 0}
+                  >
+                    <Archive className="h-4 w-4" />
+                    Create Settlement
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -917,6 +1018,76 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Settlement Creation Dialog */}
+      <Dialog open={showSettlementDialog} onOpenChange={setShowSettlementDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Settlement</DialogTitle>
+            <DialogDescription>
+              Archive current data and start fresh with a settlement balance of {formatCurrency(Math.abs(totals.finalBalance))}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="settlement-notes">Settlement Notes (Optional)</Label>
+              <Input
+                id="settlement-notes"
+                placeholder="e.g., Full payment received"
+                value={settlementNotes}
+                onChange={(e) => setSettlementNotes(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSettlementDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSettlement}>
+              Create Settlement
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Archive View Dialog */}
+      <Dialog open={showArchiveView} onOpenChange={setShowArchiveView}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Archive History - {entity.name}</DialogTitle>
+            <DialogDescription>
+              View historical settlements and archived data
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {entitySettlements.map((settlement) => (
+              <Card key={settlement.id} className="border-gray-200">
+                <CardHeader>
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    <span>Settlement - {format(new Date(settlement.date), "dd/MM/yyyy")}</span>
+                    <Badge variant="secondary">
+                      {formatCurrency(Math.abs(settlement.amount))}
+                    </Badge>
+                  </CardTitle>
+                  {settlement.notes && (
+                    <p className="text-sm text-muted-foreground">{settlement.notes}</p>
+                  )}
+                </CardHeader>
+              </Card>
+            ))}
+            {entitySettlements.length === 0 && (
+              <p className="text-center text-muted-foreground py-8">
+                No settlements found
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowArchiveView(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
