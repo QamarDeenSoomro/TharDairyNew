@@ -11,11 +11,19 @@ interface SMSData {
 
 class SMSService {
   private getLanguage(): string {
-    return localStorage.getItem('language') || 'en';
+    return localStorage.getItem('thar-dairy-language') || 'en';
   }
 
   private getTranslatedText() {
-    return getTranslation(this.getLanguage() as 'en' | 'sd');
+    const lang = this.getLanguage() as 'en' | 'sd';
+    console.log('SMS Service Language:', lang);
+    const translation = getTranslation(lang);
+    console.log('SMS Translation Sample:', {
+      header: translation.smsHeaderPaymentPaid,
+      dear: translation.smsDear,
+      amount: translation.smsAmount
+    });
+    return translation;
   }
   private formatPhoneNumber(phone: string): string {
     // Remove all non-digit characters
