@@ -197,6 +197,14 @@ export interface Translation {
   unknownVendor: string;
   unknownCustomer: string;
   qty: string;
+  
+  // Recent Activity
+  recentActivity: string;
+  noRecentActivity: string;
+  receivedFrom: string;
+  sentTo: string;
+  paymentReceived: string;
+  paymentMade: string;
 }
 
 export const translations: Record<Language, Translation> = {
@@ -396,6 +404,11 @@ export const translations: Record<Language, Translation> = {
     unknownVendor: 'Unknown Vendor',
     unknownCustomer: 'Unknown Customer',
     qty: 'Qty',
+    
+    // Recent Activity additional
+    noRecentActivity: 'No recent activity',
+    receivedFrom: 'Received',
+    sentTo: 'Sent',
   },
   
   sd: {
@@ -594,6 +607,11 @@ export const translations: Record<Language, Translation> = {
     unknownVendor: 'اڻڄاتل وينڊر',
     unknownCustomer: 'اڻڄاتل گراهڪ',
     qty: 'مقدار',
+    
+    // Recent Activity additional  
+    noRecentActivity: 'ڪا تازي سرگرمي نه آهي',
+    receivedFrom: 'حاصل ڪيو',
+    sentTo: 'موڪليو',
   }
 };
 

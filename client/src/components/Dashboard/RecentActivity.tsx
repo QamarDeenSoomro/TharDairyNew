@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
 import type { FirebaseVendor, FirebaseCustomer, FirebaseMilkTransaction, FirebasePayment } from "@/services/firebase-realtime";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface RecentActivityProps {
   transactions: FirebaseMilkTransaction[];
@@ -10,38 +11,40 @@ interface RecentActivityProps {
 }
 
 export default function RecentActivity({ transactions, payments, vendors, customers }: RecentActivityProps) {
+  const { t } = useLanguage();
+  
   // Helper functions to get names
   const getVendorName = (vendorId: string | null) => {
-    if (!vendorId) return 'Unknown Vendor';
+    if (!vendorId) return t.unknownVendor;
     const vendor = vendors.find(v => v.id === vendorId);
-    return vendor?.name || 'Unknown Vendor';
+    return vendor?.name || t.unknownVendor;
   };
 
   const getCustomerName = (customerId: string | null) => {
-    if (!customerId) return 'Unknown Customer';
+    if (!customerId) return t.unknownCustomer;
     const customer = customers.find(c => c.id === customerId);
-    return customer?.name || 'Unknown Customer';
+    return customer?.name || t.unknownCustomer;
   };
 
   // Combine and sort activities
   const activities = [
-    ...transactions.map(t => ({
-      id: `transaction-${t.id}`,
-      type: t.type === 'receive' ? 'receive' : 'send',
-      description: t.type === 'receive' 
-        ? `Received ${t.quantity}L from ${getVendorName(t.vendorId)}` 
-        : `Sent ${t.quantity}L to ${getCustomerName(t.customerId)}`,
-      timestamp: new Date(t.date!),
-      icon: t.type === 'receive' ? 'move_down' : 'move_up',
-      color: t.type === 'receive' ? 'primary' : 'secondary',
+    ...transactions.map(transaction => ({
+      id: `transaction-${transaction.id}`,
+      type: transaction.type === 'receive' ? 'receive' : 'send',
+      description: transaction.type === 'receive' 
+        ? `${t.receivedFrom} ${transaction.quantity}L from ${getVendorName(transaction.vendorId)}` 
+        : `${t.sentTo} ${transaction.quantity}L to ${getCustomerName(transaction.customerId)}`,
+      timestamp: new Date(transaction.date!),
+      icon: transaction.type === 'receive' ? 'move_down' : 'move_up',
+      color: transaction.type === 'receive' ? 'primary' : 'secondary',
     })),
-    ...payments.map(p => ({
-      id: `payment-${p.id}`,
-      type: p.type,
-      description: p.type === 'received' 
-        ? `Payment received ${p.amount} from ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}` 
-        : `Payment made ${p.amount} to ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}`,
-      timestamp: new Date(p.date!),
+    ...payments.map(payment => ({
+      id: `payment-${payment.id}`,
+      type: payment.type,
+      description: payment.type === 'received' 
+        ? `${t.paymentReceived} ${payment.amount} from ${payment.vendorId ? getVendorName(payment.vendorId) : getCustomerName(payment.customerId)}` 
+        : `${t.paymentMade} ${payment.amount} to ${payment.vendorId ? getVendorName(payment.vendorId) : getCustomerName(payment.customerId)}`,
+      timestamp: new Date(payment.date!),
       icon: 'payment',
       color: 'success',
     })),
@@ -52,12 +55,12 @@ export default function RecentActivity({ transactions, payments, vendors, custom
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
+        <CardTitle>{t.recentActivity}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {activities.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">No recent activity</p>
+            <p className="text-muted-foreground text-center py-8">{t.noRecentActivity}</p>
           ) : (
             activities.map((activity) => (
               <div key={activity.id} className="flex items-center space-x-3">
