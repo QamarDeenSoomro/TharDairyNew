@@ -471,7 +471,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 items-end">
+              <div className="flex flex-col gap-4 items-end">
                 <div className="flex-1">
                   <Label htmlFor="startDate">Start Date</Label>
                   <Input
@@ -558,9 +558,6 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
           {/* Previous Balance (shown only when date filter is applied) */}
           {startDate && Math.abs(totals.previousBalance) > 0.01 && (
             <Card className="border-purple-200 bg-purple-50">
-              <CardHeader>
-                <CardTitle className="text-lg">Previous Balance</CardTitle>
-              </CardHeader>
               <CardContent>
                 <div className="text-center p-4">
                   <div className="text-sm text-muted-foreground">
