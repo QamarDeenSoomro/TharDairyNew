@@ -13,6 +13,27 @@ npx cap sync android  ✅ CORRECT
 ```
 
 ## Complete Build Commands
+
+**For Windows:**
+```cmd
+# 1. Install dependencies (if not done)
+npm install
+
+# 2. Build web assets
+npm run build
+
+# 3. Sync with Android project
+npx cap sync android
+
+# 4. Open Android Studio (optional)
+npx cap open android
+
+# 5. Build APK using Gradle (from android directory)
+cd android
+gradlew.bat assembleDebug
+```
+
+**For macOS/Linux:**
 ```bash
 # 1. Install dependencies (if not done)
 npm install

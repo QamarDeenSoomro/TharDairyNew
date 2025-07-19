@@ -54,6 +54,20 @@ npx cap sync android
 ### Step 3: Build APK
 
 #### Method 1: Command Line (Recommended for CI/CD)
+
+**On Windows:**
+```cmd
+# Navigate to android directory
+cd android
+
+# Build debug APK
+gradlew.bat assembleDebug
+
+# Build release APK (unsigned)
+gradlew.bat assembleRelease
+```
+
+**On macOS/Linux:**
 ```bash
 # Navigate to android directory
 cd android
@@ -175,6 +189,26 @@ adb install android/app/build/outputs/apk/release/app-release.apk
    - Check for missing permissions
 
 ### Build Commands Reference
+
+**Windows:**
+```cmd
+# Clean build
+gradlew.bat clean
+
+# Build debug APK
+gradlew.bat assembleDebug
+
+# Build release APK
+gradlew.bat assembleRelease
+
+# Build AAB (App Bundle)
+gradlew.bat bundleRelease
+
+# Install and run on connected device
+gradlew.bat installDebug
+```
+
+**macOS/Linux:**
 ```bash
 # Clean build
 ./gradlew clean

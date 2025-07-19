@@ -35,13 +35,23 @@ fi
 
 # Build debug APK
 echo "🔨 Building debug APK..."
-./gradlew assembleDebug
+# Detect OS and use appropriate Gradle command
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+    # Windows
+    gradlew.bat assembleDebug
+else
+    # macOS/Linux
+    ./gradlew assembleDebug
+fi
+
 if [ $? -eq 0 ]; then
     echo "✅ Debug APK built successfully!"
     echo "📱 Location: android/app/build/outputs/apk/debug/app-debug.apk"
 else
     echo "❌ Debug APK build failed!"
     echo "💡 Make sure Java and Android SDK are installed"
+    echo "💡 On Windows use: gradlew.bat assembleDebug"
+    echo "💡 On macOS/Linux use: ./gradlew assembleDebug"
     echo "💡 Check APK_BUILD_GUIDE.md for setup instructions"
     exit 1
 fi
@@ -51,7 +61,14 @@ read -p "🤔 Build release APK too? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "🔨 Building release APK..."
-    ./gradlew assembleRelease
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+        # Windows
+        gradlew.bat assembleRelease
+    else
+        # macOS/Linux
+        ./gradlew assembleRelease
+    fi
+    
     if [ $? -eq 0 ]; then
         echo "✅ Release APK built successfully!"
         echo "📱 Location: android/app/build/outputs/apk/release/app-release.apk"
