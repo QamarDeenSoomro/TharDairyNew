@@ -80,18 +80,102 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
     return filtered;
   }, [payments, entity.id, entityType, startDate, endDate]);
 
+  // Calculate previous balance (before date filter)
+  const previousBalance = useMemo(() => {
+    if (!startDate) return 0;
+    
+    const startFilterDate = new Date(startDate);
+    
+    // Get all transactions before start date
+    const allTransactionsBefore = transactions.filter(t => {
+      const transactionDate = new Date(t.date!);
+      if (entityType === "vendor") {
+        return t.vendorId === entity.id && t.type === "receive" && transactionDate < startFilterDate;
+      } else {
+        return t.customerId === entity.id && t.type === "send" && transactionDate < startFilterDate;
+      }
+    });
+    
+    // Get all payments before start date
+    const allPaymentsBefore = payments.filter(p => {
+      const paymentDate = new Date(p.date!);
+      if (entityType === "vendor") {
+        return p.vendorId === entity.id && p.type === "paid" && paymentDate < startFilterDate;
+      } else {
+        return p.customerId === entity.id && p.type === "received" && paymentDate < startFilterDate;
+      }
+    });
+    
+    const totalTransactionsBefore = allTransactionsBefore.reduce((sum, t) => sum + t.totalAmount, 0);
+    const totalPaymentsBefore = allPaymentsBefore.reduce((sum, p) => sum + p.amount, 0);
+    
+    return entityType === "vendor" ? totalTransactionsBefore - totalPaymentsBefore : totalPaymentsBefore - totalTransactionsBefore;
+  }, [transactions, payments, entity.id, entityType, startDate]);
+
   // Calculate totals
   const totals = useMemo(() => {
     const totalTransactions = entityTransactions.reduce((sum, t) => sum + t.totalAmount, 0);
     const totalPayments = entityPayments.reduce((sum, p) => sum + p.amount, 0);
     const balance = entityType === "vendor" ? totalTransactions - totalPayments : totalPayments - totalTransactions;
+    const finalBalance = balance + previousBalance;
     
     return {
       transactions: totalTransactions,
       payments: totalPayments,
       balance,
+      previousBalance,
+      finalBalance,
     };
-  }, [entityTransactions, entityPayments, entityType]);
+  }, [entityTransactions, entityPayments, entityType, previousBalance]);
+
+  // Find last settlement date (last date when balance was zero or minimal)
+  const lastSettlementInfo = useMemo(() => {
+    const allTransactions = transactions.filter(t => {
+      if (entityType === "vendor") {
+        return t.vendorId === entity.id && t.type === "receive";
+      } else {
+        return t.customerId === entity.id && t.type === "send";
+      }
+    }).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+    
+    const allPayments = payments.filter(p => {
+      if (entityType === "vendor") {
+        return p.vendorId === entity.id && p.type === "paid";
+      } else {
+        return p.customerId === entity.id && p.type === "received";
+      }
+    }).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+    
+    // Find the last date where balance was close to zero (within 10 rupees)
+    let runningBalance = 0;
+    let lastSettlementDate = null;
+    let lastSettlementBalance = 0;
+    
+    // Combine and sort all records by date
+    const allRecords = [
+      ...allTransactions.map(t => ({ ...t, recordType: 'transaction' as const })),
+      ...allPayments.map(p => ({ ...p, recordType: 'payment' as const }))
+    ].sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+    
+    for (const record of allRecords) {
+      if (record.recordType === 'transaction') {
+        runningBalance += entityType === "vendor" ? record.totalAmount : -record.totalAmount;
+      } else {
+        runningBalance -= entityType === "vendor" ? record.amount : -record.amount;
+      }
+      
+      // If balance is close to zero (settled), record this date
+      if (Math.abs(runningBalance) <= 10) {
+        lastSettlementDate = record.date!;
+        lastSettlementBalance = runningBalance;
+      }
+    }
+    
+    return {
+      date: lastSettlementDate,
+      balance: lastSettlementBalance
+    };
+  }, [transactions, payments, entity.id, entityType]);
 
   // Generate ledger text for WhatsApp
   const generateLedgerText = () => {
@@ -106,7 +190,26 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
     text += `Name: ${entityName}\n`;
     text += `Contact: ${entityContact}\n`;
     text += `Period: ${dateRange}\n`;
+    
+    // Add settlement information
+    if (lastSettlementInfo.date) {
+      text += `Last Settled: ${format(new Date(lastSettlementInfo.date), "dd/MM/yyyy")}\n`;
+    } else {
+      text += `Last Settled: Never\n`;
+    }
+    
     text += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    // Add previous balance if date filter is applied
+    if (startDate && Math.abs(totals.previousBalance) > 0.01) {
+      text += `*PREVIOUS BALANCE:*\n`;
+      text += `Before ${format(new Date(startDate), "dd/MM/yyyy")}: ${formatCurrency(Math.abs(totals.previousBalance))}\n`;
+      text += totals.previousBalance > 0 
+        ? `Status: ${entityType === "vendor" ? "Amount Due" : "Credit Balance"}\n\n`
+        : totals.previousBalance < 0 
+        ? `Status: ${entityType === "vendor" ? "Advance Payment" : "Amount Due"}\n\n`
+        : `Status: Settled\n\n`;
+    }
     
     // Add transactions
     if (entityTransactions.length > 0) {
@@ -132,12 +235,30 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
     }
     
     text += `━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `*BALANCE: ${formatCurrency(Math.abs(totals.balance))}*\n`;
-    text += totals.balance > 0 
-      ? `Status: ${entityType === "vendor" ? "Amount Due" : "Credit Balance"}\n`
-      : totals.balance < 0 
-      ? `Status: ${entityType === "vendor" ? "Advance Payment" : "Amount Due"}\n`
-      : `Status: Settled\n`;
+    
+    // Show period balance and final balance
+    if (startDate && Math.abs(totals.previousBalance) > 0.01) {
+      text += `*PERIOD BALANCE: ${formatCurrency(Math.abs(totals.balance))}*\n`;
+      text += totals.balance > 0 
+        ? `Period Status: ${entityType === "vendor" ? "Amount Due" : "Credit Balance"}\n`
+        : totals.balance < 0 
+        ? `Period Status: ${entityType === "vendor" ? "Advance Payment" : "Amount Due"}\n`
+        : `Period Status: Settled\n`;
+      
+      text += `\n*FINAL BALANCE: ${formatCurrency(Math.abs(totals.finalBalance))}*\n`;
+      text += totals.finalBalance > 0 
+        ? `Final Status: ${entityType === "vendor" ? "Amount Due" : "Credit Balance"}\n`
+        : totals.finalBalance < 0 
+        ? `Final Status: ${entityType === "vendor" ? "Advance Payment" : "Amount Due"}\n`
+        : `Final Status: Settled\n`;
+    } else {
+      text += `*BALANCE: ${formatCurrency(Math.abs(totals.balance))}*\n`;
+      text += totals.balance > 0 
+        ? `Status: ${entityType === "vendor" ? "Amount Due" : "Credit Balance"}\n`
+        : totals.balance < 0 
+        ? `Status: ${entityType === "vendor" ? "Advance Payment" : "Amount Due"}\n`
+        : `Status: Settled\n`;
+    }
     
     return text;
   };
@@ -281,10 +402,77 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
             </CardContent>
           </Card>
 
+          {/* Settlement Information */}
+          <Card className="border-orange-200 bg-orange-50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Settlement Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-muted-foreground">Last Settled Date</div>
+                  <div className="text-lg font-semibold">
+                    {lastSettlementInfo.date ? (
+                      <>
+                        {format(new Date(lastSettlementInfo.date), "dd/MM/yyyy")}
+                        <span className="text-sm text-muted-foreground ml-2">
+                          ({formatDistanceToNow(new Date(lastSettlementInfo.date), { addSuffix: true })})
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">Never settled</span>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">Days Since Settlement</div>
+                  <div className="text-lg font-semibold">
+                    {lastSettlementInfo.date ? (
+                      Math.floor((new Date().getTime() - new Date(lastSettlementInfo.date).getTime()) / (1000 * 60 * 60 * 24))
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )} days
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Previous Balance (shown only when date filter is applied) */}
+          {startDate && Math.abs(totals.previousBalance) > 0.01 && (
+            <Card className="border-purple-200 bg-purple-50">
+              <CardHeader>
+                <CardTitle className="text-lg">Previous Balance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center p-4">
+                  <div className="text-sm text-muted-foreground">
+                    Balance before {format(new Date(startDate), "dd/MM/yyyy")}
+                  </div>
+                  <div className={`text-3xl font-bold ${totals.previousBalance > 0 ? "text-red-600" : totals.previousBalance < 0 ? "text-green-600" : "text-gray-600"}`}>
+                    {formatCurrency(Math.abs(totals.previousBalance))}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {totals.previousBalance > 0 
+                      ? (entityType === "vendor" ? "Amount Due" : "Credit Balance") 
+                      : totals.previousBalance < 0 
+                      ? (entityType === "vendor" ? "Advance Payment" : "Amount Due")
+                      : "Settled"}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Summary */}
           <Card>
             <CardHeader>
-              <CardTitle>Summary</CardTitle>
+              <CardTitle>
+                {startDate && Math.abs(totals.previousBalance) > 0.01 ? "Period Summary" : "Summary"}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -299,7 +487,9 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                   <div className="text-2xl font-bold text-green-600">{formatCurrency(totals.payments)}</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-sm text-muted-foreground">Balance</div>
+                  <div className="text-sm text-muted-foreground">
+                    {startDate && Math.abs(totals.previousBalance) > 0.01 ? "Period Balance" : "Balance"}
+                  </div>
                   <div className={`text-2xl font-bold ${totals.balance > 0 ? "text-red-600" : totals.balance < 0 ? "text-green-600" : "text-gray-600"}`}>
                     {formatCurrency(Math.abs(totals.balance))}
                   </div>
@@ -312,6 +502,25 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                   </div>
                 </div>
               </div>
+              
+              {/* Final Balance (shown only when there's a previous balance) */}
+              {startDate && Math.abs(totals.previousBalance) > 0.01 && (
+                <div className="mt-4 pt-4 border-t">
+                  <div className="text-center p-4 bg-slate-100 rounded-lg border-2 border-slate-300">
+                    <div className="text-sm text-muted-foreground font-semibold">FINAL BALANCE</div>
+                    <div className={`text-3xl font-bold ${totals.finalBalance > 0 ? "text-red-600" : totals.finalBalance < 0 ? "text-green-600" : "text-gray-600"}`}>
+                      {formatCurrency(Math.abs(totals.finalBalance))}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {totals.finalBalance > 0 
+                        ? (entityType === "vendor" ? "Amount Due" : "Credit Balance") 
+                        : totals.finalBalance < 0 
+                        ? (entityType === "vendor" ? "Advance Payment" : "Amount Due")
+                        : "Settled"}
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

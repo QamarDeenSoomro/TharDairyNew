@@ -138,6 +138,9 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Firebase Hosting Fix**: Added SPA rewrites to firebase.json to fix 404 errors on direct URL access (January 2025)
 - **Vendor Update Fix**: Fixed Firebase database update function naming conflict and added proper vendor editing functionality (January 2025)
 - **SMS Debug System**: Added comprehensive debugging system to troubleshoot SMS integration issues across all forms (January 2025)
+- **Enhanced Ledger System**: Added previous balance display in messages before date ranges and settlement date tracking to know when accounts were last settled (January 2025)
+- **Settlement Detection**: Automatic detection of last settlement date when balance was close to zero, with days since settlement counter
+- **Previous Balance Integration**: WhatsApp/SMS messages now show previous balance before filtered date range with final balance calculations
 
 ### File Structure
 - `client/`: React frontend application
