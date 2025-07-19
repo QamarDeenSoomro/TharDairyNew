@@ -104,3 +104,12 @@ args = "git pull origin main"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "git push --force origin main"
+
+[[workflows.workflow]]
+name = "Firebase Hosting"
+mode = "sequential"
+author = 45208334
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./deploy.sh"

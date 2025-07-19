@@ -24,7 +24,7 @@ export default function StatsCard({ title, value, icon, color }: StatsCardProps)
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
             <p className="text-2xl font-bold text-foreground">{value}</p>
           </div>
-          <div className={cn('p-3 rounded-full', colorClasses[color])}>
+          <div className="p-3 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 ml-[1px] mr-[1px] mt-[1px] mb-[1px]">
             <span className="material-icons">{icon}</span>
           </div>
         </div>
