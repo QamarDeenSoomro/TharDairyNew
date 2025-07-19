@@ -14,6 +14,8 @@ import Payments from "@/pages/Payments";
 import Reports from "@/pages/Reports";
 import DatabaseManagement from "@/pages/DatabaseManagement";
 import PendingPayments from "@/pages/PendingPayments";
+import VendorLedger from "@/pages/VendorLedger";
+import CustomerLedger from "@/pages/CustomerLedger";
 import PWAInstallPrompt from "@/components/PWA/PWAInstallPrompt";
 import OfflineIndicator from "@/components/PWA/OfflineIndicator";
 import LoginPage from "@/components/Auth/LoginPage";
@@ -32,6 +34,8 @@ function Router() {
       <Route path="/reports" component={Reports} />
       <Route path="/database" component={DatabaseManagement} />
       <Route path="/pending-payments" component={PendingPayments} />
+      <Route path="/vendor-ledger" component={VendorLedger} />
+      <Route path="/customer-ledger" component={CustomerLedger} />
       <Route component={NotFound} />
     </Switch>
   );

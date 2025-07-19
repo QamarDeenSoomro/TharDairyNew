@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, User, FileText } from "lucide-react";
+import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import VendorForm from "@/components/Forms/VendorForm";
-import LedgerView from "@/components/Ledger/LedgerView";
+
 import type { FirebaseVendor } from "@/services/firebase-realtime";
 import { useTransactions, usePayments } from "@/hooks/useFirestore";
 import { calculateVendorBalance } from "@/utils/calculateBalance";
@@ -20,10 +21,9 @@ interface VendorTableProps {
 
 export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [editingVendor, setEditingVendor] = useState<FirebaseVendor | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [ledgerVendor, setLedgerVendor] = useState<FirebaseVendor | null>(null);
-  const [ledgerOpen, setLedgerOpen] = useState(false);
   const { transactions } = useTransactions();
   const { payments } = usePayments();
 
@@ -104,10 +104,7 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        setLedgerVendor(vendor);
-                        setLedgerOpen(true);
-                      }}
+                      onClick={() => setLocation(`/vendor-ledger?id=${vendor.id}`)}
                       title="View Ledger"
                     >
                       <FileText className="h-4 w-4" />
@@ -171,10 +168,7 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    setLedgerVendor(vendor);
-                    setLedgerOpen(true);
-                  }}
+                  onClick={() => setLocation(`/vendor-ledger?id=${vendor.id}`)}
                   title="View Ledger"
                 >
                   <FileText className="h-4 w-4" />
@@ -242,6 +236,7 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Vendor</DialogTitle>
+            <DialogDescription>Update vendor information including contact details and rates.</DialogDescription>
           </DialogHeader>
           <VendorForm
             vendor={editingVendor || undefined}
@@ -253,17 +248,7 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
         </DialogContent>
       </Dialog>
 
-      {ledgerVendor && (
-        <LedgerView
-          entity={ledgerVendor}
-          entityType="vendor"
-          isOpen={ledgerOpen}
-          onClose={() => {
-            setLedgerOpen(false);
-            setLedgerVendor(null);
-          }}
-        />
-      )}
+
     </>
   );
 }
