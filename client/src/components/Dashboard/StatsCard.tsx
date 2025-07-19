@@ -37,14 +37,14 @@ export default function StatsCard({ title, value, icon, color, textColor }: Stat
         </div>
         
         {/* Data and icon row with two columns */}
-        <div className="grid grid-cols-2 gap-4 items-center">
+        <div className="grid grid-cols-2 gap-4 items-start">
           {/* Data column */}
-          <div className="flex-1 min-w-0">
-            <p className={cn("text-2xl font-bold truncate", textColor || "text-foreground")}>{value}</p>
+          <div className="flex-1 min-w-0 pr-2">
+            <p className={cn("text-2xl font-bold leading-tight break-words", textColor || "text-foreground")}>{value}</p>
           </div>
           
           {/* Icon column */}
-          <div className="flex justify-end">
+          <div className="flex justify-end items-start">
             <div className={cn("p-3 rounded-full shadow-md flex-shrink-0", colorClasses[color])}>
               <span className="material-icons text-xl">{icon}</span>
             </div>
