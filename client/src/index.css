@@ -66,23 +66,33 @@
 
 /* Sindhi font support with MBSindhWeb */
 [dir="rtl"] body {
-  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
-  line-height: 1.6;
+  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif !important;
+  line-height: 1.7;
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
 }
 
 [dir="rtl"] * {
-  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
+  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif !important;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
 }
 
-/* Custom font loading for MBSindhWeb (user will upload this) */
+/* Enhanced RTL text rendering for Sindhi */
+[dir="rtl"] .sindhi-text {
+  font-family: 'MBSindhWeb', 'MB Sindhi', Arial, sans-serif !important;
+  unicode-bidi: bidi-override;
+  direction: rtl;
+  text-align: right;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+/* Custom font loading for MB Sindhi Web */
 @font-face {
   font-family: 'MBSindhWeb';
-  src: url('./assets/fonts/MBSindhWeb-Regular.woff2') format('woff2'),
-       url('./assets/fonts/MBSindhWeb-Regular.woff') format('woff'),
-       url('./assets/fonts/MBSindhWeb-Regular.ttf') format('truetype');
+  src: url('/src/assets/fonts/MB-Sindhi-Web-SK-2.0.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -90,9 +100,7 @@
 
 @font-face {
   font-family: 'MBSindhWeb';
-  src: url('./assets/fonts/MBSindhWeb-Bold.woff2') format('woff2'),
-       url('./assets/fonts/MBSindhWeb-Bold.woff') format('woff'),
-       url('./assets/fonts/MBSindhWeb-Bold.ttf') format('truetype');
+  src: url('/src/assets/fonts/MB-Sindhi-Web-SK-2.0.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -105,6 +113,19 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+}
+
+/* Enhanced font loading success indicator */
+.font-loaded [dir="rtl"] {
+  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', Arial, sans-serif !important;
+}
+
+/* Font optimization for Sindhi text */
+.sindhi-font [dir="rtl"] {
+  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', Arial, sans-serif !important;
+  font-kerning: auto;
+  font-variant-ligatures: common-ligatures;
+  text-rendering: optimizeLegibility;
 }
 
 /* Enhanced RTL text rendering */
