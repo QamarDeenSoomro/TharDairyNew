@@ -134,7 +134,7 @@ export default function Dashboard() {
                   <YAxis 
                     fontSize={12}
                     className="text-muted-foreground"
-                    label={{ value: 'Liters', angle: -90, position: 'insideLeft' }}
+                    label={{ value: t.liters, angle: -90, position: 'insideLeft' }}
                   />
                   <Tooltip 
                     contentStyle={{ 
@@ -144,13 +144,13 @@ export default function Dashboard() {
                     }}
                     formatter={(value, name) => [
                       `${value}L`,
-                      name === 'received' ? 'Received' : name === 'sent' ? 'Sent' : 'Balance'
+                      name === 'received' ? t.received : name === 'sent' ? t.sent : t.balanceMilk
                     ]}
                   />
                   <Legend 
                     wrapperStyle={{ fontSize: '12px' }}
                     formatter={(value) => 
-                      value === 'received' ? 'Received' : value === 'sent' ? 'Sent' : 'Balance'
+                      value === 'received' ? t.received : value === 'sent' ? t.sent : t.balanceMilk
                     }
                   />
                   <Bar 

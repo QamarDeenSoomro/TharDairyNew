@@ -3,8 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { WifiOff, Wifi, CloudOff, Cloud } from 'lucide-react';
 import { isOnline, onNetworkChange } from '@/utils/pwa';
 import { offlineStorage } from '@/utils/offlineStorage';
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function OfflineIndicator() {
+  const { t } = useLanguage();
   const [online, setOnline] = useState(isOnline());
   const [pendingCount, setPendingCount] = useState(0);
 
@@ -47,18 +49,18 @@ export default function OfflineIndicator() {
           pendingCount > 0 ? (
             <>
               <CloudOff className="h-3 w-3" />
-              {pendingCount} pending
+              {pendingCount} {t.pending}
             </>
           ) : (
             <>
               <Cloud className="h-3 w-3" />
-              Online
+              {t.online}
             </>
           )
         ) : (
           <>
             <WifiOff className="h-3 w-3" />
-            Offline
+            {t.offline}
           </>
         )}
       </Badge>

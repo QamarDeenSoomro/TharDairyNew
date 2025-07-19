@@ -129,6 +129,74 @@ export interface Translation {
   selectParty: string;
   selectPaymentType: string;
   selectPaymentMethod: string;
+  
+  // Table headers
+  party: string;
+  type: string;
+  milkTypeCap: string;
+  actions: string;
+  
+  // Status and badges
+  received: string;
+  sent: string;
+  paid: string;
+  online: string;
+  offline: string;
+  pending: string;
+  active: string;
+  disabled: string;
+  installed: string;
+  webVersion: string;
+  connection: string;
+  appInstallation: string;
+  serviceWorker: string;
+  offlineData: string;
+  sync: string;
+  
+  // PWA
+  pwaReady: string;
+  installApp: string;
+  installAppDesc: string;
+  install: string;
+  notNow: string;
+  installOptionDesc: string;
+  deployToEnable: string;
+  developmentMode: string;
+  devModeDesc: string;
+  
+  // Forms and UI
+  generateReport: string;
+  exportCSV: string;
+  exportExcel: string;
+  filters: string;
+  dateRange: string;
+  reportType: string;
+  downloadBackup: string;
+  uploadBackup: string;
+  resetDatabase: string;
+  backupDesc: string;
+  restoreDesc: string;
+  resetDesc: string;
+  
+  // Messages and notifications
+  noExpensesFound: string;
+  expenseRecords: string;
+  recentReceipts: string;
+  recentDeliveries: string;
+  addMilkReceipt: string;
+  addMilkDelivery: string;
+  liters: string;
+  
+  // Additional content
+  searchVendors: string;
+  searchCustomers: string;
+  addNewVendor: string;
+  addNewCustomer: string;
+  noRecentReceipts: string;
+  noRecentDeliveries: string;
+  unknownVendor: string;
+  unknownCustomer: string;
+  qty: string;
 }
 
 export const translations: Record<Language, Translation> = {
@@ -260,6 +328,74 @@ export const translations: Record<Language, Translation> = {
     selectParty: 'Select party',
     selectPaymentType: 'Select payment type',
     selectPaymentMethod: 'Select payment method',
+    
+    // Table headers
+    party: 'Party',
+    type: 'Type',
+    milkTypeCap: 'Milk Type',
+    actions: 'Actions',
+    
+    // Status and badges
+    received: 'Received',
+    sent: 'Sent', 
+    paid: 'Paid',
+    online: 'Online',
+    offline: 'Offline',
+    pending: 'pending',
+    active: 'Active',
+    disabled: 'Disabled',
+    installed: 'Installed',
+    webVersion: 'Web Version',
+    connection: 'Connection',
+    appInstallation: 'App Installation',
+    serviceWorker: 'Service Worker',
+    offlineData: 'Offline Data',
+    sync: 'Sync',
+    
+    // PWA
+    pwaReady: 'PWA Ready!',
+    installApp: 'Install App',
+    installAppDesc: 'Install this app on your device for a better experience and offline access.',
+    install: 'Install',
+    notNow: 'Not Now',
+    installOptionDesc: 'Install option will appear after deployment to production with HTTPS.',
+    deployToEnable: 'Deploy to Firebase to enable "Add to Home Screen"',
+    developmentMode: 'Development Mode',
+    devModeDesc: 'Service workers are disabled. Full PWA features will be available in production.',
+    
+    // Forms and UI
+    generateReport: 'Generate Report',
+    exportCSV: 'Export CSV',
+    exportExcel: 'Export Excel',
+    filters: 'Filters',
+    dateRange: 'Date Range',
+    reportType: 'Report Type',
+    downloadBackup: 'Download Backup',
+    uploadBackup: 'Upload Backup',
+    resetDatabase: 'Reset Database',
+    backupDesc: 'Download a complete backup of your database',
+    restoreDesc: 'Restore from a previous backup file',
+    resetDesc: 'Clear all data and start fresh',
+    
+    // Messages and notifications
+    noExpensesFound: 'No expenses found',
+    expenseRecords: 'Expense Records',
+    recentReceipts: 'Recent Receipts',
+    recentDeliveries: 'Recent Deliveries',
+    addMilkReceipt: 'Add Milk Receipt',
+    addMilkDelivery: 'Add Milk Delivery',
+    liters: 'Liters',
+    
+    // Additional content
+    searchVendors: 'Search vendors...',
+    searchCustomers: 'Search customers...',
+    addNewVendor: 'Add New Vendor',
+    addNewCustomer: 'Add New Customer',
+    noRecentReceipts: 'No recent receipts',
+    noRecentDeliveries: 'No recent deliveries',
+    unknownVendor: 'Unknown Vendor',
+    unknownCustomer: 'Unknown Customer',
+    qty: 'Qty',
   },
   
   sd: {
@@ -390,6 +526,74 @@ export const translations: Record<Language, Translation> = {
     selectParty: 'پارٽي چونڊيو',
     selectPaymentType: 'ادائيگي جو قسم چونڊيو',
     selectPaymentMethod: 'ادائيگي جو طريقو چونڊيو',
+    
+    // Table headers
+    party: 'پارٽي',
+    type: 'قسم',
+    milkTypeCap: 'کير جو قسم',
+    actions: 'عمل',
+    
+    // Status and badges
+    received: 'وصول ٿيل',
+    sent: 'موڪليل',
+    paid: 'ادا ڪيل',
+    online: 'آن لائن',
+    offline: 'آف لائن',
+    pending: 'باقي',
+    active: 'فعال',
+    disabled: 'بند',
+    installed: 'انسٽال ٿيل',
+    webVersion: 'ويب ورزن',
+    connection: 'ڪنيڪشن',
+    appInstallation: 'ايپ انسٽاليشن',
+    serviceWorker: 'سروس ورڪر',
+    offlineData: 'آف لائن ڊيٽا',
+    sync: 'هم وقت ڪريو',
+    
+    // PWA
+    pwaReady: 'PWA تيار!',
+    installApp: 'ايپ انسٽال ڪريو',
+    installAppDesc: 'بهتر تجربي ۽ آف لائن رسائي لاءِ هي ايپ پنهنجي ڊوائيس تي انسٽال ڪريو.',
+    install: 'انسٽال ڪريو',
+    notNow: 'هاڻي نه',
+    installOptionDesc: 'انسٽاليشن جو اختيار HTTPS سان پروڊڪشن ۾ ڊپلائي ڪرڻ کان پوءِ ظاهر ٿيندو.',
+    deployToEnable: '"هوم اسڪرين ۾ شامل ڪريو" کي فعال ڪرڻ لاءِ Firebase تي ڊپلائي ڪريو',
+    developmentMode: 'ڊولپمينٽ موڊ',
+    devModeDesc: 'سروس ورڪرز بند آهن. مڪمل PWA خصوصيات پروڊڪشن ۾ دستياب هونديون.',
+    
+    // Forms and UI
+    generateReport: 'رپورٽ ٺاهيو',
+    exportCSV: 'CSV ايڪسپورٽ ڪريو',
+    exportExcel: 'Excel ايڪسپورٽ ڪريو',
+    filters: 'فلٽرز',
+    dateRange: 'تاريخ جي حد',
+    reportType: 'رپورٽ جو قسم',
+    downloadBackup: 'بيڪ اپ ڊائون لوڊ ڪريو',
+    uploadBackup: 'بيڪ اپ اپ لوڊ ڪريو',
+    resetDatabase: 'ڊيٽابيس ري سيٽ ڪريو',
+    backupDesc: 'پنهنجي ڊيٽابيس جو مڪمل بيڪ اپ ڊائون لوڊ ڪريو',
+    restoreDesc: 'اڳوڻي بيڪ اپ فائل مان بحالي ڪريو',
+    resetDesc: 'سمورو ڊيٽا صاف ڪريو ۽ نئين سر شروع ڪريو',
+    
+    // Messages and notifications
+    noExpensesFound: 'ڪوبه خرچ نه مليو',
+    expenseRecords: 'خرچ جا رڪارڊ',
+    recentReceipts: 'تازا رسيدون',
+    recentDeliveries: 'تازيون ترسيلون',
+    addMilkReceipt: 'کير جي رسيد شامل ڪريو',
+    addMilkDelivery: 'کير جي ترسيل شامل ڪريو',
+    liters: 'ليٽر',
+    
+    // Additional content
+    searchVendors: 'وينڊرز ڳوليو...',
+    searchCustomers: 'گراهڪ ڳوليو...',
+    addNewVendor: 'نئون وينڊر شامل ڪريو',
+    addNewCustomer: 'نئون گراهڪ شامل ڪريو',
+    noRecentReceipts: 'ڪا تازي رسيد نه آهي',
+    noRecentDeliveries: 'ڪا تازي ترسيل نه آهي',
+    unknownVendor: 'اڻڄاتل وينڊر',
+    unknownCustomer: 'اڻڄاتل گراهڪ',
+    qty: 'مقدار',
   }
 };
 

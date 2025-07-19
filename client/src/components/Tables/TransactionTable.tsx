@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, Package2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { MilkTransaction, Vendor, Customer } from "@shared/schema";
 import { formatCurrency } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TransactionTableProps {
   transactions: MilkTransaction[];
@@ -12,6 +13,7 @@ interface TransactionTableProps {
 }
 
 export default function TransactionTable({ transactions, vendors, customers }: TransactionTableProps) {
+  const { t } = useLanguage();
   const getPartyName = (transaction: MilkTransaction) => {
     if (transaction.vendorId) {
       const vendor = vendors.find(v => v.id === transaction.vendorId);
@@ -35,11 +37,11 @@ export default function TransactionTable({ transactions, vendors, customers }: T
   const getTypeBadge = (type: string) => {
     return type === 'receive' ? (
       <Badge variant="outline" className="text-primary border-primary">
-        Received
+        {t.received}
       </Badge>
     ) : (
       <Badge variant="outline" className="text-secondary border-secondary">
-        Sent
+        {t.sent}
       </Badge>
     );
   };
@@ -58,14 +60,14 @@ export default function TransactionTable({ transactions, vendors, customers }: T
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Party</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Milk Type</TableHead>
-            <TableHead>Time</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Rate</TableHead>
-            <TableHead>Amount</TableHead>
+            <TableHead>{t.date}</TableHead>
+            <TableHead>{t.party}</TableHead>
+            <TableHead>{t.type}</TableHead>
+            <TableHead>{t.milkTypeCap}</TableHead>
+            <TableHead>{t.time}</TableHead>
+            <TableHead>{t.quantity}</TableHead>
+            <TableHead>{t.rate}</TableHead>
+            <TableHead>{t.amount}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

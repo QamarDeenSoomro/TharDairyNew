@@ -10,8 +10,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { InsertCustomer } from "@shared/schema";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Customers() {
+  const { t } = useLanguage();
   const { customers, loading, error, createCustomer, updateCustomer, deleteCustomer } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -80,19 +82,19 @@ export default function Customers() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-foreground mb-2">Customer Management</h2>
-          <p className="text-muted-foreground">Manage your milk buyers and their rates</p>
+          <h2 className="text-2xl font-semibold text-foreground mb-2">{t.customerManagement}</h2>
+          <p className="text-muted-foreground">{t.customerManagementDesc}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="flex items-center justify-center space-x-2 w-full sm:w-auto">
               <Plus className="h-4 w-4" />
-              <span>Add Customer</span>
+              <span>{t.addCustomer}</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="mx-4">
             <DialogHeader>
-              <DialogTitle>Add New Customer</DialogTitle>
+              <DialogTitle>{t.addNewCustomer}</DialogTitle>
             </DialogHeader>
             <CustomerForm onSuccess={handleAddCustomer} />
           </DialogContent>
@@ -102,11 +104,11 @@ export default function Customers() {
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <CardTitle>Customers</CardTitle>
+            <CardTitle>{t.customers}</CardTitle>
             <div className="relative w-full sm:w-auto sm:min-w-[250px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search customers..."
+                placeholder={t.searchCustomers}
                 className="pl-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

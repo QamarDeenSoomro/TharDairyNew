@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MilkSendForm from "@/components/Forms/MilkSendForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function MilkSending() {
+  const { t } = useLanguage();
   const { customers, loading: customersLoading } = useCustomers();
   const { transactions, loading: transactionsLoading } = useTransactions();
 
@@ -31,15 +33,15 @@ export default function MilkSending() {
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-foreground mb-2">Milk Sending</h2>
-        <p className="text-muted-foreground">Record milk sent to customers</p>
+        <h2 className="text-2xl font-semibold text-foreground mb-2">{t.milkSendingManagement}</h2>
+        <p className="text-muted-foreground">{t.milkSendingDesc}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sending Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Add Milk Delivery</CardTitle>
+            <CardTitle>{t.addMilkDelivery}</CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
             <MilkSendForm customers={customers} />
@@ -49,12 +51,12 @@ export default function MilkSending() {
         {/* Recent Sends */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Deliveries</CardTitle>
+            <CardTitle>{t.recentDeliveries}</CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
             <div className="space-y-4">
               {recentSends.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">No recent deliveries</p>
+                <p className="text-muted-foreground text-center py-8">{t.noRecentDeliveries}</p>
               ) : (
                 recentSends.map((send) => {
                   const customer = customers.find(c => c.id === send.customerId);
@@ -62,7 +64,7 @@ export default function MilkSending() {
                     <div key={send.id} className="border border-border rounded-md p-3 sm:p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                         <span className="text-sm font-medium text-foreground">
-                          {customer?.name || 'Unknown Customer'}
+                          {customer?.name || t.unknownCustomer}
                         </span>
                         <span className="text-xs sm:text-sm text-muted-foreground">
                           {formatDistanceToNow(new Date(send.date!), { addSuffix: true })}
