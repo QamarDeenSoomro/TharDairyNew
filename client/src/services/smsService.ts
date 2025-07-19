@@ -11,14 +11,17 @@ interface SMSData {
 
 class SMSService {
   private getLanguage(): string {
-    return localStorage.getItem('thar-dairy-language') || 'en';
+    const stored = localStorage.getItem('thar-dairy-language');
+    console.log('SMS Service - localStorage language:', stored);
+    return stored || 'en';
   }
 
   private getTranslatedText() {
     const lang = this.getLanguage() as 'en' | 'sd';
-    console.log('SMS Service Language:', lang);
+    console.log('SMS Service - Final language used:', lang);
     const translation = getTranslation(lang);
     console.log('SMS Translation Sample:', {
+      language: lang,
       header: translation.smsHeaderPaymentPaid,
       dear: translation.smsDear,
       amount: translation.smsAmount
