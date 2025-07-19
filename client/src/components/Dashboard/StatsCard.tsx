@@ -36,15 +36,18 @@ export default function StatsCard({ title, value, icon, color, textColor }: Stat
           <p className="text-sm font-medium text-muted-foreground/80 text-center">{title}</p>
         </div>
         
-        {/* Data and icon row with two columns */}
-        <div className="grid grid-cols-2 gap-4 items-start">
-          {/* Data column */}
-          <div className="flex-1 min-w-0 pr-2">
-            <p className={cn("text-2xl font-bold leading-tight break-words", textColor || "text-foreground")}>{value}</p>
+        {/* Data and icon row with 60-40 split */}
+        <div className="grid grid-cols-5 gap-2 items-center">
+          {/* Data column - 60% (3 columns) */}
+          <div className="col-span-3 min-w-0">
+            <p className={cn("font-bold leading-none whitespace-nowrap overflow-hidden text-ellipsis", 
+              value && value.toString().length > 10 ? "text-lg" : 
+              value && value.toString().length > 6 ? "text-xl" : "text-2xl", 
+              textColor || "text-foreground")}>{value}</p>
           </div>
           
-          {/* Icon column */}
-          <div className="flex justify-end items-start">
+          {/* Icon column - 40% (2 columns) */}
+          <div className="col-span-2 flex justify-end">
             <div className={cn("p-3 rounded-full shadow-md flex-shrink-0", colorClasses[color])}>
               <span className="material-icons text-xl">{icon}</span>
             </div>
