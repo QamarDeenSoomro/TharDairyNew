@@ -38,7 +38,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
         <StatsCard
           title="Today's Milk Received"
           value={`${stats.todayReceived}L`}
@@ -50,6 +50,13 @@ export default function Dashboard() {
           value={`${stats.todaySent}L`}
           icon="move_up"
           color="secondary"
+        />
+        <StatsCard
+          title="Balance Milk"
+          value={`${stats.todayReceived - stats.todaySent}L`}
+          icon="inventory_2"
+          color={(stats.todayReceived - stats.todaySent) < 0 ? "danger" : "info"}
+          textColor={(stats.todayReceived - stats.todaySent) < 0 ? "text-red-600" : undefined}
         />
         <StatsCard
           title="Today's Profit"
