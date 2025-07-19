@@ -111,7 +111,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Database**: Firebase Realtime Database with offline sync
 - **Environment Variables**: Firebase configuration keys required
 - **PWA Features**: Service workers, web manifest, offline storage, installable app
-- **Recent Fix**: Corrected import names for Firebase services (transactionService vs milkTransactionService)
+- **Recent Fix**: Database backup/restore now preserves original IDs to maintain vendor-customer-transaction relationships
 
 ### File Structure
 - `client/`: React frontend application
