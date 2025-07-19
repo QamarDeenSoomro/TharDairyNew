@@ -3,6 +3,8 @@ import StatsCard from "@/components/Dashboard/StatsCard";
 import RecentActivity from "@/components/Dashboard/RecentActivity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { format, subDays, startOfDay } from 'date-fns';
 
 export default function Dashboard() {
   const { transactions, loading: transactionsLoading } = useTransactions();
@@ -29,6 +31,43 @@ export default function Dashboard() {
 
   const recentTransactions = transactions.slice(0, 5);
   const recentPayments = payments.slice(0, 5);
+
+  // Generate weekly milk flow data
+  const weeklyMilkFlow = () => {
+    const data = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = subDays(today, i);
+      const dayStart = startOfDay(date);
+      const dayEnd = new Date(dayStart);
+      dayEnd.setHours(23, 59, 59);
+      
+      const dayTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.date);
+        return transactionDate >= dayStart && transactionDate <= dayEnd;
+      });
+      
+      const received = dayTransactions
+        .filter(t => t.type === 'receive')
+        .reduce((sum, t) => sum + t.quantity, 0);
+      
+      const sent = dayTransactions
+        .filter(t => t.type === 'send')
+        .reduce((sum, t) => sum + t.quantity, 0);
+      
+      data.push({
+        date: format(date, 'MMM dd'),
+        received,
+        sent,
+        balance: received - sent
+      });
+    }
+    
+    return data;
+  };
+
+  const chartData = weeklyMilkFlow();
 
   return (
     <div className="space-y-6">
@@ -81,8 +120,51 @@ export default function Dashboard() {
             <CardTitle className="text-lg font-semibold">Weekly Milk Flow</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
-              <span className="text-muted-foreground">Chart: Weekly milk received vs sent</span>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis 
+                    dataKey="date" 
+                    fontSize={12}
+                    className="text-muted-foreground"
+                  />
+                  <YAxis 
+                    fontSize={12}
+                    className="text-muted-foreground"
+                    label={{ value: 'Liters', angle: -90, position: 'insideLeft' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                    formatter={(value, name) => [
+                      `${value}L`,
+                      name === 'received' ? 'Received' : name === 'sent' ? 'Sent' : 'Balance'
+                    ]}
+                  />
+                  <Legend 
+                    wrapperStyle={{ fontSize: '12px' }}
+                    formatter={(value) => 
+                      value === 'received' ? 'Received' : value === 'sent' ? 'Sent' : 'Balance'
+                    }
+                  />
+                  <Bar 
+                    dataKey="received" 
+                    fill="hsl(var(--primary))" 
+                    name="received"
+                    radius={[2, 2, 0, 0]}
+                  />
+                  <Bar 
+                    dataKey="sent" 
+                    fill="hsl(142 71% 45%)" 
+                    name="sent"
+                    radius={[2, 2, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
