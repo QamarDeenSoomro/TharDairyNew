@@ -89,8 +89,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             })}
           </nav>
 
-          {/* Language Selector at bottom */}
-          <div className="px-4 pb-4 border-t border-border pt-4">
+          {/* Language Selector at bottom - with mobile spacing */}
+          <div className="px-4 pb-20 lg:pb-4 border-t border-border pt-4">
             <div className="text-xs text-muted-foreground mb-2">{t.language}</div>
             <LanguageSelector />
           </div>

@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Globe } from 'lucide-react';
 
 export const LanguageSelector: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
@@ -15,23 +14,25 @@ export const LanguageSelector: React.FC = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Globe className="h-4 w-4" />
+        <Button variant="outline" size="sm" className="gap-2 w-full justify-start">
+          <span className="material-icons text-lg">language</span>
           {language === 'en' ? t.english : t.sindhi}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => setLanguage('en')}
-          className={language === 'en' ? 'bg-accent' : ''}
+          className={`gap-2 ${language === 'en' ? 'bg-accent' : ''}`}
         >
-          🇺🇸 {t.english}
+          <span className="material-icons text-lg">public</span>
+          {t.english}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setLanguage('sd')}
-          className={language === 'sd' ? 'bg-accent' : ''}
+          className={`gap-2 ${language === 'sd' ? 'bg-accent' : ''}`}
         >
-          🇵🇰 {t.sindhi}
+          <span className="material-icons text-lg">translate</span>
+          {t.sindhi}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

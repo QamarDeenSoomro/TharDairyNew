@@ -2,7 +2,6 @@ import { Menu, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SyncButton from "@/components/PWA/SyncButton";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface HeaderProps {
@@ -36,7 +35,6 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
           </div>
           
           <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-            <LanguageSelector />
             <SyncButton />
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
