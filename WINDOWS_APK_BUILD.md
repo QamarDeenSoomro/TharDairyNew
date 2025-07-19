@@ -64,6 +64,23 @@ android\app\build\outputs\apk\debug\app-debug.apk
 3. Ensure Java is installed and JAVA_HOME is set
 4. Try running: `java -version`
 
+## Java Version Issues
+
+If you get "invalid source release: 21" error:
+
+1. **Check your Java version**: `java -version`
+2. **Install Java 17 or higher** (recommended: Java 17)
+3. **Set JAVA_HOME** to Java 17+ installation
+4. **Restart command prompt** after setting JAVA_HOME
+
+### Windows Java Installation
+1. Download Java 17+ from: https://adoptium.net/temurin/releases/
+2. Install and note the installation path (e.g., `C:\Program Files\Eclipse Adoptium\jdk-17.0.x`)
+3. Set JAVA_HOME environment variable:
+   - Windows Key + R → `sysdm.cpl` → Advanced → Environment Variables
+   - Add: `JAVA_HOME` = `C:\Program Files\Eclipse Adoptium\jdk-17.0.x`
+   - Add to PATH: `%JAVA_HOME%\bin`
+
 ## Alternative: Use Android Studio
 
 1. Run: `npx cap open android`

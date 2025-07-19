@@ -56,6 +56,14 @@ cd android
 - `npm exec` looks for a package named "cap" 
 - `npx` correctly runs the Capacitor CLI from @capacitor/cli package
 
+## Java Version Fix
+If you get "invalid source release: 21" error after fixing the npm issue:
+
+1. **Install Java 17+**: Download from https://adoptium.net/
+2. **Set JAVA_HOME**: Point to Java 17+ installation directory
+3. **Restart terminal**: Close and reopen command prompt
+4. **Verify**: Run `java -version` to confirm Java 17+
+
 ## Alternative: Use the build script
 You can also use our automation script:
 ```bash

@@ -173,7 +173,13 @@ adb install android/app/build/outputs/apk/release/app-release.apk
    - Use `npx cap sync android` instead of `npm exec cap sync android`
    - Ensure @capacitor/cli is installed: `npm install @capacitor/cli`
 
-2. **Gradle build fails**
+2. **Java version error ("invalid source release: 21")**
+   - Install Java 17+ (recommended: Java 17 LTS)
+   - Set JAVA_HOME environment variable to Java 17+ installation
+   - Restart terminal/command prompt after setting JAVA_HOME
+   - Verify with: `java -version`
+
+3. **Gradle build fails**
    - Check JAVA_HOME is set correctly
    - Ensure Android SDK is installed
    - Run `./gradlew --version` to verify setup
