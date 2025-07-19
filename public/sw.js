@@ -1,14 +1,15 @@
-const CACHE_NAME = 'milk-supply-v1';
+const CACHE_NAME = 'milk-supply-v2';
 const OFFLINE_URL = '/offline.html';
 
 // Files to cache for offline functionality
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json',
   '/icon-192.svg',
   '/icon-512.svg',
+  '/assets/index-BuLSAozQ.css',
+  '/assets/index-1K3kNzSa.js',
+  '/assets/firebaseOfflineSync-DdMkwEMV.js',
   OFFLINE_URL
 ];
 
@@ -44,35 +45,43 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache when offline
+// Fetch event - serve cached content when offline
 self.addEventListener('fetch', (event) => {
+  // Handle navigation requests (page loads) - serve the main app
   if (event.request.mode === 'navigate') {
-    // Handle navigation requests
     event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          return caches.open(CACHE_NAME)
-            .then((cache) => {
-              return cache.match(OFFLINE_URL);
-            });
-        })
-    );
-  } else {
-    // Handle other requests
-    event.respondWith(
-      caches.match(event.request)
+      caches.match('/')
         .then((response) => {
-          // Return cached version or fetch from network
-          return response || fetch(event.request);
-        })
-        .catch(() => {
-          // If both cache and network fail, return offline page for HTML requests
-          if (event.request.destination === 'document') {
-            return caches.match(OFFLINE_URL);
+          if (response) {
+            return response;
           }
+          return fetch(event.request)
+            .catch(() => caches.match('/'));
         })
     );
+    return;
   }
+
+  // Handle other requests (assets, API calls)
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request)
+          .catch(() => {
+            // For API requests, return empty array to prevent errors
+            if (event.request.url.includes('/api/')) {
+              return new Response('[]', {
+                headers: { 'Content-Type': 'application/json' }
+              });
+            }
+            return undefined;
+          });
+      })
+  );
+});
 });
 
 // Background sync for offline data
