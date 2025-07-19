@@ -1,0 +1,58 @@
+
+manifest.json:1 Manifest: Line: 1, column: 1, Syntax error.Understand this error
+sw.js:1 Uncaught SyntaxError: Unexpected token '<' (at sw.js:1:1)Understand this error
+2index-CH8ug9Yh.js:238 Service Worker registration failed: TypeError: Failed to register a ServiceWorker for scope ('https://thar-dairy.web.app/') with script ('https://thar-dairy.web.app/sw.js'): ServiceWorker script evaluation failed
+KW @ index-CH8ug9Yh.js:238
+await in KW
+(anonymous) @ index-CH8ug9Yh.js:238
+await in (anonymous)
+(anonymous) @ index-CH8ug9Yh.js:238
+$m @ index-CH8ug9Yh.js:40
+xc @ index-CH8ug9Yh.js:40
+SE @ index-CH8ug9Yh.js:40
+xo @ index-CH8ug9Yh.js:38
+o9 @ index-CH8ug9Yh.js:40
+No @ index-CH8ug9Yh.js:40
+jP @ index-CH8ug9Yh.js:40
+N @ index-CH8ug9Yh.js:25
+F @ index-CH8ug9Yh.js:25Understand this error
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVaYvXMzwGeNMlcKGY: {id: '-OVVaYvXMzwGeNMlcKGY', type: 'receive', vendorId: '-OVVXpyCUF6gPXZkYzwM', customerId: null, milkType: 'cow', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVcvFi7_vvDOKbPmg4: {id: '-OVVcvFi7_vvDOKbPmg4', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVe14QLm9KvhwpqwGV: {id: '-OVVe14QLm9KvhwpqwGV', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVaYvXMzwGeNMlcKGY: {id: '-OVVaYvXMzwGeNMlcKGY', type: 'receive', vendorId: '-OVVXpyCUF6gPXZkYzwM', customerId: null, milkType: 'cow', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVcvFi7_vvDOKbPmg4: {id: '-OVVcvFi7_vvDOKbPmg4', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVe14QLm9KvhwpqwGV: {id: '-OVVe14QLm9KvhwpqwGV', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+iframe.js:271  GET https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig?key=demo-key&cb=1752899952031 400 (Bad Request)
+k.send @ iframe.js:271
+Sm.bm @ iframe.js:370
+Zm @ iframe.js:368
+(anonymous) @ iframe.js:374
+F @ iframe.js:156
+cn @ iframe.js:374
+(anonymous) @ iframe.js:382
+a @ iframe.js:155
+(anonymous) @ iframe.js:155
+c @ iframe.js:155
+e.Pc @ iframe.js:163
+lg @ iframe.js:166
+hg @ iframe.js:166
+F.zk @ iframe.js:165
+a @ iframe.js:155
+(anonymous) @ iframe.js:155
+c @ iframe.js:155
+Qf @ iframe.js:156
+a
+Jf @ iframe.js:156
+cg @ iframe.js:162
+F.then @ iframe.js:159
+Q @ iframe.js:382
+jn @ iframe.js:374
+(anonymous) @ iframe.js:574
+is.start @ iframe.js:573
+js.start @ iframe.js:574
+ls.start @ iframe.js:576
+os @ iframe.js:578
+(anonymous) @ iframe.js:579
+aj @ iframe.js:240
+b @ iframe.js:238Understand this error
+iframe.js:310 {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","errors":[{"message":"API key not valid. Please pass a valid API key.","domain":"global","reason":"badRequest"}],"status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"identitytoolkit.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}

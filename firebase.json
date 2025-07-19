@@ -16,7 +16,7 @@
         "destination": "/index.html"
       },
       {
-        "source": "!/icon-*.svg",
+        "source": "!/icon-*",
         "destination": "/index.html"
       },
       {
@@ -26,15 +26,11 @@
       {
         "source": "!/assets/**",
         "destination": "/index.html"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
       }
     ],
     "headers": [
       {
-        "source": "/sw.js",
+        "source": "sw.js",
         "headers": [
           {
             "key": "Content-Type",
@@ -47,7 +43,25 @@
         ]
       },
       {
-        "source": "/manifest.json",
+        "source": "manifest.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      {
+        "source": "**/*.js",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/javascript"
+          }
+        ]
+      },
+      {
+        "source": "**/*.json",
         "headers": [
           {
             "key": "Content-Type",
