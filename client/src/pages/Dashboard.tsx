@@ -51,13 +51,15 @@ export default function Dashboard() {
           icon="move_up"
           color="secondary"
         />
-        <StatsCard
-          title="Balance Milk"
-          value={`${stats.todayReceived - stats.todaySent}L`}
-          icon="inventory_2"
-          color={(stats.todayReceived - stats.todaySent) < 0 ? "danger" : "info"}
-          textColor={(stats.todayReceived - stats.todaySent) < 0 ? "text-red-600" : undefined}
-        />
+        <div className="col-span-2 lg:col-span-1">
+          <StatsCard
+            title="Balance Milk"
+            value={`${stats.todayReceived - stats.todaySent}L`}
+            icon="inventory_2"
+            color={(stats.todayReceived - stats.todaySent) < 0 ? "danger" : "info"}
+            textColor={(stats.todayReceived - stats.todaySent) < 0 ? "text-red-600" : undefined}
+          />
+        </div>
         <StatsCard
           title="Today's Profit"
           value={`${stats.todayProfit.toLocaleString()}`}
