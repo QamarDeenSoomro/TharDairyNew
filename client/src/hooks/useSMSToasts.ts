@@ -9,23 +9,31 @@ export function useSMSToasts() {
       const { phone, type } = event.detail;
       
       let message = '';
-      switch (type) {
-        case 'milk_transaction':
-          message = 'SMS sent to notify about milk transaction';
-          break;
-        case 'payment':
-          message = 'SMS sent to notify about payment';
-          break;
-        case 'ledger':
-          message = 'Ledger shared via WhatsApp';
-          break;
-        default:
-          message = 'SMS notification sent';
+      let title = 'SMS App Opened';
+      
+      if (type.includes('_fallback')) {
+        title = 'SMS Ready';
+        message = 'Copy the message from console and send manually';
+      } else {
+        switch (type) {
+          case 'milk_transaction':
+            message = 'Milk transaction SMS ready to send';
+            break;
+          case 'payment':
+            message = 'Payment notification SMS ready to send';
+            break;
+          case 'ledger':
+            message = 'Ledger shared via WhatsApp';
+            title = 'WhatsApp Opened';
+            break;
+          default:
+            message = 'SMS ready to send';
+        }
       }
       
       toast({
-        title: 'SMS App Opened',
-        description: `${message} - Check your messaging app`,
+        title,
+        description: `${message} to ${phone}`,
         duration: 4000,
       });
     };

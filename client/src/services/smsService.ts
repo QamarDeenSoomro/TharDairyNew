@@ -152,48 +152,37 @@ class SMSService {
       // Format phone number
       const formattedPhone = this.formatPhoneNumber(data.to);
       
-      // Open device's SMS app with pre-filled message
-      try {
-        const smsUrl = `sms:${formattedPhone}?body=${encodeURIComponent(data.message)}`;
-        
-        // On mobile devices, use window.location.href to open SMS app
-        // On desktop, use window.open as fallback
-        if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i)) {
-          window.location.href = smsUrl;
-        } else {
-          window.open(smsUrl, "_self");
-        }
-        
-        console.log('SMS app opened for:', formattedPhone);
-        console.log('Message:', data.message);
-        
-        // Show a toast notification to user
-        if (window.dispatchEvent) {
-          const event = new CustomEvent('sms-sent', {
-            detail: {
-              phone: formattedPhone,
-              message: data.message,
-              type: data.type
-            }
-          });
-          window.dispatchEvent(event);
-        }
-      } catch (error) {
-        // Fallback: just log the message if SMS app can't be opened
-        console.log('SMS would be sent to:', formattedPhone);
-        console.log('Message:', data.message);
-        
-        // Show a toast notification to user
-        if (window.dispatchEvent) {
-          const event = new CustomEvent('sms-sent', {
-            detail: {
-              phone: formattedPhone,
-              message: data.message,
-              type: data.type
-            }
-          });
-          window.dispatchEvent(event);
-        }
+      // Create SMS URL with phone number and message
+      const smsUrl = `sms:${formattedPhone}?body=${encodeURIComponent(data.message)}`;
+      
+      // Open SMS app based on device type
+      if (navigator.userAgent.match(/Android/i)) {
+        // Android device - use location.href for direct app opening
+        window.location.href = smsUrl;
+        console.log('Android SMS app opened for:', formattedPhone);
+      } else if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+        // iOS device - use location.href for direct app opening
+        window.location.href = smsUrl;
+        console.log('iOS SMS app opened for:', formattedPhone);
+      } else {
+        // Desktop or other devices - open in new window
+        window.open(smsUrl, "_blank");
+        console.log('SMS URL opened in new window for:', formattedPhone);
+      }
+      
+      console.log('SMS URL:', smsUrl);
+      console.log('Message content:', data.message);
+      
+      // Dispatch event for toast notification
+      if (window.dispatchEvent) {
+        const event = new CustomEvent('sms-sent', {
+          detail: {
+            phone: formattedPhone,
+            message: data.message,
+            type: data.type
+          }
+        });
+        window.dispatchEvent(event);
       }
       
       return true;
