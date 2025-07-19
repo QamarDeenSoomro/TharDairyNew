@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays, startOfDay } from 'date-fns';
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
   const { transactions, loading: transactionsLoading } = useTransactions();
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const { stats, loading: statsLoading } = useDashboard();
   const { vendors, loading: vendorsLoading } = useVendors();
   const { customers, loading: customersLoading } = useCustomers();
+  const { t, isRTL } = useLanguage();
 
   if (statsLoading || transactionsLoading || paymentsLoading || vendorsLoading || customersLoading) {
     return (
@@ -72,27 +74,27 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-foreground mb-2">Dashboard</h2>
+        <h2 className="text-2xl font-semibold text-foreground mb-2">{t.dashboard}</h2>
         <p className="text-muted-foreground">Overview of Thar Dairy's operations</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
         <StatsCard
-          title="Today's Milk Received"
+          title={t.todaysMilkReceived}
           value={`${stats.todayReceived}L`}
           icon="move_down"
           color="primary"
         />
         <StatsCard
-          title="Today's Milk Sent"
+          title={t.todaysMilkSent}
           value={`${stats.todaySent}L`}
           icon="move_up"
           color="secondary"
         />
         <div className="col-span-2 lg:col-span-1">
           <StatsCard
-            title="Balance Milk"
+            title={t.balanceMilk}
             value={`${stats.todayReceived - stats.todaySent}L`}
             icon="inventory_2"
             color={(stats.todayReceived - stats.todaySent) < 0 ? "danger" : "info"}
@@ -100,13 +102,13 @@ export default function Dashboard() {
           />
         </div>
         <StatsCard
-          title="Today's Profit"
+          title={t.todaysProfit}
           value={`${stats.todayProfit.toLocaleString()}`}
           icon="trending_up"
           color="success"
         />
         <StatsCard
-          title="Pending Payments"
+          title={t.pendingPaymentsAmount}
           value={`${stats.pendingPayments.toLocaleString()}`}
           icon="pending"
           color="warning"
@@ -117,7 +119,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Weekly Milk Flow</CardTitle>
+            <CardTitle className="text-lg font-semibold">{t.weeklyMilkFlow}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-64">

@@ -4,33 +4,38 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const navigationItems = [
-  { name: "Dashboard", href: "/", icon: "dashboard" },
-  { name: "Vendors", href: "/vendors", icon: "agriculture" },
-  { name: "Customers", href: "/customers", icon: "people" },
-  { name: "Milk Receiving", href: "/milk-receiving", icon: "move_down" },
-  { name: "Milk Sending", href: "/milk-sending", icon: "move_up" },
-  { name: "Payments", href: "/payments", icon: "payment" },
-  { name: "Pending Payments", href: "/pending-payments", icon: "pending" },
-  { name: "Daily Expenses", href: "/expenses", icon: "trending_down" },
-  { name: "Reports", href: "/reports", icon: "assessment" },
-  { name: "Database", href: "/database", icon: "storage" },
+const getNavigationItems = (t: any) => [
+  { name: t.dashboard, href: "/", icon: "dashboard" },
+  { name: t.vendors, href: "/vendors", icon: "agriculture" },
+  { name: t.customers, href: "/customers", icon: "people" },
+  { name: t.milkReceiving, href: "/milk-receiving", icon: "move_down" },
+  { name: t.milkSending, href: "/milk-sending", icon: "move_up" },
+  { name: t.payments, href: "/payments", icon: "payment" },
+  { name: t.pendingPayments, href: "/pending-payments", icon: "pending" },
+  { name: t.dailyExpenses, href: "/expenses", icon: "trending_down" },
+  { name: t.reports, href: "/reports", icon: "assessment" },
+  { name: t.databaseManagement, href: "/database", icon: "storage" },
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
   const isMobile = useIsMobile();
+  const { t, isRTL } = useLanguage();
+  
+  const navigationItems = getNavigationItems(t);
 
   const sidebarClasses = cn(
-    "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out",
+    "fixed inset-y-0 z-50 w-64 bg-card border-border transform transition-transform duration-300 ease-in-out",
     "lg:translate-x-0 lg:static lg:inset-0 lg:pt-16",
-    isOpen ? "translate-x-0" : "-translate-x-full"
+    isRTL ? "right-0 border-l" : "left-0 border-r",
+    isOpen ? "translate-x-0" : (isRTL ? "translate-x-full" : "-translate-x-full")
   );
 
   return (
