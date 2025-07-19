@@ -553,44 +553,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
             </CardContent>
           </Card>
 
-          {/* Settlement Information */}
-          <Card className="border-orange-200 bg-orange-50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Settlement Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-muted-foreground">Last Settled Date</div>
-                  <div className="text-lg font-semibold">
-                    {lastSettlementInfo.date ? (
-                      <>
-                        {format(new Date(lastSettlementInfo.date), "dd/MM/yyyy")}
-                        <span className="text-sm text-muted-foreground ml-2">
-                          ({formatDistanceToNow(new Date(lastSettlementInfo.date), { addSuffix: true })})
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-muted-foreground">Never settled</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Days Since Settlement</div>
-                  <div className="text-lg font-semibold">
-                    {lastSettlementInfo.date ? (
-                      Math.floor((new Date().getTime() - new Date(lastSettlementInfo.date).getTime()) / (1000 * 60 * 60 * 24))
-                    ) : (
-                      <span className="text-muted-foreground">N/A</span>
-                    )} days
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          
 
           {/* Previous Balance (shown only when date filter is applied) */}
           {startDate && Math.abs(totals.previousBalance) > 0.01 && (
@@ -686,32 +649,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <Button variant="outline" className="h-16 flex flex-col gap-1">
-                  <span className="material-icons text-lg">payment</span>
-                  <span className="text-xs">Make Payment</span>
-                </Button>
-                <Button variant="outline" className="h-16 flex flex-col gap-1">
-                  <span className="material-icons text-lg">receipt</span>
-                  <span className="text-xs">Receive Payment</span>
-                </Button>
-                <Button variant="outline" className="h-16 flex flex-col gap-1">
-                  <span className="material-icons text-lg">move_down</span>
-                  <span className="text-xs">{entityType === "vendor" ? "Record Milk" : "Send Milk"}</span>
-                </Button>
-                <Button variant="outline" className="h-16 flex flex-col gap-1">
-                  <span className="material-icons text-lg">edit</span>
-                  <span className="text-xs">Edit Details</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          
 
           {/* Communication Actions */}
           <div className="flex flex-col sm:flex-row gap-3">
