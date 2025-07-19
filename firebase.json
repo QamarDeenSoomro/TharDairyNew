@@ -6,28 +6,8 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "!/sw.js",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/manifest.json",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/icon-*",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/offline.html",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/assets/**",
-        "destination": "/index.html"
-      }
-    ],
+    "redirects": [],
+    "rewrites": [],
     "headers": [
       {
         "source": "sw.js",
