@@ -119,6 +119,8 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Country Code**: Updated from India (+91) to Pakistan (+92) for all SMS and WhatsApp communications
 - **Current Balance Display**: Payment form now shows real-time current balance of selected party (vendor/customer) with color-coded status indicators
 - **Internationalization**: Complete English/Sindhi language support with RTL layout and MB Sindhi font integration
+- **Language Selector**: Located in sidebar bottom with Material Icons, avoids mobile navigation overlap
+- **Stats Cards**: Improved layout with title row and data/icon columns for better content fitting
 
 ### File Structure
 - `client/`: React frontend application

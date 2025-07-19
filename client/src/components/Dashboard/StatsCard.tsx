@@ -31,13 +31,23 @@ export default function StatsCard({ title, value, icon, color, textColor }: Stat
   return (
     <Card className={cn("border-0 shadow-lg", cardGradients[color])}>
       <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground/80">{title}</p>
-            <p className={cn("text-2xl font-bold", textColor || "text-foreground")}>{value}</p>
+        {/* Title row */}
+        <div className="mb-4">
+          <p className="text-sm font-medium text-muted-foreground/80 text-center">{title}</p>
+        </div>
+        
+        {/* Data and icon row with two columns */}
+        <div className="grid grid-cols-2 gap-4 items-center">
+          {/* Data column */}
+          <div className="flex-1 min-w-0">
+            <p className={cn("text-2xl font-bold truncate", textColor || "text-foreground")}>{value}</p>
           </div>
-          <div className={cn("p-3 rounded-full shadow-md", colorClasses[color])}>
-            <span className="material-icons">{icon}</span>
+          
+          {/* Icon column */}
+          <div className="flex justify-end">
+            <div className={cn("p-3 rounded-full shadow-md flex-shrink-0", colorClasses[color])}>
+              <span className="material-icons text-xl">{icon}</span>
+            </div>
           </div>
         </div>
       </CardContent>
