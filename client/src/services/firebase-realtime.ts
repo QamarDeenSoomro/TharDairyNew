@@ -473,6 +473,7 @@ export const expenseService = {
     const newExpenseRef = push(expensesRef);
     const data = {
       ...expenseData,
+      date: expenseData.date ? new Date(expenseData.date).toISOString() : new Date().toISOString(),
       createdAt: new Date().toISOString(),
     };
     await set(newExpenseRef, data);
@@ -495,7 +496,11 @@ export const expenseService = {
   // Update expense
   async update(id: string, updates: Partial<InsertDailyExpense>): Promise<void> {
     const expenseRef = ref(db, `${PATHS.DAILY_EXPENSES}/${id}`);
-    await set(expenseRef, updates);
+    const updateData = {
+      ...updates,
+      date: updates.date ? new Date(updates.date).toISOString() : undefined,
+    };
+    await set(expenseRef, updateData);
   },
 
   // Delete expense
@@ -535,7 +540,8 @@ export const expenseService = {
   async getByDateRange(startDate: Date, endDate: Date): Promise<FirebaseDailyExpense[]> {
     const expenses = await this.getAll();
     return expenses.filter(expense => {
-      const expenseDate = new Date(expense.date);
+      // Handle expenses without date field (use createdAt as fallback)
+      const expenseDate = expense.date ? new Date(expense.date) : new Date(expense.createdAt);
       return expenseDate >= startDate && expenseDate <= endDate;
     });
   },
@@ -556,6 +562,7 @@ export const dashboardService = {
 
     const transactions = await transactionService.getByDateRange(startOfDay, endOfDay);
     const payments = await paymentService.getByDateRange(startOfDay, endOfDay);
+    const dailyExpenses = await expenseService.getByDateRange(startOfDay, endOfDay);
 
     const todayReceived = transactions
       .filter(t => t.type === 'receive')
@@ -569,11 +576,15 @@ export const dashboardService = {
       .filter(t => t.type === 'send')
       .reduce((sum, t) => sum + t.totalAmount, 0);
 
-    const todayExpenses = transactions
+    const todayMilkExpenses = transactions
       .filter(t => t.type === 'receive')
       .reduce((sum, t) => sum + t.totalAmount, 0);
 
-    const todayProfit = todayRevenue - todayExpenses;
+    // Add daily expenses to total expenses
+    const todayDailyExpenses = dailyExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const totalExpenses = todayMilkExpenses + todayDailyExpenses;
+
+    const todayProfit = todayRevenue - totalExpenses;
 
     const allPayments = await paymentService.getAll();
     const allTransactions = await transactionService.getAll();

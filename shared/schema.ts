@@ -95,10 +95,9 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
 export const insertDailyExpenseSchema = createInsertSchema(dailyExpenses).omit({
   id: true,
   createdAt: true,
-  date: true,
 }).extend({
   amount: z.number().or(z.string().transform(val => parseFloat(val))),
-  date: z.string().optional().transform(val => val ? new Date(val) : new Date()),
+  date: z.string().optional().transform(val => val ? new Date(val).toISOString() : new Date().toISOString()),
 });
 
 export type InsertVendor = z.infer<typeof insertVendorSchema>;
