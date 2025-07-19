@@ -16,11 +16,11 @@ import { formatCurrency } from "@/lib/utils";
 interface LedgerViewProps {
   entity: FirebaseVendor | FirebaseCustomer;
   entityType: "vendor" | "customer";
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export default function LedgerView({ entity, entityType, isOpen, onClose }: LedgerViewProps) {
+export default function LedgerView({ entity, entityType, isOpen = true, onClose }: LedgerViewProps) {
   const { transactions } = useTransactions();
   const { payments } = usePayments();
   const { toast } = useToast();
@@ -238,19 +238,8 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
     setEndDate("");
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>{entity.name} - Ledger</span>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
+  const renderContent = () => (
+    <div className="space-y-6">
           {/* Date Filter */}
           <Card>
             <CardHeader>
@@ -559,6 +548,26 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
             </CardContent>
           </Card>
         </div>
+  );
+
+  // If no onClose prop provided, render as standalone component
+  if (!onClose) {
+    return renderContent();
+  }
+
+  // Otherwise render as dialog
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-between">
+            <span>{entity.name} - Ledger</span>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogTitle>
+        </DialogHeader>
+        {renderContent()}
       </DialogContent>
     </Dialog>
   );
