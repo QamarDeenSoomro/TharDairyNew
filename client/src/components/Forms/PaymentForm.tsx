@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPaymentSchema, type InsertPayment, type Vendor, type Customer } from "@shared/schema";
+import { insertPaymentSchema, type InsertPayment, type Payment, type Vendor, type Customer } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,10 +17,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface PaymentFormProps {
   vendors: Vendor[];
   customers: Customer[];
-  onSuccess?: () => void;
+  payment?: Payment;
+  onSuccess?: (data?: any) => void;
 }
 
-export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFormProps) {
+export default function PaymentForm({ vendors, customers, payment, onSuccess }: PaymentFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedPartyBalance, setSelectedPartyBalance] = useState<number | null>(null);
@@ -30,13 +31,22 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
 
   const form = useForm<InsertPayment>({
     resolver: zodResolver(insertPaymentSchema),
-    defaultValues: {
+    defaultValues: payment ? {
+      type: payment.type,
+      vendorId: payment.vendorId,
+      customerId: payment.customerId,
+      amount: payment.amount,
+      method: payment.method,
+      reference: payment.reference || "",
+      date: payment.date ? new Date(payment.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    } : {
       type: "received",
       vendorId: null,
       customerId: null,
       amount: 0,
       method: "cash",
       reference: "",
+      date: new Date().toISOString().split('T')[0],
     },
   });
 
@@ -102,53 +112,59 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
   }, [watchedType, watchedVendorId, watchedCustomerId, transactions, payments]);
 
   const onSubmit = async (data: InsertPayment) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      console.log('PaymentForm - Creating payment with data:', data);
-      await paymentService.create(data);
-      
-      // Send SMS notification
-      let contactPerson = null;
-      if (data.type === 'received' && data.customerId) {
-        contactPerson = customers.find(c => c.id === data.customerId);
-      } else if (data.type === 'paid' && data.vendorId) {
-        contactPerson = vendors.find(v => v.id === data.vendorId);
-      }
-      
-      if (contactPerson?.contact) {
-        console.log('PaymentForm - Attempting to send SMS to:', contactPerson.name, contactPerson.contact);
-        try {
-          const smsResult = await smsService.sendPaymentSMS(
-            contactPerson.contact,
-            data.type,
-            {
-              name: contactPerson.name,
-              amount: Number(data.amount),
-              method: data.method,
-              reference: data.reference || undefined,
-              date: new Date().toISOString(),
-            }
-          );
-          console.log('PaymentForm - SMS result:', smsResult);
-        } catch (smsError) {
-          console.error('PaymentForm - SMS notification failed:', smsError);
-        }
+      if (payment) {
+        // Update existing payment
+        onSuccess?.(data);
       } else {
-        console.log('PaymentForm - No contact person available for SMS');
+        // Create new payment
+        console.log('PaymentForm - Creating payment with data:', data);
+        await paymentService.create(data);
+        
+        // Send SMS notification for new payments only
+        let contactPerson = null;
+        if (data.type === 'received' && data.customerId) {
+          contactPerson = customers.find(c => c.id === data.customerId);
+        } else if (data.type === 'paid' && data.vendorId) {
+          contactPerson = vendors.find(v => v.id === data.vendorId);
+        }
+        
+        if (contactPerson?.contact) {
+          console.log('PaymentForm - Attempting to send SMS to:', contactPerson.name, contactPerson.contact);
+          try {
+            const smsResult = await smsService.sendPaymentSMS(
+              contactPerson.contact,
+              data.type,
+              {
+                name: contactPerson.name,
+                amount: Number(data.amount),
+                method: data.method,
+                reference: data.reference || undefined,
+                date: new Date().toISOString(),
+              }
+            );
+            console.log('PaymentForm - SMS result:', smsResult);
+          } catch (smsError) {
+            console.error('PaymentForm - SMS notification failed:', smsError);
+          }
+        } else {
+          console.log('PaymentForm - No contact person available for SMS');
+        }
+        
+        toast({
+          title: "Success",
+          description: `Payment recorded and ${contactPerson ? 'notification sent' : 'ready'}`,
+        });
+        
+        form.reset();
+        setSelectedPartyBalance(null);
+        onSuccess?.();
       }
-      
-      toast({
-        title: "Success",
-        description: `Payment recorded and ${contactPerson ? 'notification sent' : 'ready'}`,
-      });
-      
-      form.reset();
-      onSuccess?.();
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to record payment",
+        description: payment ? "Failed to update payment" : "Failed to record payment",
         variant: "destructive",
       });
     } finally {
@@ -289,7 +305,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       </div>
 
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? `${t.loading}...` : t.recordPayment}
+        {loading ? `${t.loading}...` : (payment ? "Update Payment" : t.recordPayment)}
       </Button>
     </form>
   );

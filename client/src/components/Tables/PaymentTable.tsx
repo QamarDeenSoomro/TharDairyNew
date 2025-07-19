@@ -1,18 +1,70 @@
+import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowDown, ArrowUp, Receipt } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ArrowDown, ArrowUp, Receipt, Edit, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { Payment, Vendor, Customer } from "@shared/schema";
 import { formatCurrency } from "@/lib/utils";
+import { paymentService } from "@/services/firebase-realtime";
+import { useToast } from "@/hooks/use-toast";
+import PaymentForm from "@/components/Forms/PaymentForm";
 
 interface PaymentTableProps {
   payments: Payment[];
   vendors: Vendor[];
   customers: Customer[];
   showPagination?: boolean;
+  showActions?: boolean;
 }
 
-export default function PaymentTable({ payments, vendors, customers, showPagination = true }: PaymentTableProps) {
+export default function PaymentTable({ payments, vendors, customers, showPagination = true, showActions = true }: PaymentTableProps) {
+  const { toast } = useToast();
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleEdit = (payment: Payment) => {
+    setEditingPayment(payment);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (paymentId: string) => {
+    try {
+      await paymentService.delete(paymentId);
+      toast({
+        title: "Success",
+        description: "Payment record deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete payment record",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdate = async (paymentData: any) => {
+    if (!editingPayment) return;
+    
+    try {
+      await paymentService.update(editingPayment.id.toString(), paymentData);
+      toast({
+        title: "Success",
+        description: "Payment record updated successfully",
+      });
+      setDialogOpen(false);
+      setEditingPayment(null);
+    } catch (error) {
+      toast({
+        title: "Error", 
+        description: "Failed to update payment record",
+        variant: "destructive",
+      });
+    }
+  };
   const getPartyName = (payment: Payment) => {
     if (payment.vendorId) {
       const vendor = vendors.find(v => v.id === payment.vendorId);
@@ -83,6 +135,7 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
             <TableHead>Method</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Reference</TableHead>
+            {showActions && <TableHead>Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -117,10 +170,60 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
               <TableCell className="text-muted-foreground">
                 {payment.reference || '-'}
               </TableCell>
+              {showActions && (
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEdit(payment)}
+                      title="Edit Payment"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" title="Delete Payment">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Payment</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this payment record? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(payment.id.toString())}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* Edit Payment Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Payment</DialogTitle>
+          </DialogHeader>
+          <PaymentForm
+            vendors={vendors}
+            customers={customers}
+            payment={editingPayment || undefined}
+            onSuccess={handleUpdate}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

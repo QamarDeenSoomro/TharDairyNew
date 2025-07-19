@@ -13,9 +13,11 @@ import { smsService } from "@/services/smsService";
 
 interface MilkReceiveFormProps {
   vendors: FirebaseVendor[];
+  transaction?: any;
+  onSuccess?: (data?: any) => void;
 }
 
-export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
+export default function MilkReceiveForm({ vendors, transaction, onSuccess }: MilkReceiveFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<FirebaseVendor | null>(null);
@@ -23,7 +25,18 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
 
   const form = useForm<InsertMilkTransaction>({
     resolver: zodResolver(insertMilkTransactionSchema),
-    defaultValues: {
+    defaultValues: transaction ? {
+      type: "receive",
+      vendorId: transaction.vendorId || "",
+      customerId: null,
+      milkType: transaction.milkType || "cow",
+      quantity: transaction.quantity?.toString() || "",
+      rate: transaction.rate?.toString() || "",
+      totalAmount: transaction.totalAmount?.toString() || "",
+      handlerPerson: transaction.handlerPerson || "",
+      time: transaction.time || "morning",
+      date: transaction.date ? new Date(transaction.date) : new Date(),
+    } : {
       type: "receive",
       vendorId: "",
       customerId: null,
@@ -75,44 +88,50 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
         totalAmount: Number(data.totalAmount),
       };
       
-      console.log('MilkReceiveForm - Creating transaction with vendorId:', data.vendorId);
-      console.log('MilkReceiveForm - Full transformedData:', transformedData);
-      
-      await transactionService.create(transformedData);
-      
-      // Send SMS notification to vendor
-      if (selectedVendor?.contact) {
-        console.log('MilkReceiveForm - Attempting to send SMS to vendor:', selectedVendor.name, selectedVendor.contact);
-        try {
-          const smsResult = await smsService.sendMilkTransactionSMS(
-            selectedVendor.contact,
-            'receive',
-            {
-              name: selectedVendor.name,
-              quantity: Number(data.quantity),
-              milkType: data.milkType,
-              rate: Number(data.rate),
-              totalAmount: Number(data.totalAmount),
-              time: data.time,
-              date: new Date().toISOString(),
-            }
-          );
-          console.log('MilkReceiveForm - SMS result:', smsResult);
-        } catch (smsError) {
-          console.error('MilkReceiveForm - SMS notification failed:', smsError);
-        }
+      if (transaction) {
+        // Update existing transaction
+        onSuccess?.(transformedData);
       } else {
-        console.log('MilkReceiveForm - No vendor contact available for SMS');
+        // Create new transaction
+        console.log('MilkReceiveForm - Creating transaction with vendorId:', data.vendorId);
+        console.log('MilkReceiveForm - Full transformedData:', transformedData);
+        
+        await transactionService.create(transformedData);
+        
+        // Send SMS notification to vendor for new transactions only
+        if (selectedVendor?.contact) {
+          console.log('MilkReceiveForm - Attempting to send SMS to vendor:', selectedVendor.name, selectedVendor.contact);
+          try {
+            const smsResult = await smsService.sendMilkTransactionSMS(
+              selectedVendor.contact,
+              'receive',
+              {
+                name: selectedVendor.name,
+                quantity: Number(data.quantity),
+                milkType: data.milkType,
+                rate: Number(data.rate),
+                totalAmount: Number(data.totalAmount),
+                time: data.time,
+                date: new Date().toISOString(),
+              }
+            );
+            console.log('MilkReceiveForm - SMS result:', smsResult);
+          } catch (smsError) {
+            console.error('MilkReceiveForm - SMS notification failed:', smsError);
+          }
+        } else {
+          console.log('MilkReceiveForm - No vendor contact available for SMS');
+        }
+        
+        toast({
+          title: "Success",
+          description: "Milk receipt recorded and vendor notified",
+        });
+        
+        form.reset();
+        setSelectedVendor(null);
+        setTotalAmount(0);
       }
-      
-      toast({
-        title: "Success",
-        description: "Milk receipt recorded and vendor notified",
-      });
-      
-      form.reset();
-      setSelectedVendor(null);
-      setTotalAmount(0);
     } catch (error) {
       toast({
         title: "Error",

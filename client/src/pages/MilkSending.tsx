@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useCustomers, useTransactions } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MilkSendForm from "@/components/Forms/MilkSendForm";
+import MilkTransactionActions from "@/components/Tables/MilkTransactionActions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -66,11 +67,13 @@ export default function MilkSending() {
                         <span className="text-sm font-medium text-foreground">
                           {customer?.name || t.unknownCustomer}
                         </span>
-                        <span className="text-xs sm:text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(send.date!), { addSuffix: true })}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs sm:text-sm text-muted-foreground">
+                            {formatDistanceToNow(new Date(send.date!), { addSuffix: true })}
+                          </span>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm mb-3">
                         <div>
                           <span className="text-muted-foreground">Type:</span>
                           <span className="text-foreground ml-1 capitalize">{send.milkType}</span>
@@ -84,6 +87,12 @@ export default function MilkSending() {
                           <span className="text-foreground ml-1">{send.totalAmount}</span>
                         </div>
                       </div>
+                      <MilkTransactionActions 
+                        transaction={send} 
+                        customers={customers} 
+                        onEdit={() => {}} 
+                        onDelete={() => {}} 
+                      />
                     </div>
                   );
                 })

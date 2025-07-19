@@ -13,9 +13,11 @@ import { smsService } from "@/services/smsService";
 
 interface MilkSendFormProps {
   customers: FirebaseCustomer[];
+  transaction?: any;
+  onSuccess?: (data?: any) => void;
 }
 
-export default function MilkSendForm({ customers }: MilkSendFormProps) {
+export default function MilkSendForm({ customers, transaction, onSuccess }: MilkSendFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<FirebaseCustomer | null>(null);
@@ -23,7 +25,18 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
 
   const form = useForm<InsertMilkTransaction>({
     resolver: zodResolver(insertMilkTransactionSchema),
-    defaultValues: {
+    defaultValues: transaction ? {
+      type: "send",
+      vendorId: null,
+      customerId: transaction.customerId || "",
+      milkType: transaction.milkType || "cow",
+      quantity: transaction.quantity?.toString() || "",
+      rate: transaction.rate?.toString() || "",
+      totalAmount: transaction.totalAmount?.toString() || "",
+      handlerPerson: transaction.handlerPerson || "",
+      time: transaction.time || "morning",
+      date: transaction.date ? new Date(transaction.date) : new Date(),
+    } : {
       type: "send",
       vendorId: null,
       customerId: "",
@@ -75,44 +88,50 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
         totalAmount: Number(data.totalAmount),
       };
       
-      console.log('MilkSendForm - Creating transaction with customerId:', data.customerId);
-      console.log('MilkSendForm - Full transformedData:', transformedData);
-      
-      await transactionService.create(transformedData);
-      
-      // Send SMS notification to customer
-      if (selectedCustomer?.contact) {
-        console.log('MilkSendForm - Attempting to send SMS to customer:', selectedCustomer.name, selectedCustomer.contact);
-        try {
-          const smsResult = await smsService.sendMilkTransactionSMS(
-            selectedCustomer.contact,
-            'send',
-            {
-              name: selectedCustomer.name,
-              quantity: Number(data.quantity),
-              milkType: data.milkType,
-              rate: Number(data.rate),
-              totalAmount: Number(data.totalAmount),
-              time: data.time,
-              date: new Date().toISOString(),
-            }
-          );
-          console.log('MilkSendForm - SMS result:', smsResult);
-        } catch (smsError) {
-          console.error('MilkSendForm - SMS notification failed:', smsError);
-        }
+      if (transaction) {
+        // Update existing transaction
+        onSuccess?.(transformedData);
       } else {
-        console.log('MilkSendForm - No customer contact available for SMS');
+        // Create new transaction
+        console.log('MilkSendForm - Creating transaction with customerId:', data.customerId);
+        console.log('MilkSendForm - Full transformedData:', transformedData);
+        
+        await transactionService.create(transformedData);
+        
+        // Send SMS notification to customer for new transactions only
+        if (selectedCustomer?.contact) {
+          console.log('MilkSendForm - Attempting to send SMS to customer:', selectedCustomer.name, selectedCustomer.contact);
+          try {
+            const smsResult = await smsService.sendMilkTransactionSMS(
+              selectedCustomer.contact,
+              'send',
+              {
+                name: selectedCustomer.name,
+                quantity: Number(data.quantity),
+                milkType: data.milkType,
+                rate: Number(data.rate),
+                totalAmount: Number(data.totalAmount),
+                time: data.time,
+                date: new Date().toISOString(),
+              }
+            );
+            console.log('MilkSendForm - SMS result:', smsResult);
+          } catch (smsError) {
+            console.error('MilkSendForm - SMS notification failed:', smsError);
+          }
+        } else {
+          console.log('MilkSendForm - No customer contact available for SMS');
+        }
+        
+        toast({
+          title: "Success",
+          description: "Milk delivery recorded and customer notified",
+        });
+        
+        form.reset();
+        setSelectedCustomer(null);
+        setTotalAmount(0);
       }
-      
-      toast({
-        title: "Success",
-        description: "Milk delivery recorded and customer notified",
-      });
-      
-      form.reset();
-      setSelectedCustomer(null);
-      setTotalAmount(0);
     } catch (error) {
       toast({
         title: "Error",

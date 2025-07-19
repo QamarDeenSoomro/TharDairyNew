@@ -318,7 +318,7 @@ export const transactionService = {
       ...transactionData,
       date: transactionData.date ? new Date(transactionData.date).toISOString() : undefined,
     };
-    await set(transactionRef, updateData);
+    await updateDB(transactionRef, updateData);
   },
 
   // Delete transaction
@@ -424,7 +424,7 @@ export const paymentService = {
       ...paymentData,
       date: paymentData.date ? new Date(paymentData.date).toISOString() : undefined,
     };
-    await set(paymentRef, updateData);
+    await updateDB(paymentRef, updateData);
   },
 
   // Delete payment

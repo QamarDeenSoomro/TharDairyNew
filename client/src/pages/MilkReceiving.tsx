@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useVendors, useTransactions } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MilkReceiveForm from "@/components/Forms/MilkReceiveForm";
+import MilkTransactionActions from "@/components/Tables/MilkTransactionActions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -66,11 +67,13 @@ export default function MilkReceiving() {
                         <span className="text-sm font-medium text-foreground">
                           {vendor?.name || t.unknownVendor}
                         </span>
-                        <span className="text-xs sm:text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(receipt.date!), { addSuffix: true })}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs sm:text-sm text-muted-foreground">
+                            {formatDistanceToNow(new Date(receipt.date!), { addSuffix: true })}
+                          </span>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm mb-3">
                         <div>
                           <span className="text-muted-foreground">{t.type}:</span>
                           <span className="text-foreground ml-1 capitalize">{receipt.milkType}</span>
@@ -84,6 +87,12 @@ export default function MilkReceiving() {
                           <span className="text-foreground ml-1">{receipt.totalAmount}</span>
                         </div>
                       </div>
+                      <MilkTransactionActions 
+                        transaction={receipt} 
+                        vendors={vendors} 
+                        onEdit={() => {}} 
+                        onDelete={() => {}} 
+                      />
                     </div>
                   );
                 })
