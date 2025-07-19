@@ -82,20 +82,20 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
         <StatsCard
           title={t.todaysMilkReceived}
-          value={`${stats.todayReceived}L`}
+          value={`${Math.round(stats.todayReceived)}L`}
           icon="move_down"
           color="primary"
         />
         <StatsCard
           title={t.todaysMilkSent}
-          value={`${stats.todaySent}L`}
+          value={`${Math.round(stats.todaySent)}L`}
           icon="move_up"
           color="secondary"
         />
         <div className="col-span-2 lg:col-span-1">
           <StatsCard
             title={t.balanceMilk}
-            value={`${stats.todayReceived - stats.todaySent}L`}
+            value={`${Math.round(stats.todayReceived - stats.todaySent)}L`}
             icon="inventory_2"
             color={(stats.todayReceived - stats.todaySent) < 0 ? "danger" : "info"}
             textColor={(stats.todayReceived - stats.todaySent) < 0 ? "text-red-600" : undefined}
@@ -103,13 +103,13 @@ export default function Dashboard() {
         </div>
         <StatsCard
           title={t.todaysProfit}
-          value={`${stats.todayProfit.toLocaleString()}`}
+          value={`${Math.round(stats.todayProfit).toLocaleString()}`}
           icon="trending_up"
           color="success"
         />
         <StatsCard
           title={t.pendingPaymentsAmount}
-          value={`${stats.pendingPayments.toLocaleString()}`}
+          value={`${Math.round(stats.pendingPayments).toLocaleString()}`}
           icon="pending"
           color="warning"
         />

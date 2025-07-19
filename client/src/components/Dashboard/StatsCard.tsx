@@ -18,10 +18,16 @@ function formatDisplayValue(value: string): string {
   const num = parseFloat(numMatch[0]);
   const suffix = value.replace(numMatch[0], ''); // Get the suffix (L, units, etc.)
   
+  // Handle already formatted values (those with commas)
+  if (value.includes(',')) {
+    return value; // Already formatted, return as is
+  }
+  
   // Round to whole numbers and format with commas
   if (Math.abs(num) >= 1000000) {
     // For millions, show like "1.2M"
-    return `${(num / 1000000).toFixed(1).replace('.0', '')}M${suffix}`;
+    const millions = (num / 1000000).toFixed(1).replace('.0', '');
+    return `${millions}M${suffix}`;
   } else if (Math.abs(num) >= 1000) {
     // For thousands, show with comma like "1,000"
     return `${Math.round(num).toLocaleString()}${suffix}`;
@@ -66,6 +72,7 @@ export default function StatsCard({ title, value, icon, color, textColor }: Stat
           {/* Data column - 60% (3 columns) */}
           <div className="col-span-3 min-w-0">
             <p className={cn("font-bold leading-none whitespace-nowrap overflow-hidden text-ellipsis", 
+              displayValue.length > 15 ? "text-sm" :
               displayValue.length > 12 ? "text-base" :
               displayValue.length > 8 ? "text-lg" : 
               displayValue.length > 6 ? "text-xl" : "text-2xl", 
