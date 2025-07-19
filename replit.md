@@ -107,6 +107,15 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 
 ### Vercel Deployment
 - **Status**: Ready for deployment as PWA (Build Fixed)
+
+### Android APK Generation
+- **Status**: Capacitor Android project configured and ready for APK build
+- **App ID**: com.thardairy.app
+- **App Name**: Thar Dairy
+- **Build Tools**: Capacitor 7.4.2 with Android platform support
+- **Requirements**: Java 17+ and Android SDK for local building
+- **Scripts**: build-apk.sh automation script and comprehensive APK_BUILD_GUIDE.md
+- **Features**: Native Android app with all PWA features, offline support, SMS integration
 - **Build Command**: `vite build`
 - **Output Directory**: `dist/public`
 - **Architecture**: JAMstack PWA (JavaScript, APIs, Markup)

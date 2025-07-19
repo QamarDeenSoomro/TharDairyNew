@@ -530,10 +530,10 @@ export const translations: Record<Language, Translation> = {
     smsPaymentMade: 'ادائيگي ڪئي: {amount} {customer} کي {method} ذريعي',
     
     // SMS Template Messages
-    smsHeaderMilkReceived: '🥛 ٿر ڊيئري - کير وصول ڪيو',
-    smsHeaderMilkSent: '🥛 ٿر ڊيئري - کير موڪليو',
-    smsHeaderPaymentReceived: '💰 ٿر ڊيئري - ادائگي وصول',
-    smsHeaderPaymentPaid: '💰 ٿر ڊيئري - ادائگي ڪئي',
+    smsHeaderMilkReceived: '🥛 ٿر ڊيري - کير وصول ڪيو',
+    smsHeaderMilkSent: '🥛 ٿر ڊيري - کير موڪليو',
+    smsHeaderPaymentReceived: '💰 ٿر ڊيري - ادائگي وصول',
+    smsHeaderPaymentPaid: '💰 ٿر ڊيري - ادائگي ڪئي',
     smsDear: 'محترم',
     smsMilkReceivedFrom: 'توهان کان کير وصول ڪيو:',
     smsMilkDeliveredTo: 'توهان کي کير پهچايو:',
@@ -549,7 +549,7 @@ export const translations: Record<Language, Translation> = {
     smsMethod: 'طريقو',
     smsReference: 'حوالو',
     smsThankYou: 'توهان جي ڪاروبار لاءِ مهرباني!',
-    smsFromTharDairy: '- ٿر ڊيئري',
+    smsFromTharDairy: '- ٿر ڊيري',
     smsLiters: 'ليٽر',
     smsPerLiter: '/ليٽر',
     smsMorning: 'صبح',

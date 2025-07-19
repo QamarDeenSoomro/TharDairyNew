@@ -1,0 +1,26 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Green gradient background -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="milkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="512" cy="512" r="512" fill="url(#bgGrad)"/>
+  
+  <!-- Milk drop icon -->
+  <path d="M512 200 C400 200, 320 280, 320 392 C320 520, 400 600, 512 600 C624 600, 704 520, 704 392 C704 280, 624 200, 512 200 Z" fill="url(#milkGrad)" stroke="#e2e8f0" stroke-width="4"/>
+  
+  <!-- Inner highlight -->
+  <ellipse cx="480" cy="360" rx="40" ry="60" fill="#ffffff" opacity="0.4"/>
+  
+  <!-- Title text -->
+  <text x="512" y="720" font-family="Arial, sans-serif" font-size="72" font-weight="bold" text-anchor="middle" fill="white">THAR</text>
+  <text x="512" y="800" font-family="Arial, sans-serif" font-size="48" font-weight="normal" text-anchor="middle" fill="white">DAIRY</text>
+</svg>
