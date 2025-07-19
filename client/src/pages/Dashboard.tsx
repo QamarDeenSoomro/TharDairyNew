@@ -83,34 +83,39 @@ export default function Dashboard() {
         <StatsCard
           title={t.todaysMilkReceived}
           value={`${Math.round(stats.todayReceived)}L`}
-          icon="move_down"
           color="primary"
+          details={{
+            quantity: `${Math.round(stats.todayReceived)}L`,
+            amount: `Rs. ${Math.round(stats.todayReceivedAmount || 0)}`,
+            averageRate: `Rs. ${stats.todayReceived > 0 ? Math.round((stats.todayReceivedAmount || 0) / stats.todayReceived) : 0}/L`
+          }}
         />
         <StatsCard
           title={t.todaysMilkSent}
           value={`${Math.round(stats.todaySent)}L`}
-          icon="move_up"
           color="secondary"
+          details={{
+            quantity: `${Math.round(stats.todaySent)}L`,
+            amount: `Rs. ${Math.round(stats.todaySentAmount || 0)}`,
+            averageRate: `Rs. ${stats.todaySent > 0 ? Math.round((stats.todaySentAmount || 0) / stats.todaySent) : 0}/L`
+          }}
         />
         <div className="col-span-2 lg:col-span-1">
           <StatsCard
             title={t.balanceMilk}
             value={`${Math.round(stats.todayReceived - stats.todaySent)}L`}
-            icon="inventory_2"
             color={(stats.todayReceived - stats.todaySent) < 0 ? "danger" : "info"}
             textColor={(stats.todayReceived - stats.todaySent) < 0 ? "text-red-600" : undefined}
           />
         </div>
         <StatsCard
           title={t.todaysProfit}
-          value={`${Math.round(stats.todayProfit)}`}
-          icon="trending_up"
+          value={`Rs. ${Math.round(stats.todayProfit)}`}
           color="success"
         />
         <StatsCard
           title={t.pendingPaymentsAmount}
-          value={`${Math.round(stats.pendingPayments)}`}
-          icon="pending"
+          value={`Rs. ${Math.round(stats.pendingPayments)}`}
           color="warning"
         />
       </div>

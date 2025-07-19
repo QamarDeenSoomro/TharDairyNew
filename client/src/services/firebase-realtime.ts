@@ -572,13 +572,16 @@ export const dashboardService = {
       .filter(t => t.type === 'send')
       .reduce((sum, t) => sum + t.quantity, 0);
 
-    const todayRevenue = transactions
+    const todayReceivedAmount = transactions
+      .filter(t => t.type === 'receive')
+      .reduce((sum, t) => sum + t.totalAmount, 0);
+
+    const todaySentAmount = transactions
       .filter(t => t.type === 'send')
       .reduce((sum, t) => sum + t.totalAmount, 0);
 
-    const todayMilkExpenses = transactions
-      .filter(t => t.type === 'receive')
-      .reduce((sum, t) => sum + t.totalAmount, 0);
+    const todayRevenue = todaySentAmount;
+    const todayMilkExpenses = todayReceivedAmount;
 
     // Add daily expenses to total expenses
     const todayDailyExpenses = dailyExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -597,6 +600,8 @@ export const dashboardService = {
     return {
       todayReceived,
       todaySent,
+      todayReceivedAmount,
+      todaySentAmount,
       todayProfit,
       pendingPayments,
     };

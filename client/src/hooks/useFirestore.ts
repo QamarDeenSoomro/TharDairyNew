@@ -260,6 +260,8 @@ export const useDashboard = () => {
   const [stats, setStats] = useState({
     todayReceived: 0,
     todaySent: 0,
+    todayReceivedAmount: 0,
+    todaySentAmount: 0,
     todayProfit: 0,
     pendingPayments: 0,
   });

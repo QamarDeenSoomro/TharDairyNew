@@ -143,6 +143,8 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Previous Balance Integration**: WhatsApp/SMS messages now show previous balance before filtered date range with final balance calculations
 - **Milk Weight Summary**: Added milk weight tracking to ledger summary cards and message generation with period/total calculations (January 2025)
 - **Message Confirmation**: Added confirmation dialogs for WhatsApp and SMS sending to prevent accidental message dispatch (January 2025)
+- **Form Confirmation Dialogs**: Added confirmation dialogs to all milk transaction and payment forms to prevent accidental submissions with SMS notification previews (January 2025)
+- **Enhanced Dashboard Stats**: Updated dashboard service and display to show detailed milk statistics including quantity, amount, and average rates for received/sent milk without icons (January 2025)
 
 ### File Structure
 - `client/`: React frontend application

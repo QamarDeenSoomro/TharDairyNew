@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { paymentService } from "@/services/firebase-realtime";
@@ -25,6 +26,8 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedPartyBalance, setSelectedPartyBalance] = useState<number | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingData, setPendingData] = useState<InsertPayment | null>(null);
   const { transactions } = useTransactions();
   const { payments } = usePayments();
   const { t } = useLanguage();
@@ -112,6 +115,18 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
   }, [watchedType, watchedVendorId, watchedCustomerId, transactions, payments]);
 
   const onSubmit = async (data: InsertPayment) => {
+    // Show confirmation dialog for new payments
+    if (!payment) {
+      setPendingData(data);
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    // For updates, proceed directly
+    await processPayment(data);
+  };
+
+  const processPayment = async (data: InsertPayment) => {
     setLoading(true);
     try {
       if (payment) {
@@ -175,8 +190,26 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
   const availableParties = watchedType === "received" ? customers : vendors;
   const partyKey = watchedType === "received" ? "customerId" : "vendorId";
 
+  const confirmPayment = async () => {
+    if (pendingData) {
+      setShowConfirmDialog(false);
+      await processPayment(pendingData);
+      setPendingData(null);
+    }
+  };
+
+  const getSelectedParty = () => {
+    if (pendingData?.type === "received" && pendingData.customerId) {
+      return customers.find(c => c.id === pendingData.customerId);
+    } else if (pendingData?.type === "paid" && pendingData.vendorId) {
+      return vendors.find(v => v.id === pendingData.vendorId);
+    }
+    return null;
+  };
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div>
         <Label htmlFor="type">{t.type}</Label>
         <Select
@@ -304,9 +337,50 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? `${t.loading}...` : (payment ? "Update Payment" : t.recordPayment)}
-      </Button>
-    </form>
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? `${t.loading}...` : (payment ? "Update Payment" : t.recordPayment)}
+        </Button>
+      </form>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to record this payment?
+              <br /><br />
+              <strong>Type:</strong> {pendingData?.type === "received" ? "Payment Received" : "Payment Made"}
+              <br />
+              <strong>Party:</strong> {getSelectedParty()?.name}
+              <br />
+              <strong>Amount:</strong> Rs. {pendingData?.amount}
+              <br />
+              <strong>Method:</strong> {pendingData?.method}
+              {pendingData?.reference && (
+                <>
+                  <br />
+                  <strong>Reference:</strong> {pendingData.reference}
+                </>
+              )}
+              {getSelectedParty()?.contact && (
+                <>
+                  <br /><br />
+                  <span className="text-sm text-muted-foreground">
+                    SMS notification will be sent to: {getSelectedParty()?.contact}
+                  </span>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmPayment}>
+              Record Payment
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

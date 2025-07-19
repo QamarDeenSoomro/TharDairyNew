@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { transactionService, type FirebaseVendor } from "@/services/firebase-realtime";
@@ -22,6 +23,8 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
   const [loading, setLoading] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<FirebaseVendor | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingData, setPendingData] = useState<InsertMilkTransaction | null>(null);
 
   const form = useForm<InsertMilkTransaction>({
     resolver: zodResolver(insertMilkTransactionSchema),
@@ -65,35 +68,47 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
   }, [selectedVendor, watchedFields.milkType, watchedFields.quantity, form]);
 
   const onSubmit = async (data: InsertMilkTransaction) => {
+    // Validate that we have a vendor selected
+    if (!data.vendorId || data.vendorId.trim() === '') {
+      toast({
+        title: "Error",
+        description: "Please select a vendor",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Transform the data to ensure correct types
+    const transformedData = {
+      ...data,
+      vendorId: data.vendorId,
+      customerId: null, // Always null for receive transactions
+      quantity: Number(data.quantity),
+      rate: Number(data.rate),
+      totalAmount: Number(data.totalAmount),
+    };
+
+    // Show confirmation dialog for new transactions
+    if (!transaction) {
+      setPendingData(transformedData);
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    // For updates, proceed directly
+    await processTransaction(transformedData);
+  };
+
+  const processTransaction = async (transformedData: any) => {
     try {
       setLoading(true);
-      
-      // Validate that we have a vendor selected
-      if (!data.vendorId || data.vendorId.trim() === '') {
-        toast({
-          title: "Error",
-          description: "Please select a vendor",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Transform the data to ensure correct types
-      const transformedData = {
-        ...data,
-        vendorId: data.vendorId,
-        customerId: null, // Always null for receive transactions
-        quantity: Number(data.quantity),
-        rate: Number(data.rate),
-        totalAmount: Number(data.totalAmount),
-      };
       
       if (transaction) {
         // Update existing transaction
         onSuccess?.(transformedData);
       } else {
         // Create new transaction
-        console.log('MilkReceiveForm - Creating transaction with vendorId:', data.vendorId);
+        console.log('MilkReceiveForm - Creating transaction with vendorId:', transformedData.vendorId);
         console.log('MilkReceiveForm - Full transformedData:', transformedData);
         
         await transactionService.create(transformedData);
@@ -107,11 +122,11 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
               'receive',
               {
                 name: selectedVendor.name,
-                quantity: Number(data.quantity),
-                milkType: data.milkType,
-                rate: Number(data.rate),
-                totalAmount: Number(data.totalAmount),
-                time: data.time,
+                quantity: transformedData.quantity,
+                milkType: transformedData.milkType,
+                rate: transformedData.rate,
+                totalAmount: transformedData.totalAmount,
+                time: transformedData.time,
                 date: new Date().toISOString(),
               }
             );
@@ -143,8 +158,17 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
     }
   };
 
+  const confirmTransaction = async () => {
+    if (pendingData) {
+      setShowConfirmDialog(false);
+      await processTransaction(pendingData);
+      setPendingData(null);
+    }
+  };
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+    <>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
       <div>
         <Label htmlFor="vendorId">Vendor</Label>
         <Select
@@ -248,9 +272,44 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
         </div>
       </div>
 
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Recording..." : "Record Receipt"}
-      </Button>
-    </form>
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Recording..." : "Record Receipt"}
+        </Button>
+      </form>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Milk Receipt</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to record this milk receipt?
+              <br /><br />
+              <strong>Vendor:</strong> {selectedVendor?.name}
+              <br />
+              <strong>Quantity:</strong> {pendingData?.quantity}L ({pendingData?.milkType})
+              <br />
+              <strong>Amount:</strong> Rs. {pendingData?.totalAmount}
+              <br />
+              <strong>Time:</strong> {pendingData?.time}
+              {selectedVendor?.contact && (
+                <>
+                  <br /><br />
+                  <span className="text-sm text-muted-foreground">
+                    SMS notification will be sent to: {selectedVendor.contact}
+                  </span>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmTransaction}>
+              Record Receipt
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
