@@ -123,7 +123,10 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
       text += `*PAYMENTS:*\n`;
       entityPayments.forEach(p => {
         const date = format(new Date(p.date!), "dd/MM/yyyy");
-        text += `${date} - ${formatCurrency(p.amount)}${p.notes ? ` (${p.notes})` : ""}\n`;
+        const method = p.method ? ` via ${p.method.toUpperCase()}` : '';
+        const reference = p.reference ? ` (Ref: ${p.reference})` : '';
+        const notes = p.notes ? ` - ${p.notes}` : '';
+        text += `${date} - ${formatCurrency(p.amount)}${method}${reference}${notes}\n`;
       });
       text += `Subtotal: ${formatCurrency(totals.payments)}\n\n`;
     }
@@ -323,7 +326,34 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
             </CardContent>
           </Card>
 
-          {/* Actions */}
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <Button variant="outline" className="h-16 flex flex-col gap-1">
+                  <span className="material-icons text-lg">payment</span>
+                  <span className="text-xs">Make Payment</span>
+                </Button>
+                <Button variant="outline" className="h-16 flex flex-col gap-1">
+                  <span className="material-icons text-lg">receipt</span>
+                  <span className="text-xs">Receive Payment</span>
+                </Button>
+                <Button variant="outline" className="h-16 flex flex-col gap-1">
+                  <span className="material-icons text-lg">move_down</span>
+                  <span className="text-xs">{entityType === "vendor" ? "Record Milk" : "Send Milk"}</span>
+                </Button>
+                <Button variant="outline" className="h-16 flex flex-col gap-1">
+                  <span className="material-icons text-lg">edit</span>
+                  <span className="text-xs">Edit Details</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Communication Actions */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button 
               onClick={sendViaWhatsApp} 
@@ -364,41 +394,77 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
                   No transactions found for the selected period
                 </p>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Rate</TableHead>
-                        <TableHead>Amount</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {entityTransactions.map((transaction) => (
-                        <TableRow key={transaction.id}>
-                          <TableCell>
-                            <div>
-                              <div>{format(new Date(transaction.date!), "dd/MM/yyyy")}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {formatDistanceToNow(new Date(transaction.date!), { addSuffix: true })}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="capitalize">
-                              {transaction.milkType}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{transaction.quantity}L</TableCell>
-                          <TableCell>{formatCurrency(transaction.rate)}/L</TableCell>
-                          <TableCell className="font-medium">{formatCurrency(transaction.totalAmount)}</TableCell>
+                <>
+                  {/* Desktop Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Quantity</TableHead>
+                          <TableHead>Rate</TableHead>
+                          <TableHead>Amount</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {entityTransactions.map((transaction) => (
+                          <TableRow key={transaction.id}>
+                            <TableCell>
+                              <div>
+                                <div>{format(new Date(transaction.date!), "dd/MM/yyyy")}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {formatDistanceToNow(new Date(transaction.date!), { addSuffix: true })}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className="capitalize">
+                                {transaction.milkType}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{transaction.quantity}L</TableCell>
+                            <TableCell>{formatCurrency(transaction.rate)}/L</TableCell>
+                            <TableCell className="font-medium">{formatCurrency(transaction.totalAmount)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Mobile Cards */}
+                  <div className="md:hidden space-y-4">
+                    {entityTransactions.map((transaction) => (
+                      <Card key={transaction.id} className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="font-medium">{format(new Date(transaction.date!), "dd/MM/yyyy")}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(new Date(transaction.date!), { addSuffix: true })}
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="capitalize">
+                            {transaction.milkType}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">Quantity:</span>
+                            <div className="font-medium">{transaction.quantity}L</div>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Rate:</span>
+                            <div className="font-medium">{formatCurrency(transaction.rate)}/L</div>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground">Amount:</span>
+                            <div className="font-bold text-lg">{formatCurrency(transaction.totalAmount)}</div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -414,39 +480,81 @@ export default function LedgerView({ entity, entityType, isOpen, onClose }: Ledg
                   No payments found for the selected period
                 </p>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Method</TableHead>
-                        <TableHead>Notes</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {entityPayments.map((payment) => (
-                        <TableRow key={payment.id}>
-                          <TableCell>
-                            <div>
-                              <div>{format(new Date(payment.date!), "dd/MM/yyyy")}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {formatDistanceToNow(new Date(payment.date!), { addSuffix: true })}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-medium">{formatCurrency(payment.amount)}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="capitalize">
-                              {payment.method}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{payment.notes || "-"}</TableCell>
+                <>
+                  {/* Desktop Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Method</TableHead>
+                          <TableHead>Reference</TableHead>
+                          <TableHead>Notes</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {entityPayments.map((payment) => (
+                          <TableRow key={payment.id}>
+                            <TableCell>
+                              <div>
+                                <div>{format(new Date(payment.date!), "dd/MM/yyyy")}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {formatDistanceToNow(new Date(payment.date!), { addSuffix: true })}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-medium">{formatCurrency(payment.amount)}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="capitalize">
+                                {payment.method}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{payment.reference || "-"}</TableCell>
+                            <TableCell>{payment.notes || "-"}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Mobile Cards */}
+                  <div className="md:hidden space-y-4">
+                    {entityPayments.map((payment) => (
+                      <Card key={payment.id} className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="font-medium">{format(new Date(payment.date!), "dd/MM/yyyy")}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(new Date(payment.date!), { addSuffix: true })}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="capitalize">
+                            {payment.method}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Amount:</span>
+                            <span className="font-bold text-lg">{formatCurrency(payment.amount)}</span>
+                          </div>
+                          {payment.reference && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Reference:</span>
+                              <span>{payment.reference}</span>
+                            </div>
+                          )}
+                          {payment.notes && (
+                            <div>
+                              <span className="text-muted-foreground">Notes:</span>
+                              <div className="mt-1">{payment.notes}</div>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertVendorSchema, type InsertVendor } from "@shared/schema";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,14 +18,17 @@ export default function VendorForm({ vendor, onSuccess }: VendorFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<InsertVendor>({
-    resolver: zodResolver(insertVendorSchema),
+  const form = useForm<InsertVendor & { previousBalance?: number }>({
+    resolver: zodResolver(insertVendorSchema.extend({
+      previousBalance: z.number().optional(),
+    })),
     defaultValues: {
       name: vendor?.name || "",
       contact: vendor?.contact || "",
       location: vendor?.location || "",
       cowRate: vendor?.cowRate || 0,
       buffaloRate: vendor?.buffaloRate || 0,
+      previousBalance: 0,
     },
   });
 
@@ -120,6 +124,23 @@ export default function VendorForm({ vendor, onSuccess }: VendorFormProps) {
           )}
         </div>
       </div>
+
+      {!vendor && (
+        <div>
+          <Label htmlFor="previousBalance">Previous Balance (₹)</Label>
+          <Input
+            id="previousBalance"
+            type="number"
+            step="0.01"
+            {...form.register("previousBalance", { valueAsNumber: true })}
+            placeholder="0"
+            className="mt-1"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Enter any existing balance for this vendor (positive for amount due, negative for advance paid)
+          </p>
+        </div>
+      )}
 
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Saving..." : vendor ? "Update Vendor" : "Create Vendor"}

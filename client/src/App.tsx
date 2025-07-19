@@ -13,9 +13,12 @@ import MilkSending from "@/pages/MilkSending";
 import Payments from "@/pages/Payments";
 import Reports from "@/pages/Reports";
 import DatabaseManagement from "@/pages/DatabaseManagement";
+import PendingPayments from "@/pages/PendingPayments";
 import PWAInstallPrompt from "@/components/PWA/PWAInstallPrompt";
 import OfflineIndicator from "@/components/PWA/OfflineIndicator";
+import LoginPage from "@/components/Auth/LoginPage";
 import usePWA from "@/hooks/usePWA";
+import { useState, useEffect } from "react";
 
 function Router() {
   return (
@@ -28,6 +31,7 @@ function Router() {
       <Route path="/payments" component={Payments} />
       <Route path="/reports" component={Reports} />
       <Route path="/database" component={DatabaseManagement} />
+      <Route path="/pending-payments" component={PendingPayments} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -36,6 +40,36 @@ function Router() {
 function App() {
   // Initialize PWA hooks
   usePWA();
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const authStatus = localStorage.getItem("thar_dairy_auth");
+    if (authStatus === "authenticated") {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("thar_dairy_auth");
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <LoginPage onLogin={handleLogin} />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -43,7 +77,7 @@ function App() {
         <Toaster />
         <OfflineIndicator />
         <PWAInstallPrompt />
-        <AppLayout>
+        <AppLayout onLogout={handleLogout}>
           <Router />
         </AppLayout>
       </TooltipProvider>

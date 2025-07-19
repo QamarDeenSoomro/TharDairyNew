@@ -33,6 +33,7 @@ export const milkTransactions = pgTable("milk_transactions", {
   snf: real("snf"),
   rate: real("rate").notNull(),
   totalAmount: real("total_amount").notNull(),
+  handlerPerson: text("handler_person"),
   date: timestamp("date").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
 });

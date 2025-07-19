@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertCustomerSchema, type InsertCustomer } from "@shared/schema";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,14 +18,17 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<InsertCustomer>({
-    resolver: zodResolver(insertCustomerSchema),
+  const form = useForm<InsertCustomer & { previousBalance?: number }>({
+    resolver: zodResolver(insertCustomerSchema.extend({
+      previousBalance: z.number().optional(),
+    })),
     defaultValues: {
       name: customer?.name || "",
       contact: customer?.contact || "",
       location: customer?.location || "",
       cowRate: customer?.cowRate || 0,
       buffaloRate: customer?.buffaloRate || 0,
+      previousBalance: 0,
     },
   });
 
@@ -120,6 +124,23 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
           )}
         </div>
       </div>
+
+      {!customer && (
+        <div>
+          <Label htmlFor="previousBalance">Previous Balance (₹)</Label>
+          <Input
+            id="previousBalance"
+            type="number"
+            step="0.01"
+            {...form.register("previousBalance", { valueAsNumber: true })}
+            placeholder="0"
+            className="mt-1"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Enter any existing balance for this customer (positive for credit, negative for amount due)
+          </p>
+        </div>
+      )}
 
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Saving..." : customer ? "Update Customer" : "Create Customer"}

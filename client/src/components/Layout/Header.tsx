@@ -5,9 +5,10 @@ import SyncButton from "@/components/PWA/SyncButton";
 
 interface HeaderProps {
   onMenuClick: () => void;
+  onLogout?: () => void;
 }
 
-export default function Header({ onMenuClick }: HeaderProps) {
+export default function Header({ onMenuClick, onLogout }: HeaderProps) {
   const isMobile = useIsMobile();
 
   return (
@@ -43,6 +44,12 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <span className="text-sm font-medium text-foreground hidden sm:block">
                 Admin User
               </span>
+              {onLogout && (
+                <Button variant="ghost" size="sm" onClick={onLogout} className="ml-2">
+                  <span className="material-icons text-lg mr-1">logout</span>
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>

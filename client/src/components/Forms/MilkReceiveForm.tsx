@@ -29,6 +29,7 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
       quantity: "",
       rate: "",
       totalAmount: "",
+      handlerPerson: "",
       date: new Date(),
     },
   });
@@ -158,7 +159,18 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
         </div>
       </div>
 
-
+      <div>
+        <Label htmlFor="handlerPerson">Handler Person</Label>
+        <Input
+          id="handlerPerson"
+          {...form.register("handlerPerson")}
+          placeholder="Enter person who handled this transaction"
+          className="mt-1"
+        />
+        {form.formState.errors.handlerPerson && (
+          <p className="text-sm text-destructive mt-1">{form.formState.errors.handlerPerson.message}</p>
+        )}
+      </div>
 
       <div className="bg-muted p-4 rounded-md">
         <div className="flex justify-between items-center">
