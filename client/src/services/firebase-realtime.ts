@@ -73,6 +73,12 @@ export const vendorService = {
     return newVendorRef.key!;
   },
 
+  // Create vendor with specific ID (for restore)
+  async createWithId(id: string, vendorData: Partial<FirebaseVendor>): Promise<void> {
+    const vendorRef = ref(db, `${PATHS.VENDORS}/${id}`);
+    await set(vendorRef, vendorData);
+  },
+
   // Get all vendors
   async getAll(): Promise<FirebaseVendor[]> {
     const vendorsRef = ref(db, PATHS.VENDORS);
@@ -146,6 +152,12 @@ export const customerService = {
     };
     await set(newCustomerRef, data);
     return newCustomerRef.key!;
+  },
+
+  // Create customer with specific ID (for restore)
+  async createWithId(id: string, customerData: Partial<FirebaseCustomer>): Promise<void> {
+    const customerRef = ref(db, `${PATHS.CUSTOMERS}/${id}`);
+    await set(customerRef, customerData);
   },
 
   // Get all customers
@@ -231,6 +243,12 @@ export const transactionService = {
     console.log('Firebase transactionService.create - Saving data:', data);
     await set(newTransactionRef, data);
     return newTransactionRef.key!;
+  },
+
+  // Create transaction with specific ID (for restore)
+  async createWithId(id: string, transactionData: Partial<FirebaseMilkTransaction>): Promise<void> {
+    const transactionRef = ref(db, `${PATHS.MILK_TRANSACTIONS}/${id}`);
+    await set(transactionRef, transactionData);
   },
 
   // Get all transactions
@@ -347,6 +365,12 @@ export const paymentService = {
     };
     await set(newPaymentRef, data);
     return newPaymentRef.key!;
+  },
+
+  // Create payment with specific ID (for restore)
+  async createWithId(id: string, paymentData: Partial<FirebasePayment>): Promise<void> {
+    const paymentRef = ref(db, `${PATHS.PAYMENTS}/${id}`);
+    await set(paymentRef, paymentData);
   },
 
   // Get all payments

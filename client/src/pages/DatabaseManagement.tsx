@@ -90,31 +90,27 @@ export default function DatabaseManagement() {
       // Restore data
       const { vendors, customers, transactions, payments } = backup.data;
 
-      // Restore vendors
+      // Restore vendors with original IDs
       for (const vendor of vendors || []) {
-        const { id, ...vendorData } = vendor;
-        await vendorService.create(vendorData);
+        await vendorService.createWithId(vendor.id, vendor);
       }
 
-      // Restore customers
+      // Restore customers with original IDs
       for (const customer of customers || []) {
-        const { id, ...customerData } = customer;
-        await customerService.create(customerData);
+        await customerService.createWithId(customer.id, customer);
       }
 
       // Wait a bit to ensure vendors/customers are created
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Restore transactions
+      // Restore transactions with original IDs
       for (const transaction of transactions || []) {
-        const { id, ...transactionData } = transaction;
-        await transactionService.create(transactionData);
+        await transactionService.createWithId(transaction.id, transaction);
       }
 
-      // Restore payments
+      // Restore payments with original IDs
       for (const payment of payments || []) {
-        const { id, ...paymentData } = payment;
-        await paymentService.create(paymentData);
+        await paymentService.createWithId(payment.id, payment);
       }
 
       toast({
