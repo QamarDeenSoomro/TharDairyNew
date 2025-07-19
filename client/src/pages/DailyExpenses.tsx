@@ -46,43 +46,7 @@ export default function DailyExpenses() {
   const { toast } = useToast();
   const { expenses, loading: isLoading, createExpense, updateExpense, deleteExpense } = useExpenses();
 
-  // Mock data for demonstration
-  const mockExpenses: DailyExpense[] = [
-    {
-      id: '1',
-      description: 'Diesel fuel for milk collection truck',
-      amount: 2500,
-      category: 'fuel',
-      date: new Date().toISOString(),
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: '2', 
-      description: 'Veterinary check-up for cows',
-      amount: 1500,
-      category: 'veterinary',
-      date: new Date(Date.now() - 86400000).toISOString(),
-      createdAt: new Date(Date.now() - 86400000).toISOString()
-    },
-    {
-      id: '3',
-      description: 'Monthly electricity bill',
-      amount: 3200,
-      category: 'utilities',
-      date: new Date(Date.now() - 172800000).toISOString(),
-      createdAt: new Date(Date.now() - 172800000).toISOString()
-    },
-    {
-      id: '4',
-      description: 'Animal feed purchase',
-      amount: 4500,
-      category: 'feed',
-      date: new Date(Date.now() - 259200000).toISOString(),
-      createdAt: new Date(Date.now() - 259200000).toISOString()
-    }
-  ];
-
-  const allExpenses = expenses.length > 0 ? expenses : mockExpenses;
+  const allExpenses = expenses;
 
   // Filter expenses
   const filteredExpenses = allExpenses.filter(expense => {

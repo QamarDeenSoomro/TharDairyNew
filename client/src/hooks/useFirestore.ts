@@ -4,19 +4,22 @@ import {
   customerService, 
   transactionService, 
   paymentService, 
-  dashboardService 
+  dashboardService,
+  expenseService 
 } from '@/services/firebase-realtime';
 import type { 
   InsertVendor, 
   InsertCustomer, 
   InsertMilkTransaction, 
-  InsertPayment 
+  InsertPayment,
+  InsertDailyExpense 
 } from '@shared/schema';
 import type {
   FirebaseVendor,
   FirebaseCustomer,
   FirebaseMilkTransaction,
-  FirebasePayment
+  FirebasePayment,
+  FirebaseDailyExpense
 } from '@/services/firebase-realtime';
 
 // Types are now imported from the service file
@@ -290,23 +293,59 @@ export const useDashboard = () => {
 
 // Daily Expenses hook  
 export const useExpenses = () => {
-  const { data: expenses = [], isLoading: loading, addData, updateData, deleteData } = useFirestore<any>('daily_expenses');
-  
-  const createExpense = useCallback(async (expense: any) => {
+  const [expenses, setExpenses] = useState<FirebaseDailyExpense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = expenseService.subscribe((expenseList) => {
+      setExpenses(expenseList);
+      setLoading(false);
+      setError(null);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const createExpense = useCallback(async (expense: InsertDailyExpense) => {
     try {
-      await addData(expense);
+      setError(null);
+      await expenseService.create(expense);
     } catch (err) {
-      console.error('Failed to create expense:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create expense');
       throw err;
     }
-  }, [addData]);
+  }, []);
+
+  const updateExpense = useCallback(async (id: string, updates: Partial<InsertDailyExpense>) => {
+    try {
+      setError(null);
+      await expenseService.update(id, updates);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update expense');
+      throw err;
+    }
+  }, []);
+
+  const deleteExpense = useCallback(async (id: string) => {
+    try {
+      setError(null);
+      await expenseService.delete(id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete expense');
+      throw err;
+    }
+  }, []);
 
   return { 
     expenses, 
     loading, 
+    error,
     createExpense,
-    updateExpense: updateData,
-    deleteExpense: deleteData
+    updateExpense,
+    deleteExpense
   };
 };
 

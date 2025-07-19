@@ -1,14 +1,15 @@
 // Firebase Realtime Database Services
 import { ref, push, set, get, remove, onValue, off, query, orderByChild, equalTo, limitToLast } from 'firebase/database';
 import { db } from '@/lib/firebase';
-import { InsertVendor, InsertCustomer, InsertMilkTransaction, InsertPayment } from '@shared/schema';
+import { InsertVendor, InsertCustomer, InsertMilkTransaction, InsertPayment, InsertDailyExpense } from '@shared/schema';
 
 // Database paths
 const PATHS = {
   VENDORS: 'vendors',
   CUSTOMERS: 'customers',
   MILK_TRANSACTIONS: 'milk_transactions',
-  PAYMENTS: 'payments'
+  PAYMENTS: 'payments',
+  DAILY_EXPENSES: 'daily_expenses'
 };
 
 // Firebase-compatible types with string IDs
@@ -55,6 +56,15 @@ export type FirebasePayment = {
   amount: number;
   method: string;
   reference: string | null;
+  date: string;
+  createdAt: string;
+};
+
+export type FirebaseDailyExpense = {
+  id: string;
+  description: string;
+  amount: number;
+  category: string;
   date: string;
   createdAt: string;
 };
@@ -452,6 +462,88 @@ export const paymentService = {
     });
 
     return () => off(paymentsRef, 'value', unsubscribe);
+  }
+};
+
+// Daily Expense operations
+export const expenseService = {
+  // Create expense
+  async create(expenseData: InsertDailyExpense): Promise<string> {
+    const expensesRef = ref(db, PATHS.DAILY_EXPENSES);
+    const newExpenseRef = push(expensesRef);
+    const data = {
+      ...expenseData,
+      createdAt: new Date().toISOString(),
+    };
+    await set(newExpenseRef, data);
+    return newExpenseRef.key!;
+  },
+
+  // Get all expenses
+  async getAll(): Promise<FirebaseDailyExpense[]> {
+    const expensesRef = ref(db, PATHS.DAILY_EXPENSES);
+    const snapshot = await get(expensesRef);
+    if (!snapshot.exists()) return [];
+    
+    const data = snapshot.val();
+    return Object.keys(data).map(key => ({
+      id: key,
+      ...data[key]
+    }));
+  },
+
+  // Update expense
+  async update(id: string, updates: Partial<InsertDailyExpense>): Promise<void> {
+    const expenseRef = ref(db, `${PATHS.DAILY_EXPENSES}/${id}`);
+    await set(expenseRef, updates);
+  },
+
+  // Delete expense
+  async delete(id: string): Promise<void> {
+    const expenseRef = ref(db, `${PATHS.DAILY_EXPENSES}/${id}`);
+    await remove(expenseRef);
+  },
+
+  // Subscribe to expense changes
+  subscribe(callback: (expenses: FirebaseDailyExpense[]) => void): () => void {
+    const expensesRef = ref(db, PATHS.DAILY_EXPENSES);
+    
+    const handleChange = (snapshot: any) => {
+      if (!snapshot.exists()) {
+        callback([]);
+        return;
+      }
+      
+      const data = snapshot.val();
+      const expenses = Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      }));
+      
+      console.log('Retrieved expenses:', expenses);
+      callback(expenses);
+    };
+
+    onValue(expensesRef, handleChange);
+    
+    return () => {
+      off(expensesRef, 'value', handleChange);
+    };
+  },
+
+  // Get expenses by date range
+  async getByDateRange(startDate: Date, endDate: Date): Promise<FirebaseDailyExpense[]> {
+    const expenses = await this.getAll();
+    return expenses.filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate >= startDate && expenseDate <= endDate;
+    });
+  },
+
+  // Get expenses by category
+  async getByCategory(category: string): Promise<FirebaseDailyExpense[]> {
+    const expenses = await this.getAll();
+    return expenses.filter(expense => expense.category === category);
   }
 };
 
