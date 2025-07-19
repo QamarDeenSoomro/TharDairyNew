@@ -16,10 +16,12 @@ import DatabaseManagement from "@/pages/DatabaseManagement";
 import PendingPayments from "@/pages/PendingPayments";
 import VendorLedger from "@/pages/VendorLedger";
 import CustomerLedger from "@/pages/CustomerLedger";
+import DailyExpenses from "@/pages/DailyExpenses";
 import PWAInstallPrompt from "@/components/PWA/PWAInstallPrompt";
 import OfflineIndicator from "@/components/PWA/OfflineIndicator";
 import LoginPage from "@/components/Auth/LoginPage";
 import usePWA from "@/hooks/usePWA";
+import { useSMSToasts } from "@/hooks/useSMSToasts";
 import { useState, useEffect } from "react";
 
 function Router() {
@@ -36,6 +38,7 @@ function Router() {
       <Route path="/pending-payments" component={PendingPayments} />
       <Route path="/vendor-ledger" component={VendorLedger} />
       <Route path="/customer-ledger" component={CustomerLedger} />
+      <Route path="/expenses" component={DailyExpenses} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -44,6 +47,7 @@ function Router() {
 function App() {
   // Initialize PWA hooks
   usePWA();
+  useSMSToasts();
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 

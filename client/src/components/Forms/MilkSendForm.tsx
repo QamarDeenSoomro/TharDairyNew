@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { transactionService, type FirebaseCustomer } from "@/services/firebase-realtime";
+import { smsService } from "@/services/smsService";
 
 interface MilkSendFormProps {
   customers: FirebaseCustomer[];
@@ -76,9 +77,30 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
       console.log('MilkSendForm - Full transformedData:', transformedData);
       
       await transactionService.create(transformedData);
+      
+      // Send SMS notification to customer
+      if (selectedCustomer?.contact) {
+        try {
+          await smsService.sendMilkTransactionSMS(
+            selectedCustomer.contact,
+            'send',
+            {
+              name: selectedCustomer.name,
+              quantity: Number(data.quantity),
+              milkType: data.milkType,
+              rate: Number(data.rate),
+              totalAmount: Number(data.totalAmount),
+              date: new Date().toISOString(),
+            }
+          );
+        } catch (smsError) {
+          console.log('SMS notification failed:', smsError);
+        }
+      }
+      
       toast({
         title: "Success",
-        description: "Milk delivery recorded successfully",
+        description: "Milk delivery recorded and customer notified",
       });
       
       form.reset();

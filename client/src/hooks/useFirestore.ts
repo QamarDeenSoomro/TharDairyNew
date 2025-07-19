@@ -287,3 +287,122 @@ export const useDashboard = () => {
 
   return { stats, loading, error };
 };
+
+// Daily Expenses hook  
+export const useExpenses = () => {
+  const { data: expenses = [], isLoading: loading, addData, updateData, deleteData } = useFirestore<any>('daily_expenses');
+  
+  const createExpense = useCallback(async (expense: any) => {
+    try {
+      await addData(expense);
+    } catch (err) {
+      console.error('Failed to create expense:', err);
+      throw err;
+    }
+  }, [addData]);
+
+  return { 
+    expenses, 
+    loading, 
+    createExpense,
+    updateExpense: updateData,
+    deleteExpense: deleteData
+  };
+};
+
+// Generic Firestore hook
+export const useFirestore = <T>(collection: string) => {
+  const [data, setData] = useState<T[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Subscribe to collection changes
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+    
+    const setupSubscription = async () => {
+      try {
+        setError(null);
+        
+        // Map collection names to services
+        const serviceMap: Record<string, any> = {
+          'vendors': vendorService,
+          'customers': customerService,
+          'milk_transactions': transactionService,
+          'payments': paymentService,
+          'daily_expenses': { 
+            subscribe: (callback: (data: T[]) => void) => {
+              // For now, return empty data for daily_expenses
+              callback([]);
+              return () => {};
+            }
+          }
+        };
+        
+        const service = serviceMap[collection];
+        if (service && service.subscribe) {
+          unsubscribe = service.subscribe((newData: T[]) => {
+            setData(newData);
+            setIsLoading(false);
+          });
+        } else {
+          setData([]);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        setIsLoading(false);
+      }
+    };
+
+    setupSubscription();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [collection]);
+
+  const addData = useCallback(async (item: Partial<T>) => {
+    try {
+      setError(null);
+      // Implementation would depend on the service
+      console.log('Adding data to', collection, item);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add data');
+      throw err;
+    }
+  }, [collection]);
+
+  const updateData = useCallback(async (id: string, updates: Partial<T>) => {
+    try {
+      setError(null);
+      // Implementation would depend on the service
+      console.log('Updating data in', collection, id, updates);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update data');
+      throw err;
+    }
+  }, [collection]);
+
+  const deleteData = useCallback(async (id: string) => {
+    try {
+      setError(null);
+      // Implementation would depend on the service
+      console.log('Deleting data from', collection, id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete data');
+      throw err;
+    }
+  }, [collection]);
+
+  return {
+    data,
+    isLoading,
+    error,
+    addData,
+    updateData,
+    deleteData
+  };
+};

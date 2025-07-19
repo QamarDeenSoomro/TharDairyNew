@@ -148,8 +148,8 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
       const message = generateLedgerText();
       const phoneNumber = entity.contact.replace(/[^0-9]/g, ""); // Remove non-numeric characters
       
-      // Format phone number for WhatsApp (add country code if not present)
-      const formattedNumber = phoneNumber.startsWith("91") ? phoneNumber : `91${phoneNumber}`;
+      // Format phone number for WhatsApp with Pakistan country code (+92)
+      const formattedNumber = phoneNumber.startsWith("92") ? phoneNumber : `92${phoneNumber}`;
       
       const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(message)}`;
       

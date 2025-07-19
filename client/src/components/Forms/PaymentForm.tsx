@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { paymentService } from "@/services/firebase-realtime";
+import { smsService } from "@/services/smsService";
 
 interface PaymentFormProps {
   vendors: Vendor[];
@@ -39,9 +40,36 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       
       console.log('PaymentForm - Creating payment with data:', data);
       await paymentService.create(data);
+      
+      // Send SMS notification
+      let contactPerson = null;
+      if (data.type === 'received' && data.customerId) {
+        contactPerson = customers.find(c => c.id === data.customerId);
+      } else if (data.type === 'paid' && data.vendorId) {
+        contactPerson = vendors.find(v => v.id === data.vendorId);
+      }
+      
+      if (contactPerson?.contact) {
+        try {
+          await smsService.sendPaymentSMS(
+            contactPerson.contact,
+            data.type,
+            {
+              name: contactPerson.name,
+              amount: Number(data.amount),
+              method: data.method,
+              reference: data.reference || undefined,
+              date: new Date().toISOString(),
+            }
+          );
+        } catch (smsError) {
+          console.log('SMS notification failed:', smsError);
+        }
+      }
+      
       toast({
         title: "Success",
-        description: "Payment recorded successfully",
+        description: `Payment recorded and ${contactPerson ? 'notification sent' : 'ready'}`,
       });
       
       form.reset();

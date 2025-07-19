@@ -18,6 +18,7 @@ const navigationItems = [
   { name: "Milk Sending", href: "/milk-sending", icon: "move_up" },
   { name: "Payments", href: "/payments", icon: "payment" },
   { name: "Pending Payments", href: "/pending-payments", icon: "pending" },
+  { name: "Daily Expenses", href: "/expenses", icon: "trending_down" },
   { name: "Reports", href: "/reports", icon: "assessment" },
   { name: "Database", href: "/database", icon: "storage" },
 ];
