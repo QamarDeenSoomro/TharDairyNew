@@ -1,6 +1,9 @@
 /* Material Icons and Google Fonts */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+/* MB Sindhi Font for Sindhi language support */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/mb-sindhi');
 
 @tailwind base;
 @tailwind components;
@@ -42,9 +45,58 @@
   margin-right: 16rem;
 }
 
-/* Sindhi font support */
+[dir="rtl"] .lg:mr-64 {
+  margin-left: 16rem;
+  margin-right: 0;
+}
+
+/* Fix sidebar positioning for RTL */
+[dir="rtl"] .sidebar-rtl {
+  right: 0;
+  left: auto;
+  border-left: 1px solid hsl(var(--border));
+  border-right: none;
+}
+
+/* Fix mobile menu positioning for RTL */
+[dir="rtl"] .mobile-menu-rtl {
+  right: 0;
+  left: auto;
+}
+
+/* Sindhi font support with MB Sindhi */
 [dir="rtl"] body {
-  font-family: 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
+  font-family: 'MB Sindhi', 'MB Sindhi Fallback', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
+  line-height: 1.6;
+}
+
+[dir="rtl"] * {
+  font-family: 'MB Sindhi', 'MB Sindhi Fallback', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+/* Custom font loading for MB Sindhi fallback */
+@font-face {
+  font-family: 'MB Sindhi Fallback';
+  src: url('https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/noto/NotoSansArabic-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Enhanced RTL text rendering */
+[dir="rtl"] {
+  text-align: right;
+  direction: rtl;
+  unicode-bidi: embed;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
 }
 
 :root {

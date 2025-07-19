@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const sidebarClasses = cn(
     "fixed inset-y-0 z-50 w-64 bg-card border-border transform transition-transform duration-300 ease-in-out",
     "lg:translate-x-0 lg:static lg:inset-0 lg:pt-16",
-    isRTL ? "right-0 border-l" : "left-0 border-r",
+    isRTL ? "right-0 border-l sidebar-rtl" : "left-0 border-r",
     isOpen ? "translate-x-0" : (isRTL ? "translate-x-full" : "-translate-x-full")
   );
 
