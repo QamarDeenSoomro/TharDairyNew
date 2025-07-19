@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -87,6 +88,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               );
             })}
           </nav>
+
+          {/* Language Selector at bottom */}
+          <div className="px-4 pb-4 border-t border-border pt-4">
+            <div className="text-xs text-muted-foreground mb-2">{t.language}</div>
+            <LanguageSelector />
+          </div>
         </div>
       </aside>
     </>

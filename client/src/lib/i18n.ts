@@ -94,6 +94,41 @@ export interface Translation {
   language: string;
   english: string;
   sindhi: string;
+  
+  // Page titles and descriptions
+  paymentManagement: string;
+  paymentManagementDesc: string;
+  vendorManagement: string;
+  vendorManagementDesc: string;
+  customerManagement: string;
+  customerManagementDesc: string;
+  milkReceivingManagement: string;
+  milkReceivingDesc: string;
+  milkSendingManagement: string;
+  milkSendingDesc: string;
+  reportsAndAnalytics: string;
+  reportsDesc: string;
+  dailyExpenseTracking: string;
+  dailyExpenseDesc: string;
+  databaseBackupRestore: string;
+  databaseDesc: string;
+  
+  // Payment page specific
+  recordPayment: string;
+  paymentSummary: string;
+  totalReceived: string;
+  totalPaid: string;
+  recentPayments: string;
+  currentBalance: string;
+  customerOwes: string;
+  amountDueToVendor: string;
+  advancePaid: string;
+  settled: string;
+  paymentReceived: string;
+  paymentMade: string;
+  selectParty: string;
+  selectPaymentType: string;
+  selectPaymentMethod: string;
 }
 
 export const translations: Record<Language, Translation> = {
@@ -190,6 +225,41 @@ export const translations: Record<Language, Translation> = {
     language: 'Language',
     english: 'English',
     sindhi: 'Sindhi',
+    
+    // Page titles and descriptions
+    paymentManagement: 'Payment Management',
+    paymentManagementDesc: 'Track payments to vendors and from customers',
+    vendorManagement: 'Vendor Management',
+    vendorManagementDesc: 'Manage milk suppliers and their information',
+    customerManagement: 'Customer Management',
+    customerManagementDesc: 'Manage milk buyers and customer details',
+    milkReceivingManagement: 'Milk Receiving',
+    milkReceivingDesc: 'Record milk received from vendors',
+    milkSendingManagement: 'Milk Sending',
+    milkSendingDesc: 'Record milk delivered to customers',
+    reportsAndAnalytics: 'Reports & Analytics',
+    reportsDesc: 'Generate reports and view analytics',
+    dailyExpenseTracking: 'Daily Expense Tracking',
+    dailyExpenseDesc: 'Track daily business expenses',
+    databaseBackupRestore: 'Database Management',
+    databaseDesc: 'Backup and restore system data',
+    
+    // Payment page specific
+    recordPayment: 'Record Payment',
+    paymentSummary: 'Payment Summary',
+    totalReceived: 'Total Received',
+    totalPaid: 'Total Paid',
+    recentPayments: 'Recent Payments',
+    currentBalance: 'Current Balance',
+    customerOwes: 'Customer owes',
+    amountDueToVendor: 'Amount due to vendor',
+    advancePaid: 'Advance paid',
+    settled: 'Settled',
+    paymentReceived: 'Payment Received',
+    paymentMade: 'Payment Made',
+    selectParty: 'Select party',
+    selectPaymentType: 'Select payment type',
+    selectPaymentMethod: 'Select payment method',
   },
   
   sd: {
@@ -285,6 +355,41 @@ export const translations: Record<Language, Translation> = {
     language: 'ٻولي',
     english: 'انگريزي',
     sindhi: 'سنڌي',
+    
+    // Page titles and descriptions
+    paymentManagement: 'ادائيگي جو انتظام',
+    paymentManagementDesc: 'وينڊرز کي ادائيگيون ۽ گراهڪن کان ادائيگيون ٽريڪ ڪريو',
+    vendorManagement: 'وينڊر جو انتظام',
+    vendorManagementDesc: 'کير فراهم ڪندڙن ۽ انهن جي معلومات جو انتظام ڪريو',
+    customerManagement: 'گراهڪ جو انتظام',
+    customerManagementDesc: 'کير خريدار ۽ گراهڪن جي تفصيلات جو انتظام ڪريو',
+    milkReceivingManagement: 'کير وصول ڪرڻ',
+    milkReceivingDesc: 'وينڊرز کان وصول ٿيل کير جو رڪارڊ',
+    milkSendingManagement: 'کير موڪلڻ',
+    milkSendingDesc: 'گراهڪن کي پهچائيل کير جو رڪارڊ',
+    reportsAndAnalytics: 'رپورٽون ۽ تجزيا',
+    reportsDesc: 'رپورٽون ٺاهيو ۽ تجزيا ڏسو',
+    dailyExpenseTracking: 'روزاني خرچ جي ٽريڪنگ',
+    dailyExpenseDesc: 'روزاني ڪاروباري خرچ جي ٽريڪنگ',
+    databaseBackupRestore: 'ڊيٽابيس جو انتظام',
+    databaseDesc: 'سسٽم ڊيٽا جو بيڪ اپ ۽ بحالي',
+    
+    // Payment page specific
+    recordPayment: 'ادائيگي رڪارڊ ڪريو',
+    paymentSummary: 'ادائيگي جو خلاصو',
+    totalReceived: 'ڪل وصول ٿيل',
+    totalPaid: 'ڪل ادا ڪيل',
+    recentPayments: 'تازيون ادائيگيون',
+    currentBalance: 'موجوده بيلنس',
+    customerOwes: 'گراهڪ جو قرض',
+    amountDueToVendor: 'وينڊر کي ادا ڪرڻ وارو',
+    advancePaid: 'اڳواٽ ادا ڪيل',
+    settled: 'صاف ٿيل',
+    paymentReceived: 'ادائيگي وصول ٿيل',
+    paymentMade: 'ادائيگي ڪئي وئي',
+    selectParty: 'پارٽي چونڊيو',
+    selectPaymentType: 'ادائيگي جو قسم چونڊيو',
+    selectPaymentMethod: 'ادائيگي جو طريقو چونڊيو',
   }
 };
 

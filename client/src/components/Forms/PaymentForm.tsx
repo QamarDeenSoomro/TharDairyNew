@@ -12,6 +12,7 @@ import { paymentService } from "@/services/firebase-realtime";
 import { smsService } from "@/services/smsService";
 import { useTransactions, usePayments } from "@/hooks/useFirestore";
 import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PaymentFormProps {
   vendors: Vendor[];
@@ -25,6 +26,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
   const [selectedPartyBalance, setSelectedPartyBalance] = useState<number | null>(null);
   const { transactions } = useTransactions();
   const { payments } = usePayments();
+  const { t } = useLanguage();
 
   const form = useForm<InsertPayment>({
     resolver: zodResolver(insertPaymentSchema),
@@ -156,7 +158,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div>
-        <Label htmlFor="type">Payment Type</Label>
+        <Label htmlFor="type">{t.type}</Label>
         <Select
           value={form.watch("type")}
           onValueChange={(value: "received" | "paid") => {
@@ -166,11 +168,11 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
           }}
         >
           <SelectTrigger className="mt-1">
-            <SelectValue placeholder="Select payment type" />
+            <SelectValue placeholder={t.selectPaymentType} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="received">Payment Received</SelectItem>
-            <SelectItem value="paid">Payment Made</SelectItem>
+            <SelectItem value="received">{t.paymentReceived}</SelectItem>
+            <SelectItem value="paid">{t.paymentMade}</SelectItem>
           </SelectContent>
         </Select>
         {form.formState.errors.type && (
@@ -179,7 +181,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       </div>
 
       <div>
-        <Label htmlFor="party">Party</Label>
+        <Label htmlFor="party">{watchedType === "received" ? t.customer : t.vendor}</Label>
         <Select
           value={form.watch(partyKey) || ""}
           onValueChange={(value) => {
@@ -193,7 +195,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
           }}
         >
           <SelectTrigger className="mt-1">
-            <SelectValue placeholder="Select party" />
+            <SelectValue placeholder={t.selectParty} />
           </SelectTrigger>
           <SelectContent>
             {availableParties.map((party) => (
@@ -214,7 +216,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
           <AlertCircle className={`h-4 w-4 ${selectedPartyBalance > 0 ? "text-orange-600" : "text-green-600"}`} />
           <AlertDescription className="flex items-center justify-between">
             <span className="text-sm">
-              Current Balance: 
+              {t.currentBalance}: 
               <span className={`font-semibold ml-1 ${selectedPartyBalance > 0 ? "text-orange-700 dark:text-orange-400" : "text-green-700 dark:text-green-400"}`}>
                 {selectedPartyBalance.toLocaleString()}
               </span>
@@ -222,12 +224,12 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
             {selectedPartyBalance > 0 ? (
               <div className="flex items-center gap-1 text-xs text-orange-600">
                 <TrendingUp className="h-3 w-3" />
-                {watchedType === "received" ? "Customer owes" : "Amount due to vendor"}
+                {watchedType === "received" ? t.customerOwes : t.amountDueToVendor}
               </div>
             ) : (
               <div className="flex items-center gap-1 text-xs text-green-600">
                 <TrendingDown className="h-3 w-3" />
-                {Math.abs(selectedPartyBalance) > 0 ? "Advance paid" : "Settled"}
+                {Math.abs(selectedPartyBalance) > 0 ? t.advancePaid : t.settled}
               </div>
             )}
           </AlertDescription>
@@ -235,7 +237,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       )}
 
       <div>
-        <Label htmlFor="amount">Amount</Label>
+        <Label htmlFor="amount">{t.amount}</Label>
         <Input
           id="amount"
           type="number"
@@ -250,18 +252,18 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       </div>
 
       <div>
-        <Label htmlFor="method">Payment Method</Label>
+        <Label htmlFor="method">{t.method}</Label>
         <Select
           value={form.watch("method")}
           onValueChange={(value: "cash" | "bank" | "cheque") => form.setValue("method", value)}
         >
           <SelectTrigger className="mt-1">
-            <SelectValue placeholder="Select payment method" />
+            <SelectValue placeholder={t.selectPaymentMethod} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="cash">Cash</SelectItem>
-            <SelectItem value="bank">Bank Transfer</SelectItem>
-            <SelectItem value="cheque">Cheque</SelectItem>
+            <SelectItem value="cash">{t.cash}</SelectItem>
+            <SelectItem value="bank">{t.bank}</SelectItem>
+            <SelectItem value="cheque">{t.cheque}</SelectItem>
           </SelectContent>
         </Select>
         {form.formState.errors.method && (
@@ -270,7 +272,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       </div>
 
       <div>
-        <Label htmlFor="reference">Reference (Optional)</Label>
+        <Label htmlFor="reference">{t.reference} (Optional)</Label>
         <Input
           id="reference"
           {...form.register("reference")}
@@ -283,7 +285,7 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       </div>
 
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Recording..." : "Record Payment"}
+        {loading ? `${t.loading}...` : t.recordPayment}
       </Button>
     </form>
   );

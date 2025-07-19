@@ -64,18 +64,41 @@
   left: auto;
 }
 
-/* Sindhi font support with MB Sindhi */
+/* Sindhi font support with MBSindhWeb */
 [dir="rtl"] body {
-  font-family: 'MB Sindhi', 'MB Sindhi Fallback', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
+  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
   line-height: 1.6;
 }
 
 [dir="rtl"] * {
-  font-family: 'MB Sindhi', 'MB Sindhi Fallback', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
+  font-family: 'MBSindhWeb', 'MB Sindhi', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', Arial, sans-serif;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom font loading for MB Sindhi fallback */
+/* Custom font loading for MBSindhWeb (user will upload this) */
+@font-face {
+  font-family: 'MBSindhWeb';
+  src: url('./assets/fonts/MBSindhWeb-Regular.woff2') format('woff2'),
+       url('./assets/fonts/MBSindhWeb-Regular.woff') format('woff'),
+       url('./assets/fonts/MBSindhWeb-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MBSindhWeb';
+  src: url('./assets/fonts/MBSindhWeb-Bold.woff2') format('woff2'),
+       url('./assets/fonts/MBSindhWeb-Bold.woff') format('woff'),
+       url('./assets/fonts/MBSindhWeb-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fallback font loading */
 @font-face {
   font-family: 'MB Sindhi Fallback';
   src: url('https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/noto/NotoSansArabic-Regular.ttf') format('truetype');
