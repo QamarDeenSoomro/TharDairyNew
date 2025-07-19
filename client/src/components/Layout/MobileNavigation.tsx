@@ -13,7 +13,7 @@ export default function MobileNavigation() {
   const [location] = useLocation();
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 safe-area-inset-bottom">
       <div className="grid grid-cols-4 gap-1">
         {navigationItems.map((item) => {
           const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
