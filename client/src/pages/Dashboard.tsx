@@ -53,13 +53,13 @@ export default function Dashboard() {
         />
         <StatsCard
           title="Today's Profit"
-          value={`${stats.todayProfit.toLocaleString('en-IN', {style: 'currency', currency: 'INR'})}`}
+          value={`${stats.todayProfit.toLocaleString()}`}
           icon="trending_up"
           color="success"
         />
         <StatsCard
           title="Pending Payments"
-          value={`${stats.pendingPayments.toLocaleString('en-IN', {style: 'currency', currency: 'INR'})}`}
+          value={`${stats.pendingPayments.toLocaleString()}`}
           icon="pending"
           color="warning"
         />
