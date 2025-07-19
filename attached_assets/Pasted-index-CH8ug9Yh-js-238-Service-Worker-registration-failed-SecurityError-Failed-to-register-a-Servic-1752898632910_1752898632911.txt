@@ -1,0 +1,33 @@
+index-CH8ug9Yh.js:238 Service Worker registration failed: SecurityError: Failed to register a ServiceWorker for scope ('https://thar-dairy.web.app/') with script ('https://thar-dairy.web.app/sw.js'): The script has an unsupported MIME type ('text/html').
+KW	@	index-CH8ug9Yh.js:238
+
+manifest.json:1 Manifest: Line: 1, column: 1, Syntax error.
+thar-dairy.web.app/:1 <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">
+index-CH8ug9Yh.js:238 Offline storage initialized successfully
+The script has an unsupported MIME type ('text/html').
+index-CH8ug9Yh.js:238 Service Worker registration failed: SecurityError: Failed to register a ServiceWorker for scope ('https://thar-dairy.web.app/') with script ('https://thar-dairy.web.app/sw.js'): The script has an unsupported MIME type ('text/html').
+KW	@	index-CH8ug9Yh.js:238
+await in KW		
+(anonymous)	@	index-CH8ug9Yh.js:238
+await in (anonymous)		
+(anonymous)	@	index-CH8ug9Yh.js:238
+$m	@	index-CH8ug9Yh.js:40
+xc	@	index-CH8ug9Yh.js:40
+o9	@	index-CH8ug9Yh.js:40
+No	@	index-CH8ug9Yh.js:40
+SE	@	index-CH8ug9Yh.js:40
+xo	@	index-CH8ug9Yh.js:38
+(anonymous)	@	index-CH8ug9Yh.js:40
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVaYvXMzwGeNMlcKGY: 
+{id: '-OVVaYvXMzwGeNMlcKGY', type: 'receive', vendorId: '-OVVXpyCUF6gPXZkYzwM', customerId: null, milkType: 'cow', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVcvFi7_vvDOKbPmg4: 
+{id: '-OVVcvFi7_vvDOKbPmg4', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVe14QLm9KvhwpqwGV: 
+{id: '-OVVe14QLm9KvhwpqwGV', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVaYvXMzwGeNMlcKGY: 
+{id: '-OVVaYvXMzwGeNMlcKGY', type: 'receive', vendorId: '-OVVXpyCUF6gPXZkYzwM', customerId: null, milkType: 'cow', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVcvFi7_vvDOKbPmg4: 
+{id: '-OVVcvFi7_vvDOKbPmg4', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+index-CH8ug9Yh.js:2935 Retrieved transaction -OVVe14QLm9KvhwpqwGV: 
+{id: '-OVVe14QLm9KvhwpqwGV', type: 'send', vendorId: null, customerId: '-OVVcmTA20PSP9BlmS4h', milkType: 'buffalo', …}
+﻿

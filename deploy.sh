@@ -13,6 +13,10 @@ fi
 echo "🔨 Building application..."
 npm run build
 
+# Copy PWA files to build output
+echo "📱 Copying PWA files..."
+cp public/sw.js public/manifest.json public/icon-*.svg public/offline.html dist/public/
+
 # Check if build was successful
 if [ $? -eq 0 ]; then
     echo "✅ Build successful!"
