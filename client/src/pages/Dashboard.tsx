@@ -103,13 +103,13 @@ export default function Dashboard() {
         </div>
         <StatsCard
           title={t.todaysProfit}
-          value={`${Math.round(stats.todayProfit).toLocaleString()}`}
+          value={`${Math.round(stats.todayProfit)}`}
           icon="trending_up"
           color="success"
         />
         <StatsCard
           title={t.pendingPaymentsAmount}
-          value={`${Math.round(stats.pendingPayments).toLocaleString()}`}
+          value={`${Math.round(stats.pendingPayments)}`}
           icon="pending"
           color="warning"
         />
