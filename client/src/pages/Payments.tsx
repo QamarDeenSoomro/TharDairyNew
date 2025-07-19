@@ -70,12 +70,12 @@ export default function Payments() {
                 <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <TrendingUp className="h-8 w-8 text-green-600 mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">Total Received</p>
-                  <p className="text-xl font-bold text-green-600">₹{totalReceived.toLocaleString()}</p>
+                  <p className="text-xl font-bold text-green-600">{totalReceived.toLocaleString()}</p>
                 </div>
                 <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                   <TrendingDown className="h-8 w-8 text-orange-600 mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">Total Paid</p>
-                  <p className="text-xl font-bold text-orange-600">₹{totalPaid.toLocaleString()}</p>
+                  <p className="text-xl font-bold text-orange-600">{totalPaid.toLocaleString()}</p>
                 </div>
               </div>
             </CardContent>

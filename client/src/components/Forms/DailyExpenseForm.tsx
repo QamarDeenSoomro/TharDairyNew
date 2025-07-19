@@ -102,7 +102,7 @@ export function DailyExpenseForm({ open, onClose, expense }: DailyExpenseFormPro
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount (PKR)</FormLabel>
+                    <FormLabel>Amount</FormLabel>
                     <FormControl>
                       <Input
                         type="number"

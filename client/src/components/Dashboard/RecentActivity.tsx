@@ -39,8 +39,8 @@ export default function RecentActivity({ transactions, payments, vendors, custom
       id: `payment-${p.id}`,
       type: p.type,
       description: p.type === 'received' 
-        ? `Payment received ₹${p.amount} from ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}` 
-        : `Payment made ₹${p.amount} to ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}`,
+        ? `Payment received ${p.amount} from ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}` 
+        : `Payment made ${p.amount} to ${p.vendorId ? getVendorName(p.vendorId) : getCustomerName(p.customerId)}`,
       timestamp: new Date(p.date!),
       icon: 'payment',
       color: 'success',

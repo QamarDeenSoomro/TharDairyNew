@@ -95,7 +95,7 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="cowRate">Cow Rate (₹/L)</Label>
+          <Label htmlFor="cowRate">Cow Rate (/L)</Label>
           <Input
             id="cowRate"
             type="number"
@@ -110,7 +110,7 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
         </div>
 
         <div>
-          <Label htmlFor="buffaloRate">Buffalo Rate (₹/L)</Label>
+          <Label htmlFor="buffaloRate">Buffalo Rate (/L)</Label>
           <Input
             id="buffaloRate"
             type="number"
@@ -127,7 +127,7 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
 
       {!customer && (
         <div>
-          <Label htmlFor="previousBalance">Previous Balance (₹)</Label>
+          <Label htmlFor="previousBalance">Previous Balance</Label>
           <Input
             id="previousBalance"
             type="number"

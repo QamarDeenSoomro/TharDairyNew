@@ -168,11 +168,11 @@ export default function Reports() {
                 </div>
                 <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
-                  <p className="text-lg font-bold text-green-600">₹{totalRevenue.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-green-600">{totalRevenue.toLocaleString()}</p>
                 </div>
                 <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                   <p className="text-sm text-muted-foreground">Net Profit</p>
-                  <p className="text-lg font-bold text-orange-600">₹{netProfit.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-orange-600">{netProfit.toLocaleString()}</p>
                 </div>
               </div>
 

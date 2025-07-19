@@ -79,7 +79,7 @@ export default function MilkSending() {
                         </div>
                         <div className="col-span-2 sm:col-span-1">
                           <span className="text-muted-foreground">Amount:</span>
-                          <span className="text-foreground ml-1">₹{send.totalAmount}</span>
+                          <span className="text-foreground ml-1">{send.totalAmount}</span>
                         </div>
                       </div>
                     </div>

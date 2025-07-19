@@ -197,7 +197,7 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
       <div className="bg-muted p-4 rounded-md">
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Total Amount:</span>
-          <span className="text-lg font-bold text-primary">₹{totalAmount.toFixed(2)}</span>
+          <span className="text-lg font-bold text-primary">{totalAmount.toFixed(2)}</span>
         </div>
       </div>
 

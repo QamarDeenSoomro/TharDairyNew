@@ -58,8 +58,8 @@ class SMSService {
         `Milk ${action} you:\n` +
         `• Type: ${data.milkType.charAt(0).toUpperCase() + data.milkType.slice(1)}\n` +
         `• Quantity: ${data.quantity} liters\n` +
-        `• Rate: PKR ${data.rate}/liter\n` +
-        `• Total Amount: PKR ${data.totalAmount}\n` +
+        `• Rate: ${data.rate}/liter\n` +
+        `• Total Amount: ${data.totalAmount}\n` +
         `• Date: ${new Date(data.date).toLocaleDateString()}\n\n` +
         `Thank you for your business!\n` +
         `- Thar Dairy Management`;
@@ -93,7 +93,7 @@ class SMSService {
       const message = `💰 Thar Dairy - Payment ${type.toUpperCase()}\n\n` +
         `Dear ${data.name},\n\n` +
         `Payment ${action} you:\n` +
-        `• Amount: PKR ${data.amount}\n` +
+        `• Amount: ${data.amount}\n` +
         `• Method: ${data.method.charAt(0).toUpperCase() + data.method.slice(1)}\n` +
         `${data.reference ? `• Reference: ${data.reference}\n` : ''}` +
         `• Date: ${new Date(data.date).toLocaleDateString()}\n\n` +
@@ -128,9 +128,9 @@ class SMSService {
       const message = `📊 Thar Dairy - Account Statement\n\n` +
         `Dear ${data.name},\n\n` +
         `Account Summary (${data.period}):\n` +
-        `• Total Received: PKR ${data.totalReceived}\n` +
-        `• Total Paid: PKR ${data.totalPaid}\n` +
-        `• Balance: PKR ${Math.abs(data.balance)} (${balanceStatus})\n\n` +
+        `• Total Received: ${data.totalReceived}\n` +
+        `• Total Paid: ${data.totalPaid}\n` +
+        `• Balance: ${Math.abs(data.balance)} (${balanceStatus})\n\n` +
         `For detailed statement, please contact us.\n\n` +
         `Thank you for your business!\n` +
         `- Thar Dairy Management`;
