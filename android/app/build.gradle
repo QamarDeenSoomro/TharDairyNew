@@ -4,6 +4,7 @@ android {
     namespace "com.thardairy.app"
     compileSdk rootProject.ext.compileSdkVersion
     
+    // Force Java 17 compatibility - must come before capacitor.build.gradle
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -49,6 +50,14 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+// Override Capacitor's Java 21 requirement after it's applied
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
 
 try {
     def servicesJSON = file('google-services.json')
