@@ -28,14 +28,6 @@ fi
 echo "🔨 Building application..."
 npm run build
 
-# Copy PWA files to build output
-echo "📱 Copying PWA files..."
-cp public/sw.js public/manifest.json public/icon-*.svg public/offline.html dist/public/
-
-# Verify PWA files exist
-echo "🔍 Verifying PWA files..."
-ls -la dist/public/ | grep -E "\.(js|json|svg|html)$"
-
 # Deploy to Firebase
 echo "🚀 Deploying to Firebase Hosting..."
 firebase deploy --only hosting

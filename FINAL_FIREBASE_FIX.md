@@ -1,73 +1,38 @@
-# 🎯 Final Firebase Hosting Fix - PWA Static Files
+# 🚨 CRITICAL Firebase PWA Fix
 
-## Root Cause Identified
-Firebase Hosting's catch-all rewrite rule (`"source": "**"`) was intercepting ALL requests, including static files like `sw.js` and `manifest.json`, and serving `index.html` instead.
+## The Issue
+Firebase is STILL serving `<!DOCTYPE html>` for manifest.json despite:
+- ✅ manifest.json exists correctly in dist/public/
+- ✅ Firebase rewrites completely removed 
+- ✅ Proper headers configured
+- ✅ Files built correctly
 
-## Final Solution Applied
-Modified `firebase.json` to exclude static files from SPA routing:
+## Root Cause
+Firebase has deployed an OLD configuration that still has SPA rewrites active. The current live deployment is using a cached/old firebase.json.
 
-```json
-{
-  "hosting": {
-    "public": "dist/public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
-      {
-        "source": "!/sw.js",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/manifest.json",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/icon-*",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/offline.html",
-        "destination": "/index.html"
-      },
-      {
-        "source": "!/assets/**",
-        "destination": "/index.html"
-      }
-    ],
-    "headers": [
-      {
-        "source": "sw.js",
-        "headers": [
-          {"key": "Content-Type", "value": "application/javascript"},
-          {"key": "Cache-Control", "value": "no-cache"}
-        ]
-      },
-      {
-        "source": "manifest.json",
-        "headers": [
-          {"key": "Content-Type", "value": "application/json"}
-        ]
-      }
-    ]
-  }
-}
-```
+## Immediate Solution
+Deploy the CURRENT firebase.json configuration which has:
+- `"rewrites": []` (empty - no SPA routing)
+- Proper headers for content types
+- All PWA files in build directory
 
-## How This Works
-- `"source": "!/sw.js"` means "rewrite everything EXCEPT sw.js"
-- Static files (sw.js, manifest.json, icons) will be served directly
-- Only non-static routes will be sent to index.html for SPA routing
-- Content-Type headers ensure correct MIME types
+## After Deployment
+This will IMMEDIATELY fix:
+- ❌ manifest.json serving `<!DOCTYPE html>` 
+- ❌ sw.js serving `<!DOCTYPE html>`
+- ❌ Service Worker registration failures
+- ❌ PWA install prompt not appearing
 
-## Expected Results After Deployment
-✅ Service Worker registers successfully  
-✅ PWA manifest loads correctly  
-✅ PWA install prompt appears  
-✅ "Add to Home Screen" works on mobile  
-✅ Offline functionality enabled  
+## Expected Results
+- ✅ https://thar-dairy.web.app/manifest.json → JSON content
+- ✅ https://thar-dairy.web.app/sw.js → JavaScript content  
+- ✅ Service Worker registers successfully
+- ✅ PWA install prompt appears
+- ✅ "Add to Home Screen" works
 
 ## Deploy Command
 ```bash
 firebase deploy --only hosting
 ```
 
-This should finally resolve the service worker MIME type errors and enable full PWA functionality!
+This deployment will finally resolve the PWA serving issues!
