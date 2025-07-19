@@ -9,7 +9,32 @@ interface StatsCardProps {
   textColor?: string;
 }
 
+// Utility function to format numbers for display
+function formatDisplayValue(value: string): string {
+  // Extract number from string (remove currency symbols, units like 'L', etc.)
+  const numMatch = value.match(/-?\d+\.?\d*/);
+  if (!numMatch) return value;
+  
+  const num = parseFloat(numMatch[0]);
+  const suffix = value.replace(numMatch[0], ''); // Get the suffix (L, units, etc.)
+  
+  // Round to whole numbers and format with commas
+  if (Math.abs(num) >= 1000000) {
+    // For millions, show like "1.2M"
+    return `${(num / 1000000).toFixed(1).replace('.0', '')}M${suffix}`;
+  } else if (Math.abs(num) >= 1000) {
+    // For thousands, show with comma like "1,000"
+    return `${Math.round(num).toLocaleString()}${suffix}`;
+  } else {
+    // For smaller numbers, round to whole number
+    return `${Math.round(num)}${suffix}`;
+  }
+}
+
 export default function StatsCard({ title, value, icon, color, textColor }: StatsCardProps) {
+  // Format the value for display
+  const displayValue = formatDisplayValue(value);
+  
   const colorClasses = {
     primary: 'bg-gradient-to-br from-blue-500/10 to-blue-600/10 text-blue-600',
     secondary: 'bg-gradient-to-br from-purple-500/10 to-purple-600/10 text-purple-600',
@@ -41,9 +66,10 @@ export default function StatsCard({ title, value, icon, color, textColor }: Stat
           {/* Data column - 60% (3 columns) */}
           <div className="col-span-3 min-w-0">
             <p className={cn("font-bold leading-none whitespace-nowrap overflow-hidden text-ellipsis", 
-              value && value.toString().length > 10 ? "text-lg" : 
-              value && value.toString().length > 6 ? "text-xl" : "text-2xl", 
-              textColor || "text-foreground")}>{value}</p>
+              displayValue.length > 12 ? "text-base" :
+              displayValue.length > 8 ? "text-lg" : 
+              displayValue.length > 6 ? "text-xl" : "text-2xl", 
+              textColor || "text-foreground")}>{displayValue}</p>
           </div>
           
           {/* Icon column - 40% (2 columns) */}
