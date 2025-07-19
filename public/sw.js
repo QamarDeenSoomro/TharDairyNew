@@ -1,15 +1,17 @@
-const CACHE_NAME = 'milk-supply-v2';
+const CACHE_NAME = 'thar-dairy-offline-v3';
 const OFFLINE_URL = '/offline.html';
 
-// Files to cache for offline functionality
+// Files to cache for offline functionality - Android optimized
 const urlsToCache = [
   '/',
   '/manifest.json',
   '/icon-192.svg',
   '/icon-512.svg',
-  '/assets/index-BuLSAozQ.css',
-  '/assets/index-1K3kNzSa.js',
-  '/assets/firebaseOfflineSync-DdMkwEMV.js',
+  // Cache current build assets (will be updated during build)
+  '/assets/index-Dkiv87yg.css',
+  '/assets/index-CFw6YJn0.js',
+  '/assets/firebaseOfflineSync-BNKGePaw.js',
+  '/assets/MB-Sindhi-Web-SK-2.0-Cgxi2zS1.woff2',
   OFFLINE_URL
 ];
 
@@ -45,8 +47,13 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve cached content when offline
+// Fetch event - serve cached content when offline (Android optimized)
 self.addEventListener('fetch', (event) => {
+  // Skip non-HTTP requests (Android file:// schemes)
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
   // Handle navigation requests (page loads) - serve the main app
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -62,22 +69,49 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle other requests (assets, API calls)
+  // Handle Firebase requests - offline-first for Android
+  if (event.request.url.includes('firebaseio.com') || event.request.url.includes('googleapis.com')) {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          // Return empty response for Firebase when offline
+          return new Response('{}', {
+            headers: { 'Content-Type': 'application/json' }
+          });
+        })
+    );
+    return;
+  }
+
+  // Handle other requests (assets, API calls) - cache-first for Android
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         if (response) {
+          // Serve from cache immediately
           return response;
         }
+        
+        // Try network, fallback to cache or empty response
         return fetch(event.request)
+          .then((networkResponse) => {
+            // Cache successful responses for future offline use
+            if (networkResponse.ok && event.request.method === 'GET') {
+              const responseClone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseClone);
+              });
+            }
+            return networkResponse;
+          })
           .catch(() => {
-            // For API requests, return empty array to prevent errors
+            // Offline fallback
             if (event.request.url.includes('/api/')) {
               return new Response('[]', {
                 headers: { 'Content-Type': 'application/json' }
               });
             }
-            return undefined;
+            return new Response('Offline', { status: 408 });
           });
       })
   );

@@ -3,103 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline - Milk Supply Management</title>
+    <title>Thar Dairy - Offline</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8fafc;
+            background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            color: white;
             text-align: center;
+            padding: 20px;
         }
-        .offline-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        
+        .container {
             max-width: 400px;
             width: 100%;
         }
-        .offline-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+        
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
         }
+        
         h1 {
-            color: #333;
-            margin-bottom: 1rem;
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
+        
         p {
-            color: #666;
+            font-size: 16px;
+            margin-bottom: 8px;
+            opacity: 0.9;
             line-height: 1.5;
-            margin-bottom: 1.5rem;
         }
-        .retry-btn {
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .retry-btn:hover {
-            background-color: #1d4ed8;
-        }
-        .offline-features {
-            margin-top: 2rem;
+        
+        .features {
+            margin-top: 30px;
             text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
         }
-        .offline-features h3 {
-            color: #333;
-            margin-bottom: 0.5rem;
+        
+        .features h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
         }
-        .offline-features ul {
-            color: #666;
-            padding-left: 1.5rem;
+        
+        .features ul {
+            list-style: none;
         }
-        .offline-features li {
-            margin-bottom: 0.5rem;
+        
+        .features li {
+            padding: 5px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .features li:before {
+            content: "✓ ";
+            color: #22c55e;
+            font-weight: bold;
+        }
+        
+        .retry-btn {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .retry-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
 <body>
-    <div class="offline-container">
-        <div class="offline-icon">📱</div>
-        <h1>You're Offline</h1>
-        <p>No internet connection available. Don't worry, you can still use the app with limited functionality.</p>
+    <div class="container">
+        <div class="icon">🥛</div>
+        <h1>Thar Dairy</h1>
+        <p>You're currently offline</p>
+        <p>Your data is safe and will sync when you reconnect</p>
         
-        <button class="retry-btn" onclick="location.reload()">Try Again</button>
-        
-        <div class="offline-features">
+        <div class="features">
             <h3>Available Offline:</h3>
             <ul>
-                <li>View cached vendors and customers</li>
-                <li>Record new milk transactions</li>
-                <li>Add payments and notes</li>
-                <li>View recent activity</li>
-                <li>Generate basic reports</li>
+                <li>View all your data</li>
+                <li>Add new milk transactions</li>
+                <li>Record payments</li>
+                <li>Check vendor/customer balances</li>
+                <li>Generate reports</li>
+                <li>SMS notifications</li>
             </ul>
-            <p><small>Your data will sync automatically when you're back online.</small></p>
         </div>
+        
+        <button class="retry-btn" onclick="window.location.reload()">
+            Try Again
+        </button>
     </div>
-
-    <script>
-        // Auto-retry connection every 30 seconds
-        setInterval(() => {
-            if (navigator.onLine) {
-                location.reload();
-            }
-        }, 30000);
-
-        // Listen for online event
-        window.addEventListener('online', () => {
-            location.reload();
-        });
-    </script>
 </body>
 </html>

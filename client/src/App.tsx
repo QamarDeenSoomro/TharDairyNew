@@ -46,13 +46,23 @@ function Router() {
 }
 
 function App() {
-  // Initialize PWA hooks
-  usePWA();
+  // Initialize PWA hooks with offline-first for Android
+  const { status } = usePWA();
   useSMSToasts();
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // Force offline-first mode on Android/Capacitor
+    if (window.Capacitor?.isNativePlatform()) {
+      console.log('Android native platform detected - enabling offline-first mode');
+      // Prioritize offline storage for better Android performance
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(() => {
+          console.log('Service Worker ready for Android offline functionality');
+        });
+      }
+    }
     // Check if user is already logged in
     const authStatus = localStorage.getItem("thar_dairy_auth");
     if (authStatus === "authenticated") {

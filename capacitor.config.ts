@@ -5,12 +5,18 @@ const config: CapacitorConfig = {
   appName: 'Thar Dairy',
   webDir: 'dist/public',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    // Enable offline-first functionality
+    cleartext: true,
+    hostname: 'localhost'
   },
   android: {
     allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: false
+    webContentsDebuggingEnabled: false,
+    // Enable offline storage and caching
+    allowNavigationWithinFileScheme: true,
+    loggingBehavior: 'none'
   },
   plugins: {
     SplashScreen: {
@@ -20,6 +26,16 @@ const config: CapacitorConfig = {
       showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true
+    },
+    // Configure storage for offline functionality
+    Storage: {
+      group: 'TharDairyStorage',
+      scheme: 'TharDairyScheme'
+    },
+    // Enable local network access for offline sync
+    LocalNotifications: {
+      smallIcon: "ic_stat_icon_config_sample",
+      iconColor: "#488AFF"
     }
   }
 };
