@@ -37,8 +37,8 @@ gradlew.bat assembleDebug
 
 ## Notes
 - The `flatDir` warnings are normal and don't affect functionality
-- The APK includes all PWA features: offline support, SMS integration, Firebase sync
-- App works fully offline and syncs when connection is restored
+- The APK includes all PWA features: seamless online/offline operation, SMS integration, Firebase sync
+- App works both offline and online - data syncs automatically when connection is available
 
 ## Next Steps
 - Test the APK on your Android device

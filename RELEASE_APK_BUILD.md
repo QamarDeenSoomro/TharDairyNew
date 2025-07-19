@@ -25,6 +25,7 @@ android\app\build\outputs\apk\release\app-release.apk
 | **Debugging** | Enabled | Disabled |
 | **Signing** | Debug signature | Unsigned (needs signing) |
 | **Distribution** | Testing only | Production ready |
+| **Offline/Online** | Both modes work | Both modes work |
 
 ## Signing the Release APK (Optional)
 

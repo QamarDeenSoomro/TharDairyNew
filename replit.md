@@ -117,7 +117,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Java Issue Fix**: ✅ Fixed - Triple-layer Java 17 override system implemented to resolve Capacitor's Java 21 compatibility issues
 - **Build Success**: APK generation confirmed working on Windows with Java 17
 - **Scripts**: build-apk.sh automation script and comprehensive APK_BUILD_GUIDE.md
-- **Features**: Native Android app with all PWA features, offline support, SMS integration
+- **Features**: Native Android app with all PWA features, seamless online/offline operation, SMS integration
 - **Important**: Use `npx cap sync android` not `npm exec cap sync android`
 - **Build Commands**: `npm run build` → `npx cap sync android` → `cd android` → Windows: `gradlew.bat assembleDebug` | macOS/Linux: `./gradlew assembleDebug`
 - **Build Command**: `vite build`
@@ -125,7 +125,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Architecture**: JAMstack PWA (JavaScript, APIs, Markup)
 - **Database**: Firebase Realtime Database with offline sync
 - **Environment Variables**: Firebase configuration keys required
-- **PWA Features**: Service workers, web manifest, offline storage, installable app
+- **PWA Features**: Service workers, web manifest, offline storage, installable app, seamless online/offline operation
 - **Recent Fix**: Database backup/restore now preserves original IDs to maintain vendor-customer-transaction relationships
 - **SMS Integration**: Native messaging app integration opens device SMS app with pre-filled messages for milk transactions and payments
 - **Multilingual SMS**: SMS messages are fully translated based on user's selected language (English/Sindhi)
