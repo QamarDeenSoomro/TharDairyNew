@@ -16,10 +16,19 @@ interface BeforeInstallPromptEvent extends Event {
 export default function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [installer, setInstaller] = useState<PWAInstaller | null>(null);
+  const [showDevPrompt, setShowDevPrompt] = useState(false);
 
   useEffect(() => {
     // Don't show if already installed as PWA
     if (isPWA()) {
+      return;
+    }
+
+    // In development, show info about PWA after 5 seconds
+    if (import.meta.env.DEV) {
+      setTimeout(() => {
+        setShowDevPrompt(true);
+      }, 5000);
       return;
     }
 
@@ -67,6 +76,42 @@ export default function PWAInstallPrompt() {
   // Don't show if dismissed in this session
   if (sessionStorage.getItem('pwa-install-dismissed') === 'true') {
     return null;
+  }
+
+  // Show development info prompt
+  if (showDevPrompt && !showPrompt) {
+    return (
+      <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+        <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Smartphone className="h-4 w-4 text-blue-600" />
+                <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  PWA Ready!
+                </CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDevPrompt(false)}
+                className="h-6 w-6 p-0 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <CardDescription className="text-xs text-blue-700 dark:text-blue-200 mb-2">
+              Install option will appear after deployment to production with HTTPS.
+            </CardDescription>
+            <div className="text-xs text-blue-600 dark:text-blue-300">
+              Deploy to Firebase to enable "Add to Home Screen"
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   if (!showPrompt || isPWA()) {

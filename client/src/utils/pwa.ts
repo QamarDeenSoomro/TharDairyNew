@@ -1,10 +1,11 @@
 // PWA utilities for service worker and offline functionality
 
-// Register service worker (only in production)
+// Register service worker (works in production, logs in development)
 export const registerServiceWorker = async (): Promise<boolean> => {
-  // Skip service worker registration in development mode
+  // In development mode, we'll still return true to allow PWA testing
   if (import.meta.env.DEV) {
     console.log('Service Worker registration skipped in development mode');
+    console.log('PWA install will work after deployment to production');
     return true; // Return true to allow other PWA features to work
   }
   

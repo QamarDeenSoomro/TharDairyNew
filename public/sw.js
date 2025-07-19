@@ -7,8 +7,8 @@ const urlsToCache = [
   '/static/js/bundle.js',
   '/static/css/main.css',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/icon-192.svg',
+  '/icon-512.svg',
   OFFLINE_URL
 ];
 
