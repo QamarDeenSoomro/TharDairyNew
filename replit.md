@@ -146,6 +146,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Form Confirmation Dialogs**: Added confirmation dialogs to all milk transaction and payment forms to prevent accidental submissions with SMS notification previews (January 2025)
 - **Enhanced Dashboard Stats**: Updated dashboard service and display to show detailed milk statistics including quantity, amount, and average rates for received/sent milk without icons (January 2025)
 - **Dashboard Date Filtering**: Added comprehensive date filtering (today, this week, this month, custom range) with real-time statistics calculation and reorganized milk statistics into single column layout (January 2025)
+- **Vendor Settlement Archiving System**: Implemented automatic settlement system that archives vendor/customer data when balance is less than ₹1, with manual settlement option and archive viewing functionality (January 2025)
 
 ### File Structure
 - `client/`: React frontend application

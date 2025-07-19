@@ -42,8 +42,10 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
 
   // Get latest settlement for filtering
   const entitySettlements = useMemo(() => {
-    return getEntitySettlements(entity.id, entityType);
-  }, [settlements, entity.id, entityType]);
+    const settlements = getEntitySettlements(entity.id, entityType);
+    console.log(`Entity settlements for ${entity.name}:`, settlements);
+    return settlements;
+  }, [settlements, entity.id, entityType, getEntitySettlements]);
 
   const latestSettlementDate = useMemo(() => {
     if (entitySettlements.length === 0) return null;
@@ -230,8 +232,11 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
     };
   }, [transactions, payments, entity.id, entityType]);
 
+  // Auto-settlement logic: settle when balance is less than 1
+  const isAutoSettled = Math.abs(totals.finalBalance) < 1;
+  
   // Settlement handlers
-  const handleSettlement = async () => {
+  const handleManualSettlement = async () => {
     try {
       await createSettlement(entity.id, entityType, totals.finalBalance, settlementNotes || undefined);
       setShowSettlementDialog(false);
@@ -518,7 +523,11 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                     Current Balance: <span className={`font-medium ${totals.finalBalance > 0 ? 'text-green-600' : totals.finalBalance < 0 ? 'text-red-600' : 'text-gray-600'}`}>
                       {formatCurrency(Math.abs(totals.finalBalance))}
                     </span>
-                    {totals.finalBalance !== 0 && (
+                    {isAutoSettled ? (
+                      <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
+                        Auto-Settled
+                      </span>
+                    ) : totals.finalBalance !== 0 && (
                       <span className="ml-1 text-xs">
                         ({totals.finalBalance > 0 ? (entityType === 'vendor' ? 'Due' : 'Credit') : (entityType === 'vendor' ? 'Advance' : 'Due')})
                       </span>
@@ -526,20 +535,19 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {entitySettlements.length > 0 && (
-                    <Button variant="outline" onClick={handleShowArchive} className="flex items-center gap-2">
-                      <History className="h-4 w-4" />
-                      View Archive
+                  <Button variant="outline" onClick={handleShowArchive} className="flex items-center gap-2">
+                    <History className="h-4 w-4" />
+                    View Archive ({entitySettlements.length})
+                  </Button>
+                  {!isAutoSettled && (
+                    <Button 
+                      onClick={() => setShowSettlementDialog(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Archive className="h-4 w-4" />
+                      Manual Settlement
                     </Button>
                   )}
-                  <Button 
-                    onClick={() => setShowSettlementDialog(true)}
-                    className="flex items-center gap-2"
-                    disabled={totals.finalBalance === 0}
-                  >
-                    <Archive className="h-4 w-4" />
-                    Create Settlement
-                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -1043,7 +1051,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
             <Button variant="outline" onClick={() => setShowSettlementDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSettlement}>
+            <Button onClick={handleManualSettlement}>
               Create Settlement
             </Button>
           </DialogFooter>
@@ -1064,7 +1072,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
               <Card key={settlement.id} className="border-gray-200">
                 <CardHeader>
                   <CardTitle className="text-sm flex items-center justify-between">
-                    <span>Settlement - {format(new Date(settlement.date), "dd/MM/yyyy")}</span>
+                    <span>Settlement - {format(new Date(settlement.settlementDate), "dd/MM/yyyy")}</span>
                     <Badge variant="secondary">
                       {formatCurrency(Math.abs(settlement.amount))}
                     </Badge>
@@ -1076,9 +1084,10 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
               </Card>
             ))}
             {entitySettlements.length === 0 && (
-              <p className="text-center text-muted-foreground py-8">
-                No settlements found
-              </p>
+              <div className="text-center text-muted-foreground py-8">
+                <p>No settlements found.</p>
+                <p className="text-sm mt-2">Settlements are automatically created when balance is less than ₹1.</p>
+              </div>
             )}
           </div>
           <DialogFooter>

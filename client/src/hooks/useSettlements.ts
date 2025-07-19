@@ -42,10 +42,13 @@ export function useSettlements() {
   };
 
   const getEntitySettlements = (entityId: string, entityType: 'vendor' | 'customer') => {
-    return settlements.filter(s => 
+    const entitySettlements = settlements.filter(s => 
       s.entityType === entityType && 
       (entityType === 'vendor' ? s.vendorId === entityId : s.customerId === entityId)
-    );
+    ).sort((a, b) => new Date(b.settlementDate).getTime() - new Date(a.settlementDate).getTime());
+    
+    console.log(`Getting settlements for ${entityType} ${entityId}:`, entitySettlements);
+    return entitySettlements;
   };
 
   return {
