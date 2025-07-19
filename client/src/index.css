@@ -79,6 +79,37 @@
   font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
 }
 
+/* Ensure Material Icons are not affected by Sindhi font */
+.material-icons,
+.material-icons-outlined,
+.material-icons-round,
+.material-icons-sharp,
+.material-icons-two-tone {
+  font-family: 'Material Icons', 'Material Icons Outlined', 'Material Icons Round', 'Material Icons Sharp', 'Material Icons Two Tone' !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  direction: ltr !important;
+  font-feature-settings: 'liga' !important;
+  -webkit-font-feature-settings: 'liga' !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Override RTL for Material Icons specifically */
+[dir="rtl"] .material-icons,
+[dir="rtl"] .material-icons-outlined,
+[dir="rtl"] .material-icons-round,
+[dir="rtl"] .material-icons-sharp,
+[dir="rtl"] .material-icons-two-tone {
+  font-family: 'Material Icons', 'Material Icons Outlined', 'Material Icons Round', 'Material Icons Sharp', 'Material Icons Two Tone' !important;
+  direction: ltr !important;
+}
+
 /* Enhanced RTL text rendering for Sindhi */
 [dir="rtl"] .sindhi-text {
   font-family: 'MBSindhWeb', 'MB Sindhi', Arial, sans-serif !important;
@@ -126,6 +157,16 @@
   font-kerning: auto;
   font-variant-ligatures: common-ligatures;
   text-rendering: optimizeLegibility;
+}
+
+/* Exclude Material Icons from Sindhi font even in RTL */
+.sindhi-font [dir="rtl"] .material-icons,
+.sindhi-font [dir="rtl"] .material-icons-outlined,
+.sindhi-font [dir="rtl"] .material-icons-round,
+.sindhi-font [dir="rtl"] .material-icons-sharp,
+.sindhi-font [dir="rtl"] .material-icons-two-tone {
+  font-family: 'Material Icons', 'Material Icons Outlined', 'Material Icons Round', 'Material Icons Sharp', 'Material Icons Two Tone' !important;
+  direction: ltr !important;
 }
 
 /* Enhanced RTL text rendering */
