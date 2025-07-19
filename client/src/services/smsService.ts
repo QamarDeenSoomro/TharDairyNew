@@ -1,6 +1,8 @@
 // SMS Service for sending notifications to vendors and customers
 // Using Pakistan country code (+92)
 
+import { getTranslation } from '@/lib/i18n';
+
 interface SMSData {
   to: string;
   message: string;
@@ -8,6 +10,13 @@ interface SMSData {
 }
 
 class SMSService {
+  private getLanguage(): string {
+    return localStorage.getItem('language') || 'en';
+  }
+
+  private getTranslatedText() {
+    return getTranslation(this.getLanguage() as 'en' | 'sd');
+  }
   private formatPhoneNumber(phone: string): string {
     // Remove all non-digit characters
     const cleaned = phone.replace(/\D/g, '');
@@ -51,20 +60,35 @@ class SMSService {
     }
   ): Promise<boolean> {
     try {
-      const action = type === 'receive' ? 'received from' : 'delivered to';
-      const direction = type === 'receive' ? 'received' : 'sent';
+      const t = this.getTranslatedText();
       
-      const message = `🥛 Thar Dairy - Milk ${direction.toUpperCase()}\n\n` +
-        `Dear ${data.name},\n\n` +
-        `Milk ${action} you:\n` +
-        `• Type: ${data.milkType.charAt(0).toUpperCase() + data.milkType.slice(1)}\n` +
-        `• Quantity: ${data.quantity} liters\n` +
-        `• Rate: ${data.rate}/liter\n` +
-        `• Total Amount: ${data.totalAmount}\n` +
-        `• Time: ${data.time ? data.time.charAt(0).toUpperCase() + data.time.slice(1) : 'Morning'}\n` +
-        `• Date: ${new Date(data.date).toLocaleDateString()}\n\n` +
-        `Thank you for your business!\n` +
-        `- Thar Dairy`;
+      // Get translated header
+      const header = type === 'receive' ? t.smsHeaderMilkReceived : t.smsHeaderMilkSent;
+      
+      // Get translated action description
+      const actionDescription = type === 'receive' ? t.smsMilkReceivedFrom : t.smsMilkDeliveredTo;
+      
+      // Get translated milk type
+      const translatedMilkType = data.milkType === 'cow' ? t.smsCow : 
+                                 data.milkType === 'buffalo' ? t.smsBuffalo : 
+                                 data.milkType;
+      
+      // Get translated time
+      const translatedTime = data.time === 'morning' ? t.smsMorning :
+                             data.time === 'evening' ? t.evening :
+                             data.time || t.smsMorning;
+      
+      const message = `${header}\n\n` +
+        `${t.smsDear} ${data.name},\n\n` +
+        `${actionDescription}\n` +
+        `• ${t.smsType}: ${translatedMilkType}\n` +
+        `• ${t.smsQuantity}: ${data.quantity} ${t.smsLiters}\n` +
+        `• ${t.smsRate}: ${data.rate}${t.smsPerLiter}\n` +
+        `• ${t.smsTotalAmount}: ${data.totalAmount}\n` +
+        `• ${t.smsTime}: ${translatedTime}\n` +
+        `• ${t.smsDate}: ${new Date(data.date).toLocaleDateString()}\n\n` +
+        `${t.smsThankYou}\n` +
+        `${t.smsFromTharDairy}`;
 
       return this.sendSMS({
         to: contact,
@@ -90,17 +114,28 @@ class SMSService {
     }
   ): Promise<boolean> {
     try {
-      const action = type === 'received' ? 'received from' : 'paid to';
+      const t = this.getTranslatedText();
       
-      const message = `💰 Thar Dairy - Payment ${type.toUpperCase()}\n\n` +
-        `Dear ${data.name},\n\n` +
-        `Payment ${action} you:\n` +
-        `• Amount: ${data.amount}\n` +
-        `• Method: ${data.method.charAt(0).toUpperCase() + data.method.slice(1)}\n` +
-        `${data.reference ? `• Reference: ${data.reference}\n` : ''}` +
-        `• Date: ${new Date(data.date).toLocaleDateString()}\n\n` +
-        `Thank you for your business!\n` +
-        `- Thar Dairy`;
+      // Get translated header
+      const header = type === 'received' ? t.smsHeaderPaymentReceived : t.smsHeaderPaymentPaid;
+      
+      // Get translated action description
+      const actionDescription = type === 'received' ? t.smsPaymentReceivedFrom : t.smsPaymentPaidTo;
+      
+      // Get translated payment method
+      const translatedMethod = data.method === 'cash' ? t.smsCash :
+                               data.method === 'bank' ? t.smsBank :
+                               data.method;
+      
+      const message = `${header}\n\n` +
+        `${t.smsDear} ${data.name},\n\n` +
+        `${actionDescription}\n` +
+        `• ${t.smsAmount}: ${data.amount}\n` +
+        `• ${t.smsMethod}: ${translatedMethod}\n` +
+        `${data.reference ? `• ${t.smsReference}: ${data.reference}\n` : ''}` +
+        `• ${t.smsDate}: ${new Date(data.date).toLocaleDateString()}\n\n` +
+        `${t.smsThankYou}\n` +
+        `${t.smsFromTharDairy}`;
 
       return this.sendSMS({
         to: contact,

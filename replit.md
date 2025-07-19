@@ -115,6 +115,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **PWA Features**: Service workers, web manifest, offline storage, installable app
 - **Recent Fix**: Database backup/restore now preserves original IDs to maintain vendor-customer-transaction relationships
 - **SMS Integration**: Native messaging app integration opens device SMS app with pre-filled messages for milk transactions and payments
+- **Multilingual SMS**: SMS messages are fully translated based on user's selected language (English/Sindhi)
 - **Daily Expenses**: Complete expense tracking system with categories that automatically deduct from profit calculations
 - **Country Code**: Updated from India (+91) to Pakistan (+92) for all SMS and WhatsApp communications
 - **Current Balance Display**: Payment form now shows real-time current balance of selected party (vendor/customer) with color-coded status indicators
