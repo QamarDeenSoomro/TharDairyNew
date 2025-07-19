@@ -5,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { paymentService } from "@/services/firebase-realtime";
 import { smsService } from "@/services/smsService";
+import { useTransactions, usePayments } from "@/hooks/useFirestore";
+import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 
 interface PaymentFormProps {
   vendors: Vendor[];
@@ -19,6 +22,9 @@ interface PaymentFormProps {
 export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [selectedPartyBalance, setSelectedPartyBalance] = useState<number | null>(null);
+  const { transactions } = useTransactions();
+  const { payments } = usePayments();
 
   const form = useForm<InsertPayment>({
     resolver: zodResolver(insertPaymentSchema),
@@ -33,6 +39,65 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
   });
 
   const watchedType = form.watch("type");
+  const watchedVendorId = form.watch("vendorId");
+  const watchedCustomerId = form.watch("customerId");
+
+  // Calculate party balance when selection changes
+  useEffect(() => {
+    const calculateBalance = () => {
+      let partyId = null;
+      let isVendor = false;
+
+      if (watchedType === "received" && watchedCustomerId) {
+        partyId = watchedCustomerId;
+        isVendor = false;
+      } else if (watchedType === "paid" && watchedVendorId) {
+        partyId = watchedVendorId;
+        isVendor = true;
+      }
+
+      if (!partyId) {
+        setSelectedPartyBalance(null);
+        return;
+      }
+
+      // Calculate total transactions amount
+      const partyTransactions = transactions.filter(t => 
+        isVendor ? t.vendorId === partyId : t.customerId === partyId
+      );
+
+      const totalTransactionAmount = partyTransactions.reduce((sum, t) => {
+        if (isVendor) {
+          // For vendors: we owe them money for milk received
+          return t.type === 'receive' ? sum + t.totalAmount : sum;
+        } else {
+          // For customers: they owe us money for milk delivered
+          return t.type === 'send' ? sum + t.totalAmount : sum;
+        }
+      }, 0);
+
+      // Calculate total payments
+      const partyPayments = payments.filter(p => 
+        isVendor ? p.vendorId === partyId : p.customerId === partyId
+      );
+
+      const totalPaymentAmount = partyPayments.reduce((sum, p) => {
+        if (isVendor) {
+          // For vendors: payments we made to them reduce our debt
+          return p.type === 'paid' ? sum + p.amount : sum;
+        } else {
+          // For customers: payments we received from them reduce their debt
+          return p.type === 'received' ? sum + p.amount : sum;
+        }
+      }, 0);
+
+      // Calculate balance
+      const balance = totalTransactionAmount - totalPaymentAmount;
+      setSelectedPartyBalance(balance);
+    };
+
+    calculateBalance();
+  }, [watchedType, watchedVendorId, watchedCustomerId, transactions, payments]);
 
   const onSubmit = async (data: InsertPayment) => {
     try {
@@ -142,6 +207,32 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
           <p className="text-sm text-destructive mt-1">Please select a party</p>
         )}
       </div>
+
+      {/* Current Balance Display */}
+      {selectedPartyBalance !== null && (watchedVendorId || watchedCustomerId) && (
+        <Alert className={selectedPartyBalance > 0 ? "border-orange-200 bg-orange-50 dark:bg-orange-950/30" : "border-green-200 bg-green-50 dark:bg-green-950/30"}>
+          <AlertCircle className={`h-4 w-4 ${selectedPartyBalance > 0 ? "text-orange-600" : "text-green-600"}`} />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="text-sm">
+              Current Balance: 
+              <span className={`font-semibold ml-1 ${selectedPartyBalance > 0 ? "text-orange-700 dark:text-orange-400" : "text-green-700 dark:text-green-400"}`}>
+                {selectedPartyBalance.toLocaleString()}
+              </span>
+            </span>
+            {selectedPartyBalance > 0 ? (
+              <div className="flex items-center gap-1 text-xs text-orange-600">
+                <TrendingUp className="h-3 w-3" />
+                {watchedType === "received" ? "Customer owes" : "Amount due to vendor"}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 text-xs text-green-600">
+                <TrendingDown className="h-3 w-3" />
+                {Math.abs(selectedPartyBalance) > 0 ? "Advance paid" : "Settled"}
+              </div>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div>
         <Label htmlFor="amount">Amount</Label>

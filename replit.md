@@ -117,6 +117,8 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **SMS Integration**: Native messaging app integration opens device SMS app with pre-filled messages for milk transactions and payments
 - **Daily Expenses**: Complete expense tracking system with categories that automatically deduct from profit calculations
 - **Country Code**: Updated from India (+91) to Pakistan (+92) for all SMS and WhatsApp communications
+- **Current Balance Display**: Payment form now shows real-time current balance of selected party (vendor/customer) with color-coded status indicators
+- **Internationalization**: Complete English/Sindhi language support with RTL layout and MB Sindhi font integration
 
 ### File Structure
 - `client/`: React frontend application
