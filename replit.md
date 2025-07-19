@@ -1,8 +1,8 @@
-# Milk Supply Chain Management System
+# Thar Dairy - Milk Supply Management System
 
 ## Overview
 
-This is a full-stack web application for managing milk supply chain operations. The system handles milk receiving from vendors, distribution to customers, payments, and reporting. It uses a modern tech stack with React frontend, Express backend, and PostgreSQL database.
+Thar Dairy's comprehensive milk supply management system for efficient dairy operations. The system handles milk receiving from vendors, distribution to customers, payments, and reporting. Built with modern tech stack including React frontend, Firebase backend, and real-time data synchronization.
 
 ## User Preferences
 
@@ -11,6 +11,7 @@ This is a full-stack web application for managing milk supply chain operations. 
 - Make application mobile responsive (completed)
 - Add ledger functionality with WhatsApp sharing for vendors and customers (completed)
 - Convert to Progressive Web App (PWA) for offline functionality (completed)
+- Rebrand application to "Thar Dairy" (completed)
 
 ## System Architecture
 

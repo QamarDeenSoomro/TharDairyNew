@@ -1,7 +1,7 @@
 {
-  "name": "Milk Supply Chain Management",
-  "short_name": "MilkSupply",
-  "description": "Comprehensive milk distribution management system for dairy business operations",
+  "name": "Thar Dairy - Milk Supply Management",
+  "short_name": "Thar Dairy",
+  "description": "Thar Dairy's comprehensive milk distribution management system for efficient dairy operations",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

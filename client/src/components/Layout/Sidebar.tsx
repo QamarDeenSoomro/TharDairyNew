@@ -49,7 +49,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center">
                 <span className="material-icons text-primary text-2xl mr-2">local_drink</span>
-                <h1 className="text-lg font-semibold text-foreground">Milk Supply Chain</h1>
+                <h1 className="text-lg font-semibold text-foreground">Thar Dairy</h1>
               </div>
               <Button variant="ghost" size="icon" onClick={onClose}>
                 <X className="h-5 w-5" />

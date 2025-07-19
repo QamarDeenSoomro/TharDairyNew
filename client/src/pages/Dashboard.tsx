@@ -34,7 +34,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-foreground mb-2">Dashboard</h2>
-        <p className="text-muted-foreground">Overview of your milk supply chain operations</p>
+        <p className="text-muted-foreground">Overview of Thar Dairy's operations</p>
       </div>
 
       {/* Stats Cards */}

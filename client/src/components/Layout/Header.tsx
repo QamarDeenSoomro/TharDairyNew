@@ -27,7 +27,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
             )}
             <div className="flex items-center">
               <span className="material-icons text-primary text-2xl mr-2">local_drink</span>
-              <h1 className="text-xl font-semibold text-foreground">Milk Supply Chain</h1>
+              <h1 className="text-xl font-semibold text-foreground">Thar Dairy</h1>
             </div>
           </div>
           
