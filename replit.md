@@ -12,6 +12,8 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - Add ledger functionality with WhatsApp sharing for vendors and customers (completed)
 - Convert to Progressive Web App (PWA) for offline functionality (completed)
 - Rebrand application to "Thar Dairy" (completed)
+- SMS notifications with Pakistan (+92) country code that open native messaging app (completed)
+- Daily expenses tracking system integrated with profit calculations (completed)
 
 ## System Architecture
 
@@ -112,6 +114,9 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Environment Variables**: Firebase configuration keys required
 - **PWA Features**: Service workers, web manifest, offline storage, installable app
 - **Recent Fix**: Database backup/restore now preserves original IDs to maintain vendor-customer-transaction relationships
+- **SMS Integration**: Native messaging app integration opens device SMS app with pre-filled messages for milk transactions and payments
+- **Daily Expenses**: Complete expense tracking system with categories that automatically deduct from profit calculations
+- **Country Code**: Updated from India (+91) to Pakistan (+92) for all SMS and WhatsApp communications
 
 ### File Structure
 - `client/`: React frontend application

@@ -152,25 +152,49 @@ class SMSService {
       // Format phone number
       const formattedPhone = this.formatPhoneNumber(data.to);
       
-      // In production, integrate with SMS service like Twilio, MSG91, etc.
-      // For now, we'll simulate sending and log the SMS
-      console.log('SMS would be sent to:', formattedPhone);
-      console.log('Message:', data.message);
-      
-      // Show a toast notification to user
-      if (window.dispatchEvent) {
-        const event = new CustomEvent('sms-sent', {
-          detail: {
-            phone: formattedPhone,
-            message: data.message,
-            type: data.type
-          }
-        });
-        window.dispatchEvent(event);
+      // Open device's SMS app with pre-filled message
+      try {
+        const smsUrl = `sms:${formattedPhone}?body=${encodeURIComponent(data.message)}`;
+        
+        // On mobile devices, use window.location.href to open SMS app
+        // On desktop, use window.open as fallback
+        if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i)) {
+          window.location.href = smsUrl;
+        } else {
+          window.open(smsUrl, "_self");
+        }
+        
+        console.log('SMS app opened for:', formattedPhone);
+        console.log('Message:', data.message);
+        
+        // Show a toast notification to user
+        if (window.dispatchEvent) {
+          const event = new CustomEvent('sms-sent', {
+            detail: {
+              phone: formattedPhone,
+              message: data.message,
+              type: data.type
+            }
+          });
+          window.dispatchEvent(event);
+        }
+      } catch (error) {
+        // Fallback: just log the message if SMS app can't be opened
+        console.log('SMS would be sent to:', formattedPhone);
+        console.log('Message:', data.message);
+        
+        // Show a toast notification to user
+        if (window.dispatchEvent) {
+          const event = new CustomEvent('sms-sent', {
+            detail: {
+              phone: formattedPhone,
+              message: data.message,
+              type: data.type
+            }
+          });
+          window.dispatchEvent(event);
+        }
       }
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
       return true;
     } catch (error) {

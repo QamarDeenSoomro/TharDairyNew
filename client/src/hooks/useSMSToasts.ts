@@ -24,9 +24,9 @@ export function useSMSToasts() {
       }
       
       toast({
-        title: 'Notification Sent',
-        description: `${message} to ${phone}`,
-        duration: 3000,
+        title: 'SMS App Opened',
+        description: `${message} - Check your messaging app`,
+        duration: 4000,
       });
     };
 
