@@ -1,69 +1,46 @@
-# Firebase Hosting Setup Guide for Thar Dairy
+# Firebase Hosting 404 Fix Guide
 
-## Prerequisites
-- Firebase project already created (you have this)
-- Firebase configuration in environment variables (you have this)
+## Issue
+Direct URLs like `https://thar-dairy.web.app/vendors` were showing 404 errors.
 
-## Step 1: Install Firebase CLI
-```bash
-npm install -g firebase-tools
+## Root Cause
+Firebase Hosting wasn't configured for Single Page Application (SPA) routing. When users navigate directly to routes like `/vendors`, Firebase tried to find a file at that path instead of serving the main `index.html` file.
+
+## Solution Applied
+
+### Fixed `firebase.json` Configuration
+Added SPA rewrite rule:
+```json
+{
+  "hosting": {
+    "public": "dist/public",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
 ```
 
-## Step 2: Login to Firebase
-```bash
-firebase login
-```
-This will open a browser window for authentication.
+### What This Does
+- `"source": "**"` matches all URL patterns
+- `"destination": "/index.html"` serves the main HTML file for all routes
+- Client-side routing (wouter) then handles displaying the correct page
 
-## Step 3: Initialize Firebase Hosting
-```bash
-firebase init hosting
-```
-When prompted:
-- Select your existing Firebase project
-- Use `dist/public` as public directory
-- Configure as single-page app: Yes
-- Set up automatic builds: No (we'll build manually)
-- Don't overwrite index.html
+## Next Steps
+1. Deploy to Firebase Hosting: `firebase deploy --only hosting`
+2. Test direct URLs:
+   - https://thar-dairy.web.app/vendors
+   - https://thar-dairy.web.app/customers
+   - https://thar-dairy.web.app/milk-receiving
+   - etc.
 
-## Step 4: Project ID (Already Configured)
-✓ Project ID `thar-dairy` is already configured in `.firebaserc`
+## Vendor Update Fix
+Also fixed vendor updating functionality:
+- Fixed Firebase import naming conflict (`update` function)
+- Added proper vendor update handling in VendorTable component
+- Vendors can now be edited successfully through the UI
 
-## Step 5: Build the Application
-```bash
-npm run build
-```
-This creates optimized files in `dist/public/`
-
-## Step 6: Deploy to Firebase
-```bash
-firebase deploy --only hosting
-```
-
-## Step 7: Access Your Live App
-Your app will be available at:
-`https://thar-dairy.web.app`
-or
-`https://thar-dairy.firebaseapp.com`
-
-## Environment Variables for Production
-Make sure these are set in your Firebase project:
-- VITE_FIREBASE_API_KEY
-- VITE_FIREBASE_AUTH_DOMAIN
-- VITE_FIREBASE_PROJECT_ID
-- VITE_FIREBASE_STORAGE_BUCKET
-- VITE_FIREBASE_MESSAGING_SENDER_ID
-- VITE_FIREBASE_APP_ID
-
-## PWA Features
-Your app will be installable and work offline thanks to:
-- Service workers
-- Web manifest
-- IndexedDB storage
-- Background sync
-
-## Custom Domain (Optional)
-You can add a custom domain in Firebase Console > Hosting section.
-
-## Continuous Deployment
-For automatic deployments, you can set up GitHub Actions or use Firebase's CI/CD features.
+Both issues are now resolved and ready for deployment.

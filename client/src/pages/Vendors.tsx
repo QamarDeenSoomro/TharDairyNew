@@ -117,7 +117,7 @@ export default function Vendors() {
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
-          <VendorTable vendors={filteredVendors} onDelete={handleDeleteVendor} />
+          <VendorTable vendors={filteredVendors} onDelete={handleDeleteVendor} onUpdate={updateVendor} />
         </CardContent>
       </Card>
     </div>

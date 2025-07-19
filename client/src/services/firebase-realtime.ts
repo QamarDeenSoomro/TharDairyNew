@@ -1,5 +1,5 @@
 // Firebase Realtime Database Services
-import { ref, push, set, get, remove, onValue, off, query, orderByChild, equalTo, limitToLast } from 'firebase/database';
+import { ref, push, set, get, remove, onValue, off, query, orderByChild, equalTo, limitToLast, update as updateDB } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { InsertVendor, InsertCustomer, InsertMilkTransaction, InsertPayment, InsertDailyExpense } from '@shared/schema';
 
@@ -119,7 +119,7 @@ export const vendorService = {
   // Update vendor
   async update(id: string, vendorData: Partial<InsertVendor>): Promise<void> {
     const vendorRef = ref(db, `${PATHS.VENDORS}/${id}`);
-    await set(vendorRef, vendorData);
+    await updateDB(vendorRef, vendorData);
   },
 
   // Delete vendor

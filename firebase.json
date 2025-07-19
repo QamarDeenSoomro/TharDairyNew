@@ -7,7 +7,12 @@
       "**/node_modules/**"
     ],
     "redirects": [],
-    "rewrites": [],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
     "headers": [
       {
         "source": "sw.js",

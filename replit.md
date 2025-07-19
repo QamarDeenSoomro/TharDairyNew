@@ -135,6 +135,9 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Internationalization**: Complete English/Sindhi language support with RTL layout and MB Sindhi font integration
 - **Language Selector**: Located in sidebar bottom with Material Icons, avoids mobile navigation overlap
 - **Stats Cards**: Improved layout with title row and data/icon columns for better content fitting
+- **Firebase Hosting Fix**: Added SPA rewrites to firebase.json to fix 404 errors on direct URL access (January 2025)
+- **Vendor Update Fix**: Fixed Firebase database update function naming conflict and added proper vendor editing functionality (January 2025)
+- **SMS Debug System**: Added comprehensive debugging system to troubleshoot SMS integration issues across all forms (January 2025)
 
 ### File Structure
 - `client/`: React frontend application

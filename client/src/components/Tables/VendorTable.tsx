@@ -17,9 +17,10 @@ import { formatCurrency } from "@/lib/utils";
 interface VendorTableProps {
   vendors: FirebaseVendor[];
   onDelete?: (id: string) => void;
+  onUpdate?: (id: string, data: any) => Promise<void>;
 }
 
-export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
+export default function VendorTable({ vendors, onDelete, onUpdate }: VendorTableProps) {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [editingVendor, setEditingVendor] = useState<FirebaseVendor | null>(null);
@@ -240,7 +241,22 @@ export default function VendorTable({ vendors, onDelete }: VendorTableProps) {
           </DialogHeader>
           <VendorForm
             vendor={editingVendor || undefined}
-            onSuccess={() => {
+            onSuccess={async (data) => {
+              if (onUpdate && editingVendor) {
+                try {
+                  await onUpdate(editingVendor.id, data);
+                  toast({
+                    title: "Success",
+                    description: "Vendor updated successfully",
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: "Failed to update vendor",
+                    variant: "destructive",
+                  });
+                }
+              }
               setDialogOpen(false);
               setEditingVendor(null);
             }}
