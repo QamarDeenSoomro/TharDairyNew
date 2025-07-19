@@ -1,0 +1,29 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\n tech\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.4.2
+2 info using node@v22.14.0
+3 silly config load:file:C:\Users\n tech\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\n tech\Desktop\QAMAR\Thar Dairy\TharDairyNew\.npmrc
+5 silly config load:file:C:\Users\n tech\.npmrc
+6 silly config load:file:C:\Users\n tech\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm exec cap sync android
+8 verbose argv "exec" "--" "cap" "sync" "android"
+9 verbose logfile logs-max:10 dir:C:\Users\n tech\AppData\Local\npm-cache\_logs\2025-07-19T10_53_36_887Z-
+10 verbose logfile C:\Users\n tech\AppData\Local\npm-cache\_logs\2025-07-19T10_53_36_887Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+14 http fetch GET 200 https://registry.npmjs.org/cap 2793ms (cache revalidated)
+15 verbose stack Error: could not determine executable to run
+15 verbose stack     at getBinFromManifest (C:\Users\n tech\AppData\Roaming\npm\node_modules\npm\node_modules\libnpmexec\lib\get-bin-from-manifest.js:17:23)
+15 verbose stack     at exec (C:\Users\n tech\AppData\Roaming\npm\node_modules\npm\node_modules\libnpmexec\lib\index.js:205:15)
+15 verbose stack     at async Npm.exec (C:\Users\n tech\AppData\Roaming\npm\node_modules\npm\lib\npm.js:208:9)
+15 verbose stack     at async module.exports (C:\Users\n tech\AppData\Roaming\npm\node_modules\npm\lib\cli\entry.js:67:5)
+16 verbose pkgid cap@0.2.1
+17 error could not determine executable to run
+18 verbose cwd C:\Users\n tech\Desktop\QAMAR\Thar Dairy\TharDairyNew
+19 verbose os Windows_NT 10.0.26100
+20 verbose node v22.14.0
+21 verbose npm  v11.4.2
+22 verbose exit 1
+23 verbose code 1
+24 error A complete log of this run can be found in: C:\Users\n tech\AppData\Local\npm-cache\_logs\2025-07-19T10_53_36_887Z-debug-0.log

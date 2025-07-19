@@ -116,6 +116,8 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Requirements**: Java 17+ and Android SDK for local building
 - **Scripts**: build-apk.sh automation script and comprehensive APK_BUILD_GUIDE.md
 - **Features**: Native Android app with all PWA features, offline support, SMS integration
+- **Important**: Use `npx cap sync android` not `npm exec cap sync android`
+- **Build Commands**: `npm run build` → `npx cap sync android` → `cd android && ./gradlew assembleDebug`
 - **Build Command**: `vite build`
 - **Output Directory**: `dist/public`
 - **Architecture**: JAMstack PWA (JavaScript, APIs, Markup)

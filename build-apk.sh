@@ -15,9 +15,11 @@ fi
 
 # Step 2: Sync with Android project
 echo "🔄 Syncing with Android project..."
+echo "💡 Using 'npx cap sync android' (not 'npm exec cap sync android')"
 npx cap sync android
 if [ $? -ne 0 ]; then
     echo "❌ Capacitor sync failed!"
+    echo "💡 Make sure to use 'npx cap' not 'npm exec cap'"
     exit 1
 fi
 

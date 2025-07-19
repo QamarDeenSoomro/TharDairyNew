@@ -47,7 +47,7 @@ npm install
 # Build the web application
 npm run build
 
-# Sync assets with native project
+# Sync assets with native project (use npx, NOT npm exec)
 npx cap sync android
 ```
 
@@ -67,7 +67,7 @@ cd android
 
 #### Method 2: Android Studio (Recommended for development)
 ```bash
-# Open Android project in Android Studio
+# Open Android project in Android Studio (use npx, NOT npm exec)
 npx cap open android
 
 # In Android Studio:
@@ -155,17 +155,21 @@ adb install android/app/build/outputs/apk/release/app-release.apk
 
 ### Common Issues
 
-1. **Gradle build fails**
+1. **"could not determine executable to run" error**
+   - Use `npx cap sync android` instead of `npm exec cap sync android`
+   - Ensure @capacitor/cli is installed: `npm install @capacitor/cli`
+
+2. **Gradle build fails**
    - Check JAVA_HOME is set correctly
    - Ensure Android SDK is installed
    - Run `./gradlew --version` to verify setup
 
-2. **APK won't install**
+3. **APK won't install**
    - Check if device allows unknown sources
    - Verify APK is properly signed
    - Check for version conflicts
 
-3. **App crashes on startup**
+4. **App crashes on startup**
    - Check Android logs: `adb logcat`
    - Verify all web assets were synced
    - Check for missing permissions
