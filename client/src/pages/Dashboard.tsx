@@ -225,8 +225,8 @@ export default function Dashboard() {
             color="primary"
             details={{
               quantity: `${Math.round(filteredStats.receivedQuantity)}L`,
-              amount: `${Math.round(filteredStats.receivedAmount)}`,
-              averageRate: `${filteredStats.receivedQuantity > 0 ? Math.round(filteredStats.receivedAmount / filteredStats.receivedQuantity) : 0}/L`
+              amount: `${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.receivedAmount))}`,
+              averageRate: `${new Intl.NumberFormat('en-US').format(filteredStats.receivedQuantity > 0 ? Math.round(filteredStats.receivedAmount / filteredStats.receivedQuantity) : 0)}/L`
             }}
           />
           <StatsCard
@@ -235,8 +235,8 @@ export default function Dashboard() {
             color="secondary"
             details={{
               quantity: `${Math.round(filteredStats.sentQuantity)}L`,
-              amount: `${Math.round(filteredStats.sentAmount)}`,
-              averageRate: `${filteredStats.sentQuantity > 0 ? Math.round(filteredStats.sentAmount / filteredStats.sentQuantity) : 0}/L`
+              amount: `${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.sentAmount))}`,
+              averageRate: `${new Intl.NumberFormat('en-US').format(filteredStats.sentQuantity > 0 ? Math.round(filteredStats.sentAmount / filteredStats.sentQuantity) : 0)}/L`
             }}
           />
         </div>
@@ -250,12 +250,12 @@ export default function Dashboard() {
         />
         <StatsCard
           title="Period Profit"
-          value={`${Math.round(filteredStats.profit)}`}
+          value={`${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.profit))}`}
           color="success"
         />
         <StatsCard
           title="Pending Payments"
-          value={`${Math.round(filteredStats.pendingPayments)}`}
+          value={`${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.pendingPayments))}`}
           color="warning"
         />
       </div>

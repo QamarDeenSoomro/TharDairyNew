@@ -23,19 +23,11 @@ function formatDisplayValue(value: string): string {
   const num = parseFloat(numMatch[0]);
   const suffix = value.replace(numMatch[0], ''); // Get the suffix (L, units, etc.)
   
-  // Round to whole numbers and format compactly
-  if (Math.abs(num) >= 1000000) {
-    // For millions, show like "1.2M"
-    const millions = (num / 1000000).toFixed(1).replace('.0', '');
-    return `${millions}M${suffix}`;
-  } else if (Math.abs(num) >= 1000) {
-    // For thousands, show like "10K"
-    const thousands = (num / 1000).toFixed(1).replace('.0', '');
-    return `${thousands}K${suffix}`;
-  } else {
-    // For smaller numbers, round to whole number
-    return `${Math.round(num)}${suffix}`;
-  }
+  // Round to whole number and format with commas
+  const roundedNum = Math.round(num);
+  const formattedNum = new Intl.NumberFormat('en-US').format(roundedNum);
+  
+  return `${formattedNum}${suffix}`;
 }
 
 export default function StatsCard({ title, value, icon, color, textColor, details }: StatsCardProps) {
