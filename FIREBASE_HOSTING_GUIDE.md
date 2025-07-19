@@ -26,8 +26,8 @@ When prompted:
 - Set up automatic builds: No (we'll build manually)
 - Don't overwrite index.html
 
-## Step 4: Update Project ID
-Edit `.firebaserc` file and replace `your-firebase-project-id` with your actual Firebase project ID.
+## Step 4: Project ID (Already Configured)
+✓ Project ID `thar-dairy` is already configured in `.firebaserc`
 
 ## Step 5: Build the Application
 ```bash
@@ -42,9 +42,9 @@ firebase deploy --only hosting
 
 ## Step 7: Access Your Live App
 Your app will be available at:
-`https://your-project-id.web.app`
+`https://thar-dairy.web.app`
 or
-`https://your-project-id.firebaseapp.com`
+`https://thar-dairy.firebaseapp.com`
 
 ## Environment Variables for Production
 Make sure these are set in your Firebase project:
