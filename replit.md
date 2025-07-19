@@ -141,6 +141,8 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Enhanced Ledger System**: Added previous balance display in messages before date ranges and settlement date tracking to know when accounts were last settled (January 2025)
 - **Settlement Detection**: Automatic detection of last settlement date when balance was close to zero, with days since settlement counter
 - **Previous Balance Integration**: WhatsApp/SMS messages now show previous balance before filtered date range with final balance calculations
+- **Milk Weight Summary**: Added milk weight tracking to ledger summary cards and message generation with period/total calculations (January 2025)
+- **Message Confirmation**: Added confirmation dialogs for WhatsApp and SMS sending to prevent accidental message dispatch (January 2025)
 
 ### File Structure
 - `client/`: React frontend application

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, Send, Download, X, MessageSquare, Smartphone } from "lucide-react";
 import { useTransactions, usePayments } from "@/hooks/useFirestore";
@@ -29,6 +30,8 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
   const [endDate, setEndDate] = useState("");
   const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
   const [isSendingSMS, setIsSendingSMS] = useState(false);
+  const [showWhatsAppConfirm, setShowWhatsAppConfirm] = useState(false);
+  const [showSMSConfirm, setShowSMSConfirm] = useState(false);
 
   // Filter transactions for this entity
   const entityTransactions = useMemo(() => {
@@ -116,8 +119,24 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
   const totals = useMemo(() => {
     const totalTransactions = entityTransactions.reduce((sum, t) => sum + t.totalAmount, 0);
     const totalPayments = entityPayments.reduce((sum, p) => sum + p.amount, 0);
+    const milkWeight = entityTransactions.reduce((sum, t) => sum + (t.quantity || 0), 0);
     const balance = entityType === "vendor" ? totalTransactions - totalPayments : totalPayments - totalTransactions;
     const finalBalance = balance + previousBalance;
+    
+    // Calculate previous milk weight if date filter is applied
+    let previousMilkWeight = 0;
+    if (startDate) {
+      const startFilterDate = new Date(startDate);
+      const allTransactionsBefore = transactions.filter(t => {
+        const transactionDate = new Date(t.date!);
+        if (entityType === "vendor") {
+          return t.vendorId === entity.id && t.type === "receive" && transactionDate < startFilterDate;
+        } else {
+          return t.customerId === entity.id && t.type === "send" && transactionDate < startFilterDate;
+        }
+      });
+      previousMilkWeight = allTransactionsBefore.reduce((sum, t) => sum + (t.quantity || 0), 0);
+    }
     
     return {
       transactions: totalTransactions,
@@ -125,8 +144,11 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
       balance,
       previousBalance,
       finalBalance,
+      milkWeight,
+      previousMilkWeight,
+      totalMilkWeight: previousMilkWeight + milkWeight
     };
-  }, [entityTransactions, entityPayments, entityType, previousBalance]);
+  }, [entityTransactions, entityPayments, entityType, previousBalance, startDate, transactions, entity.id]);
 
   // Find last settlement date (last date when balance was zero or minimal)
   const lastSettlementInfo = useMemo(() => {
@@ -218,7 +240,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
         const date = format(new Date(t.date!), "dd/MM/yyyy");
         text += `${date} - ${t.quantity}L ${t.milkType} - ${formatCurrency(t.totalAmount)}\n`;
       });
-      text += `Subtotal: ${formatCurrency(totals.transactions)}\n\n`;
+      text += `Subtotal: ${formatCurrency(totals.transactions)} (${totals.milkWeight}L)\n\n`;
     }
     
     // Add payments
@@ -235,6 +257,16 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
     }
     
     text += `━━━━━━━━━━━━━━━━━━━━\n`;
+    
+    // Add milk weight summary
+    if (startDate && totals.previousMilkWeight > 0) {
+      text += `*MILK WEIGHT SUMMARY:*\n`;
+      text += `Previous: ${totals.previousMilkWeight}L\n`;
+      text += `Period: ${totals.milkWeight}L\n`;
+      text += `Total: ${totals.totalMilkWeight}L\n\n`;
+    } else if (totals.milkWeight > 0) {
+      text += `*TOTAL MILK WEIGHT: ${totals.milkWeight}L*\n\n`;
+    }
     
     // Show period balance and final balance
     if (startDate && Math.abs(totals.previousBalance) > 0.01) {
@@ -263,9 +295,14 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
     return text;
   };
 
+  const confirmWhatsAppSend = () => {
+    setShowWhatsAppConfirm(true);
+  };
+
   const sendViaWhatsApp = async () => {
     try {
       setIsSendingWhatsApp(true);
+      setShowWhatsAppConfirm(false);
       const message = generateLedgerText();
       const phoneNumber = entity.contact.replace(/[^0-9]/g, ""); // Remove non-numeric characters
       
@@ -292,9 +329,14 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
     }
   };
 
+  const confirmSMSSend = () => {
+    setShowSMSConfirm(true);
+  };
+
   const sendViaSMS = async () => {
     try {
       setIsSendingSMS(true);
+      setShowSMSConfirm(false);
       const message = generateLedgerText();
       const phoneNumber = entity.contact.replace(/[^0-9]/g, "");
       
@@ -475,7 +517,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
                   <div className="text-sm text-muted-foreground">
                     {entityType === "vendor" ? "Milk Purchased" : "Milk Sold"}
@@ -485,6 +527,17 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <div className="text-sm text-muted-foreground">Payments</div>
                   <div className="text-2xl font-bold text-green-600">{formatCurrency(totals.payments)}</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-sm text-muted-foreground">
+                    {startDate && totals.previousMilkWeight > 0 ? "Period Weight" : "Milk Weight"}
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600">{totals.milkWeight}L</div>
+                  {startDate && totals.previousMilkWeight > 0 && (
+                    <div className="text-xs text-muted-foreground">
+                      Total: {totals.totalMilkWeight}L
+                    </div>
+                  )}
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-sm text-muted-foreground">
@@ -554,7 +607,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
           {/* Communication Actions */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button 
-              onClick={sendViaWhatsApp} 
+              onClick={confirmWhatsAppSend} 
               disabled={isSendingWhatsApp} 
               className="flex items-center gap-2"
             >
@@ -563,7 +616,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
             </Button>
             
             <Button 
-              onClick={sendViaSMS} 
+              onClick={confirmSMSSend} 
               disabled={isSendingSMS} 
               variant="outline"
               className="flex items-center gap-2"
@@ -761,23 +814,109 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
 
   // If no onClose prop provided, render as standalone component
   if (!onClose) {
-    return renderContent();
+    return (
+      <>
+        {renderContent()}
+        
+        {/* WhatsApp Confirmation Dialog */}
+        <AlertDialog open={showWhatsAppConfirm} onOpenChange={setShowWhatsAppConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Send Ledger via WhatsApp</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to send the ledger details to {entity.name} via WhatsApp?
+                <br />
+                <span className="text-sm text-muted-foreground">Contact: {entity.contact}</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={sendViaWhatsApp}>
+                Send WhatsApp Message
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* SMS Confirmation Dialog */}
+        <AlertDialog open={showSMSConfirm} onOpenChange={setShowSMSConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Send Ledger via SMS</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to send the ledger details to {entity.name} via SMS?
+                <br />
+                <span className="text-sm text-muted-foreground">Contact: {entity.contact}</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={sendViaSMS}>
+                Send SMS Message
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
+    );
   }
 
   // Otherwise render as dialog
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>{entity.name} - Ledger</span>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogTitle>
-        </DialogHeader>
-        {renderContent()}
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>{entity.name} - Ledger</span>
+              <Button variant="ghost" size="sm" onClick={onClose}>
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          {renderContent()}
+        </DialogContent>
+      </Dialog>
+      
+      {/* WhatsApp Confirmation Dialog */}
+      <AlertDialog open={showWhatsAppConfirm} onOpenChange={setShowWhatsAppConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send Ledger via WhatsApp</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to send the ledger details to {entity.name} via WhatsApp?
+              <br />
+              <span className="text-sm text-muted-foreground">Contact: {entity.contact}</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={sendViaWhatsApp}>
+              Send WhatsApp Message
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* SMS Confirmation Dialog */}
+      <AlertDialog open={showSMSConfirm} onOpenChange={setShowSMSConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send Ledger via SMS</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to send the ledger details to {entity.name} via SMS?
+              <br />
+              <span className="text-sm text-muted-foreground">Contact: {entity.contact}</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={sendViaSMS}>
+              Send SMS Message
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
