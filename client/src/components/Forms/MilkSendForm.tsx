@@ -82,8 +82,9 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
       
       // Send SMS notification to customer
       if (selectedCustomer?.contact) {
+        console.log('MilkSendForm - Attempting to send SMS to customer:', selectedCustomer.name, selectedCustomer.contact);
         try {
-          await smsService.sendMilkTransactionSMS(
+          const smsResult = await smsService.sendMilkTransactionSMS(
             selectedCustomer.contact,
             'send',
             {
@@ -96,9 +97,12 @@ export default function MilkSendForm({ customers }: MilkSendFormProps) {
               date: new Date().toISOString(),
             }
           );
+          console.log('MilkSendForm - SMS result:', smsResult);
         } catch (smsError) {
-          console.log('SMS notification failed:', smsError);
+          console.error('MilkSendForm - SMS notification failed:', smsError);
         }
+      } else {
+        console.log('MilkSendForm - No customer contact available for SMS');
       }
       
       toast({

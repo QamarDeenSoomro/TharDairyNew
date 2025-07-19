@@ -117,8 +117,9 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
       }
       
       if (contactPerson?.contact) {
+        console.log('PaymentForm - Attempting to send SMS to:', contactPerson.name, contactPerson.contact);
         try {
-          await smsService.sendPaymentSMS(
+          const smsResult = await smsService.sendPaymentSMS(
             contactPerson.contact,
             data.type,
             {
@@ -129,9 +130,12 @@ export default function PaymentForm({ vendors, customers, onSuccess }: PaymentFo
               date: new Date().toISOString(),
             }
           );
+          console.log('PaymentForm - SMS result:', smsResult);
         } catch (smsError) {
-          console.log('SMS notification failed:', smsError);
+          console.error('PaymentForm - SMS notification failed:', smsError);
         }
+      } else {
+        console.log('PaymentForm - No contact person available for SMS');
       }
       
       toast({

@@ -82,8 +82,9 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
       
       // Send SMS notification to vendor
       if (selectedVendor?.contact) {
+        console.log('MilkReceiveForm - Attempting to send SMS to vendor:', selectedVendor.name, selectedVendor.contact);
         try {
-          await smsService.sendMilkTransactionSMS(
+          const smsResult = await smsService.sendMilkTransactionSMS(
             selectedVendor.contact,
             'receive',
             {
@@ -96,9 +97,12 @@ export default function MilkReceiveForm({ vendors }: MilkReceiveFormProps) {
               date: new Date().toISOString(),
             }
           );
+          console.log('MilkReceiveForm - SMS result:', smsResult);
         } catch (smsError) {
-          console.log('SMS notification failed:', smsError);
+          console.error('MilkReceiveForm - SMS notification failed:', smsError);
         }
+      } else {
+        console.log('MilkReceiveForm - No vendor contact available for SMS');
       }
       
       toast({

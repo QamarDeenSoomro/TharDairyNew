@@ -197,29 +197,37 @@ class SMSService {
   // Generic SMS sending function
   private async sendSMS(data: SMSData): Promise<boolean> {
     try {
+      console.log('SMS Service Debug - Starting SMS send process...');
+      console.log('SMS Service Debug - Raw phone number:', data.to);
+      console.log('SMS Service Debug - Message type:', data.type);
+      
       // Format phone number
       const formattedPhone = this.formatPhoneNumber(data.to);
+      console.log('SMS Service Debug - Formatted phone number:', formattedPhone);
       
       // Create SMS URL with phone number and message
       const smsUrl = `sms:${formattedPhone}?body=${encodeURIComponent(data.message)}`;
+      console.log('SMS Service Debug - Generated SMS URL:', smsUrl);
+      console.log('SMS Service Debug - Message content:', data.message);
+      
+      // Detect device and user agent
+      const userAgent = navigator.userAgent;
+      console.log('SMS Service Debug - User Agent:', userAgent);
       
       // Open SMS app based on device type
       if (navigator.userAgent.match(/Android/i)) {
         // Android device - use location.href for direct app opening
+        console.log('SMS Service Debug - Detected Android device, opening SMS app...');
         window.location.href = smsUrl;
-        console.log('Android SMS app opened for:', formattedPhone);
       } else if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
         // iOS device - use location.href for direct app opening
+        console.log('SMS Service Debug - Detected iOS device, opening SMS app...');
         window.location.href = smsUrl;
-        console.log('iOS SMS app opened for:', formattedPhone);
       } else {
         // Desktop or other devices - open in new window
+        console.log('SMS Service Debug - Detected desktop/other device, opening in new window...');
         window.open(smsUrl, "_blank");
-        console.log('SMS URL opened in new window for:', formattedPhone);
       }
-      
-      console.log('SMS URL:', smsUrl);
-      console.log('Message content:', data.message);
       
       // Dispatch event for toast notification
       if (window.dispatchEvent) {
@@ -231,11 +239,13 @@ class SMSService {
           }
         });
         window.dispatchEvent(event);
+        console.log('SMS Service Debug - SMS-sent event dispatched');
       }
       
+      console.log('SMS Service Debug - SMS send process completed successfully');
       return true;
     } catch (error) {
-      console.error('Failed to send SMS:', error);
+      console.error('SMS Service Debug - Failed to send SMS:', error);
       return false;
     }
   }
