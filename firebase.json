@@ -8,6 +8,26 @@
     ],
     "rewrites": [
       {
+        "source": "!/sw.js",
+        "destination": "/index.html"
+      },
+      {
+        "source": "!/manifest.json",
+        "destination": "/index.html"
+      },
+      {
+        "source": "!/icon-*.svg",
+        "destination": "/index.html"
+      },
+      {
+        "source": "!/offline.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "!/assets/**",
+        "destination": "/index.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
