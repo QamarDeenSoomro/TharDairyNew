@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +27,7 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
   const [selectedVendor, setSelectedVendor] = useState<FirebaseVendor | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [vendorSearchOpen, setVendorSearchOpen] = useState(false);
 
   const [pendingData, setPendingData] = useState<any>(null);
   const [selectedNotificationMethod, setSelectedNotificationMethod] = useState<'none' | 'sms' | 'whatsapp'>('none');
@@ -56,6 +60,16 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
   });
 
   const watchedFields = form.watch();
+
+  // Initialize selected vendor from form data (for editing)
+  useEffect(() => {
+    if (watchedFields.vendorId && vendors.length > 0 && !selectedVendor) {
+      const vendor = vendors.find(v => v.id === watchedFields.vendorId);
+      if (vendor) {
+        setSelectedVendor(vendor);
+      }
+    }
+  }, [watchedFields.vendorId, vendors, selectedVendor]);
 
   useEffect(() => {
     if (selectedVendor && watchedFields.milkType && watchedFields.quantity) {
@@ -186,28 +200,48 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
       <div>
         <Label htmlFor="vendorId">Vendor</Label>
-        <Select
-          value={watchedFields.vendorId || ""}
-          onValueChange={(value) => {
-            const vendor = vendors.find(v => v.id === value);
-            setSelectedVendor(vendor || null);
-            form.setValue('vendorId', value);
-            // Clear previous calculations when vendor changes
-            form.setValue('rate', '');
-            form.setValue('totalAmount', '');
-          }}
-        >
-          <SelectTrigger className="mt-1">
-            <SelectValue placeholder="Select vendor" />
-          </SelectTrigger>
-          <SelectContent>
-            {vendors.map((vendor) => (
-              <SelectItem key={vendor.id} value={vendor.id}>
-                {vendor.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Popover open={vendorSearchOpen} onOpenChange={setVendorSearchOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={vendorSearchOpen}
+              className="w-full mt-1 justify-between"
+            >
+              {selectedVendor ? selectedVendor.name : "Select vendor..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Search vendors..." />
+              <CommandList>
+                <CommandEmpty>No vendor found.</CommandEmpty>
+                <CommandGroup>
+                  {vendors.map((vendor) => (
+                    <CommandItem
+                      key={vendor.id}
+                      value={vendor.name}
+                      onSelect={() => {
+                        setSelectedVendor(vendor);
+                        form.setValue('vendorId', vendor.id);
+                        // Clear previous calculations when vendor changes
+                        form.setValue('rate', '');
+                        form.setValue('totalAmount', '');
+                        setVendorSearchOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={`mr-2 h-4 w-4 ${selectedVendor?.id === vendor.id ? "opacity-100" : "opacity-0"}`}
+                      />
+                      {vendor.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
         {form.formState.errors.vendorId && (
           <p className="text-sm text-destructive mt-1">{form.formState.errors.vendorId.message}</p>
         )}

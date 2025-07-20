@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +29,7 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingData, setPendingData] = useState<any>(null);
   const [selectedNotificationMethod, setSelectedNotificationMethod] = useState<'none' | 'sms' | 'whatsapp'>('none');
+  const [customerSearchOpen, setCustomerSearchOpen] = useState(false);
 
   const form = useForm<InsertMilkTransaction>({
     resolver: zodResolver(insertMilkTransactionSchema),
@@ -55,6 +59,16 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
   });
 
   const watchedFields = form.watch();
+
+  // Initialize selected customer from form data (for editing)
+  useEffect(() => {
+    if (watchedFields.customerId && customers.length > 0 && !selectedCustomer) {
+      const customer = customers.find(c => c.id === watchedFields.customerId);
+      if (customer) {
+        setSelectedCustomer(customer);
+      }
+    }
+  }, [watchedFields.customerId, customers, selectedCustomer]);
 
   useEffect(() => {
     if (selectedCustomer && watchedFields.milkType && watchedFields.quantity) {
@@ -183,28 +197,48 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
       <div>
         <Label htmlFor="customerId">Customer</Label>
-        <Select
-          value={watchedFields.customerId || ""}
-          onValueChange={(value) => {
-            const customer = customers.find(c => c.id === value);
-            setSelectedCustomer(customer || null);
-            form.setValue('customerId', value);
-            // Clear previous calculations when customer changes
-            form.setValue('rate', '');
-            form.setValue('totalAmount', '');
-          }}
-        >
-          <SelectTrigger className="mt-1">
-            <SelectValue placeholder="Select customer" />
-          </SelectTrigger>
-          <SelectContent>
-            {customers.map((customer) => (
-              <SelectItem key={customer.id} value={customer.id}>
-                {customer.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Popover open={customerSearchOpen} onOpenChange={setCustomerSearchOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={customerSearchOpen}
+              className="w-full mt-1 justify-between"
+            >
+              {selectedCustomer ? selectedCustomer.name : "Select customer..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Search customers..." />
+              <CommandList>
+                <CommandEmpty>No customer found.</CommandEmpty>
+                <CommandGroup>
+                  {customers.map((customer) => (
+                    <CommandItem
+                      key={customer.id}
+                      value={customer.name}
+                      onSelect={() => {
+                        setSelectedCustomer(customer);
+                        form.setValue('customerId', customer.id);
+                        // Clear previous calculations when customer changes
+                        form.setValue('rate', '');
+                        form.setValue('totalAmount', '');
+                        setCustomerSearchOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={`mr-2 h-4 w-4 ${selectedCustomer?.id === customer.id ? "opacity-100" : "opacity-0"}`}
+                      />
+                      {customer.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
         {form.formState.errors.customerId && (
           <p className="text-sm text-destructive mt-1">{form.formState.errors.customerId.message}</p>
         )}
