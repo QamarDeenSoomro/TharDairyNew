@@ -3,8 +3,8 @@
 echo "🔥 Thar Dairy Firebase Deployment Script"
 echo "========================================="
 
-# Exit if any command fails
-set -e
+# Don't exit on error - we want to see what fails
+# set -e
 
 # Print commands for debugging
 set -x
@@ -27,12 +27,38 @@ fi
 # Build the application
 echo "🔨 Building application..."
 npm run build
+BUILD_STATUS=$?
+if [ $BUILD_STATUS -ne 0 ]; then
+    echo "❌ Build failed with exit code: $BUILD_STATUS"
+    echo "Please check the build errors above."
+else
+    echo "✅ Build successful!"
+fi
 
 # Deploy to Firebase
 echo "🚀 Deploying to Firebase Hosting..."
-firebase deploy --only hosting
+firebase deploy --only hosting 2>&1 | tee deploy-output.log
+DEPLOY_STATUS=$?
 
-echo "🎉 Deployment successful!"
-echo "Your Thar Dairy app is live at:"
-echo "https://thar-dairy.web.app"
-echo "https://thar-dairy.firebaseapp.com"
+if [ $DEPLOY_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Deployment failed with exit code: $DEPLOY_STATUS"
+    echo ""
+    echo "Common issues and solutions:"
+    echo "1. Authentication: Run 'firebase login' on your local machine"
+    echo "2. Project: Ensure 'thar-dairy' project exists in Firebase Console"
+    echo "3. Permissions: Check if you have access to the Firebase project"
+    echo ""
+    echo "Full error output saved to: deploy-output.log"
+    echo ""
+    echo "To deploy from Replit, use the Deploy button instead!"
+else
+    echo "🎉 Deployment successful!"
+    echo "Your Thar Dairy app is live at:"
+    echo "https://thar-dairy.web.app"
+    echo "https://thar-dairy.firebaseapp.com"
+fi
+
+echo ""
+echo "Script completed. Press any key to exit..."
+read -n 1 -s
