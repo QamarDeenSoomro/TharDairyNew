@@ -912,6 +912,95 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Settlement Creation Dialog */}
+        <Dialog open={showSettlementDialog} onOpenChange={setShowSettlementDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Auto-Settlement</DialogTitle>
+              <DialogDescription>
+                This will automatically settle all transactions and payments, clear the remaining balance, and archive all data.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-900 mb-2">What will happen:</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  {Math.abs(totals.finalBalance) > 0.01 ? (
+                    <>
+                      <li>• Clear remaining balance of {formatCurrency(Math.abs(totals.finalBalance))}</li>
+                      <li>• {totals.finalBalance > 0 
+                        ? `Create settlement payment to clear what ${entity.name} owes`
+                        : `Create settlement entry to clear what you owe ${entity.name}`}
+                      </li>
+                    </>
+                  ) : (
+                    <li>• Balance is already settled</li>
+                  )}
+                  <li>• Archive all existing transactions and payments</li>
+                  <li>• Start fresh with zero balance</li>
+                </ul>
+              </div>
+              <div>
+                <Label htmlFor="settlement-notes">Settlement Notes (Optional)</Label>
+                <Input
+                  id="settlement-notes"
+                  placeholder="e.g., Full payment received, Account settled"
+                  value={settlementNotes}
+                  onChange={(e) => setSettlementNotes(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowSettlementDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleManualSettlement}>
+                {Math.abs(totals.finalBalance) > 0.01 ? "Auto-Settle & Archive" : "Archive Data"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Archive View Dialog */}
+        <Dialog open={showArchiveView} onOpenChange={setShowArchiveView}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Archive History - {entity.name}</DialogTitle>
+              <DialogDescription>
+                View historical settlements and archived data
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              {entitySettlements.map((settlement) => (
+                <Card key={settlement.id} className="border-gray-200">
+                  <CardHeader>
+                    <CardTitle className="text-sm flex items-center justify-between">
+                      <span>Settlement - {format(new Date(settlement.settlementDate), "dd/MM/yyyy")}</span>
+                      <Badge variant="secondary">
+                        {formatCurrency(Math.abs(settlement.amount))}
+                      </Badge>
+                    </CardTitle>
+                    {settlement.notes && (
+                      <p className="text-sm text-muted-foreground">{settlement.notes}</p>
+                    )}
+                  </CardHeader>
+                </Card>
+              ))}
+              {entitySettlements.length === 0 && (
+                <div className="text-center text-muted-foreground py-8">
+                  <p>No settlements found.</p>
+                  <p className="text-sm mt-2">Settlements are automatically created when balance is less than ₹1.</p>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setShowArchiveView(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </>
     );
   }
