@@ -24,7 +24,8 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
   const [selectedVendor, setSelectedVendor] = useState<FirebaseVendor | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [pendingData, setPendingData] = useState<InsertMilkTransaction | null>(null);
+  const [showSMSConfirmDialog, setShowSMSConfirmDialog] = useState(false);
+  const [pendingData, setPendingData] = useState<any>(null);
 
   const form = useForm<InsertMilkTransaction>({
     resolver: zodResolver(insertMilkTransactionSchema),
@@ -88,24 +89,21 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
       totalAmount: Number(data.totalAmount),
     };
 
-    // Show confirmation dialog for new transactions
-    if (!transaction) {
-      setPendingData(transformedData);
-      setShowConfirmDialog(true);
-      return;
-    }
-
-    // For updates, proceed directly
-    await processTransaction(transformedData);
+    // Save entry directly without confirmation
+    await saveTransaction(transformedData);
   };
 
-  const processTransaction = async (transformedData: any) => {
+  const saveTransaction = async (transformedData: any) => {
     try {
       setLoading(true);
       
       if (transaction) {
         // Update existing transaction
         onSuccess?.(transformedData);
+        toast({
+          title: "Success",
+          description: "Milk receipt updated successfully",
+        });
       } else {
         // Create new transaction
         console.log('MilkReceiveForm - Creating transaction with vendorId:', transformedData.vendorId);
@@ -113,44 +111,22 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
         
         await transactionService.create(transformedData);
         
-        // Send SMS notification to vendor for new transactions only
-        if (selectedVendor?.contact) {
-          console.log('MilkReceiveForm - Attempting to send SMS to vendor:', selectedVendor.name, selectedVendor.contact);
-          try {
-            const smsResult = await smsService.sendMilkTransactionSMS(
-              selectedVendor.contact,
-              'receive',
-              {
-                name: selectedVendor.name,
-                quantity: transformedData.quantity,
-                milkType: transformedData.milkType,
-                rate: transformedData.rate,
-                totalAmount: transformedData.totalAmount,
-                time: transformedData.time,
-                date: new Date().toISOString(),
-              }
-            );
-            console.log('MilkReceiveForm - SMS result:', smsResult);
-          } catch (smsError) {
-            console.error('MilkReceiveForm - SMS notification failed:', smsError);
-          }
-        } else {
-          console.log('MilkReceiveForm - No vendor contact available for SMS');
-        }
-        
         toast({
           title: "Success",
-          description: "Milk receipt recorded and vendor notified",
+          description: "Milk receipt recorded successfully",
         });
         
         form.reset();
         setSelectedVendor(null);
         setTotalAmount(0);
       }
+      
+      onSuccess?.(transformedData);
     } catch (error) {
+      console.error('Error saving transaction:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to record milk receipt",
+        description: "Failed to save milk receipt",
         variant: "destructive",
       });
     } finally {
@@ -158,13 +134,65 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
     }
   };
 
-  const confirmTransaction = async () => {
-    if (pendingData) {
-      setShowConfirmDialog(false);
-      await processTransaction(pendingData);
-      setPendingData(null);
+  const sendSMSWithConfirmation = async () => {
+    if (!selectedVendor?.contact) {
+      toast({
+        title: "Error",
+        description: "No contact number available for vendor",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get current form data
+    const currentData = form.getValues();
+    
+    setPendingData({
+      ...currentData,
+      vendor: selectedVendor,
+      totalAmount: totalAmount
+    });
+    setShowSMSConfirmDialog(true);
+  };
+
+  const confirmSendSMS = async () => {
+    try {
+      if (!selectedVendor?.contact || !pendingData) return;
+
+      console.log('MilkReceiveForm - Attempting to send SMS to vendor:', selectedVendor.name, selectedVendor.contact);
+      const smsResult = await smsService.sendMilkTransactionSMS(
+        selectedVendor.contact,
+        'receive',
+        {
+          name: selectedVendor.name,
+          quantity: pendingData.quantity,
+          milkType: pendingData.milkType,
+          rate: pendingData.rate,
+          totalAmount: pendingData.totalAmount,
+          time: pendingData.time,
+          date: new Date().toISOString(),
+        }
+      );
+      
+      console.log('MilkReceiveForm - SMS result:', smsResult);
+      
+      toast({
+        title: "Success",
+        description: "SMS sent to vendor successfully",
+      });
+      
+      setShowSMSConfirmDialog(false);
+    } catch (error) {
+      console.error('MilkReceiveForm - SMS notification failed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send SMS notification",
+        variant: "destructive",
+      });
     }
   };
+
+
 
   return (
     <>
@@ -277,35 +305,61 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
         </Button>
       </form>
 
-      {/* Confirmation Dialog */}
-      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+      {/* SMS/WhatsApp Actions */}
+      {selectedVendor?.contact && (
+        <div className="mt-4 p-4 bg-muted rounded-lg">
+          <h3 className="text-sm font-medium mb-3">Send Notification</h3>
+          <div className="flex gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm"
+              onClick={sendSMSWithConfirmation}
+              className="flex-1"
+            >
+              📱 Send SMS
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                const formData = form.getValues();
+                const message = `🥛 Milk Received\n\nDear ${selectedVendor.name},\n\nMilk received: ${formData.quantity}L ${formData.milkType} at rate ${formData.rate}.\nTotal: ${totalAmount}\nTime: ${formData.time}\n\nThank you!\n- Thar Dairy`;
+                const whatsappUrl = `https://wa.me/${selectedVendor.contact}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+              }}
+              className="flex-1"
+            >
+              💬 WhatsApp
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* SMS Confirmation Dialog */}
+      <AlertDialog open={showSMSConfirmDialog} onOpenChange={setShowSMSConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Milk Receipt</AlertDialogTitle>
+            <AlertDialogTitle>Confirm SMS Notification</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to record this milk receipt?
+              Are you sure you want to send SMS notification to vendor?
               <br /><br />
               <strong>Vendor:</strong> {selectedVendor?.name}
               <br />
-              <strong>Quantity:</strong> {pendingData?.quantity}L ({pendingData?.milkType})
+              <strong>Contact:</strong> {selectedVendor?.contact}
               <br />
-              <strong>Amount:</strong> Rs. {pendingData?.totalAmount}
-              <br />
-              <strong>Time:</strong> {pendingData?.time}
-              {selectedVendor?.contact && (
-                <>
-                  <br /><br />
-                  <span className="text-sm text-muted-foreground">
-                    SMS notification will be sent to: {selectedVendor.contact}
-                  </span>
-                </>
-              )}
+              <strong>Details:</strong> {pendingData?.quantity}L {pendingData?.milkType} - Rs. {pendingData?.totalAmount}
+              <br /><br />
+              <span className="text-sm text-muted-foreground">
+                This will open your SMS app with a pre-filled message.
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmTransaction}>
-              Record Receipt
+            <AlertDialogAction onClick={confirmSendSMS}>
+              Send SMS
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

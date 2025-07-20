@@ -27,7 +27,8 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
   const [loading, setLoading] = useState(false);
   const [selectedPartyBalance, setSelectedPartyBalance] = useState<number | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [pendingData, setPendingData] = useState<InsertPayment | null>(null);
+  const [showSMSConfirmDialog, setShowSMSConfirmDialog] = useState(false);
+  const [pendingData, setPendingData] = useState<any>(null);
   const { transactions } = useTransactions();
   const { payments } = usePayments();
   const { t } = useLanguage();
@@ -115,61 +116,28 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
   }, [watchedType, watchedVendorId, watchedCustomerId, transactions, payments]);
 
   const onSubmit = async (data: InsertPayment) => {
-    // Show confirmation dialog for new payments
-    if (!payment) {
-      setPendingData(data);
-      setShowConfirmDialog(true);
-      return;
-    }
-
-    // For updates, proceed directly
-    await processPayment(data);
+    // Save payment directly without confirmation
+    await savePayment(data);
   };
 
-  const processPayment = async (data: InsertPayment) => {
+  const savePayment = async (data: InsertPayment) => {
     setLoading(true);
     try {
       if (payment) {
         // Update existing payment
         onSuccess?.(data);
+        toast({
+          title: "Success",
+          description: "Payment updated successfully",
+        });
       } else {
         // Create new payment
         console.log('PaymentForm - Creating payment with data:', data);
         await paymentService.create(data);
         
-        // Send SMS notification for new payments only
-        let contactPerson = null;
-        if (data.type === 'received' && data.customerId) {
-          contactPerson = customers.find(c => c.id === data.customerId);
-        } else if (data.type === 'paid' && data.vendorId) {
-          contactPerson = vendors.find(v => v.id === data.vendorId);
-        }
-        
-        if (contactPerson?.contact) {
-          console.log('PaymentForm - Attempting to send SMS to:', contactPerson.name, contactPerson.contact);
-          try {
-            const smsResult = await smsService.sendPaymentSMS(
-              contactPerson.contact,
-              data.type,
-              {
-                name: contactPerson.name,
-                amount: Number(data.amount),
-                method: data.method,
-                reference: data.reference || undefined,
-                date: new Date().toISOString(),
-              }
-            );
-            console.log('PaymentForm - SMS result:', smsResult);
-          } catch (smsError) {
-            console.error('PaymentForm - SMS notification failed:', smsError);
-          }
-        } else {
-          console.log('PaymentForm - No contact person available for SMS');
-        }
-        
         toast({
           title: "Success",
-          description: `Payment recorded and ${contactPerson ? 'notification sent' : 'ready'}`,
+          description: "Payment recorded successfully",
         });
         
         form.reset();
@@ -177,9 +145,10 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         onSuccess?.();
       }
     } catch (error) {
+      console.error('Error saving payment:', error);
       toast({
         title: "Error",
-        description: payment ? "Failed to update payment" : "Failed to record payment",
+        description: "Failed to save payment",
         variant: "destructive",
       });
     } finally {
@@ -187,16 +156,70 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
     }
   };
 
-  const availableParties = watchedType === "received" ? customers : vendors;
-  const partyKey = watchedType === "received" ? "customerId" : "vendorId";
+  const sendSMSWithConfirmation = async () => {
+    // Get current form data
+    const formData = form.getValues();
+    
+    let contactPerson = null;
+    if (formData.type === 'received' && formData.customerId) {
+      contactPerson = customers.find(c => c.id === formData.customerId);
+    } else if (formData.type === 'paid' && formData.vendorId) {
+      contactPerson = vendors.find(v => v.id === formData.vendorId);
+    }
 
-  const confirmPayment = async () => {
-    if (pendingData) {
-      setShowConfirmDialog(false);
-      await processPayment(pendingData);
-      setPendingData(null);
+    if (!contactPerson?.contact) {
+      toast({
+        title: "Error",
+        description: `No contact number available for ${formData.type === 'received' ? 'customer' : 'vendor'}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPendingData({
+      ...formData,
+      contactPerson: contactPerson
+    });
+    setShowSMSConfirmDialog(true);
+  };
+
+  const confirmSendSMS = async () => {
+    try {
+      if (!pendingData?.contactPerson?.contact) return;
+
+      console.log('PaymentForm - Attempting to send SMS to:', pendingData.contactPerson.name, pendingData.contactPerson.contact);
+      const smsResult = await smsService.sendPaymentSMS(
+        pendingData.contactPerson.contact,
+        pendingData.type,
+        {
+          name: pendingData.contactPerson.name,
+          amount: Number(pendingData.amount),
+          method: pendingData.method,
+          reference: pendingData.reference || undefined,
+          date: new Date().toISOString(),
+        }
+      );
+      
+      console.log('PaymentForm - SMS result:', smsResult);
+      
+      toast({
+        title: "Success",
+        description: `SMS sent to ${pendingData.type === 'received' ? 'customer' : 'vendor'} successfully`,
+      });
+      
+      setShowSMSConfirmDialog(false);
+    } catch (error) {
+      console.error('PaymentForm - SMS notification failed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send SMS notification",
+        variant: "destructive",
+      });
     }
   };
+
+  const availableParties = watchedType === "received" ? customers : vendors;
+  const partyKey = watchedType === "received" ? "customerId" : "vendorId";
 
   const getSelectedParty = () => {
     if (pendingData?.type === "received" && pendingData.customerId) {
@@ -342,19 +365,60 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         </Button>
       </form>
 
-      {/* Confirmation Dialog */}
-      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+      {/* SMS/WhatsApp Actions */}
+      {(() => {
+        const formData = form.getValues();
+        let contactPerson = null;
+        if (formData.type === 'received' && formData.customerId) {
+          contactPerson = customers.find(c => c.id === formData.customerId);
+        } else if (formData.type === 'paid' && formData.vendorId) {
+          contactPerson = vendors.find(v => v.id === formData.vendorId);
+        }
+        
+        return contactPerson?.contact ? (
+          <div className="mt-4 p-4 bg-muted rounded-lg">
+            <h3 className="text-sm font-medium mb-3">Send Notification</h3>
+            <div className="flex gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={sendSMSWithConfirmation}
+                className="flex-1"
+              >
+                📱 Send SMS
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const message = `💰 Payment ${formData.type === 'received' ? 'Received' : 'Made'}\n\nDear ${contactPerson.name},\n\nAmount: ${formData.amount}\nMethod: ${formData.method}\n${formData.reference ? `Reference: ${formData.reference}\n` : ''}Date: ${new Date().toLocaleDateString()}\n\nThank you!\n- Thar Dairy`;
+                  const whatsappUrl = `https://wa.me/${contactPerson.contact}?text=${encodeURIComponent(message)}`;
+                  window.open(whatsappUrl, '_blank');
+                }}
+                className="flex-1"
+              >
+                💬 WhatsApp
+              </Button>
+            </div>
+          </div>
+        ) : null;
+      })()}
+
+      {/* SMS Confirmation Dialog */}
+      <AlertDialog open={showSMSConfirmDialog} onOpenChange={setShowSMSConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Payment</AlertDialogTitle>
+            <AlertDialogTitle>Confirm SMS Notification</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to record this payment?
+              Are you sure you want to send SMS notification?
               <br /><br />
-              <strong>Type:</strong> {pendingData?.type === "received" ? "Payment Received" : "Payment Made"}
+              <strong>To:</strong> {pendingData?.contactPerson?.name}
               <br />
-              <strong>Party:</strong> {getSelectedParty()?.name}
+              <strong>Contact:</strong> {pendingData?.contactPerson?.contact}
               <br />
-              <strong>Amount:</strong> Rs. {pendingData?.amount}
+              <strong>Payment:</strong> {pendingData?.type === "received" ? "Received" : "Made"} - Rs. {pendingData?.amount}
               <br />
               <strong>Method:</strong> {pendingData?.method}
               {pendingData?.reference && (
@@ -363,20 +427,16 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
                   <strong>Reference:</strong> {pendingData.reference}
                 </>
               )}
-              {getSelectedParty()?.contact && (
-                <>
-                  <br /><br />
-                  <span className="text-sm text-muted-foreground">
-                    SMS notification will be sent to: {getSelectedParty()?.contact}
-                  </span>
-                </>
-              )}
+              <br /><br />
+              <span className="text-sm text-muted-foreground">
+                This will open your SMS app with a pre-filled message.
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmPayment}>
-              Record Payment
+            <AlertDialogAction onClick={confirmSendSMS}>
+              Send SMS
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
