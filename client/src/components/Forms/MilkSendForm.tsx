@@ -294,7 +294,7 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
               variant={selectedNotificationMethod === 'none' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedNotificationMethod('none')}
-              className="flex-1"
+              className="flex-1 px-2"
             >
               🚫 No Notification
             </Button>
@@ -303,7 +303,7 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
               variant={selectedNotificationMethod === 'sms' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedNotificationMethod('sms')}
-              className="flex-1"
+              className="flex-1 px-2"
             >
               📱 SMS
             </Button>
@@ -312,7 +312,7 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
               variant={selectedNotificationMethod === 'whatsapp' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedNotificationMethod('whatsapp')}
-              className="flex-1"
+              className="flex-1 px-2"
             >
               💬 WhatsApp
             </Button>

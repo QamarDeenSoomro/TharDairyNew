@@ -343,11 +343,6 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         )}
       </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? `${t.loading}...` : (payment ? "Update Payment" : t.recordPayment)}
-        </Button>
-      </form>
-
       {/* Notification Method Selection */}
       {(() => {
         const formData = form.getValues();
@@ -367,7 +362,7 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
                 variant={selectedNotificationMethod === 'none' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedNotificationMethod('none')}
-                className="flex-1"
+                className="flex-1 px-2"
               >
                 🚫 No Notification
               </Button>
@@ -376,7 +371,7 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
                 variant={selectedNotificationMethod === 'sms' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedNotificationMethod('sms')}
-                className="flex-1"
+                className="flex-1 px-2"
               >
                 📱 SMS
               </Button>
@@ -385,7 +380,7 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
                 variant={selectedNotificationMethod === 'whatsapp' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedNotificationMethod('whatsapp')}
-                className="flex-1"
+                className="flex-1 px-2"
               >
                 💬 WhatsApp
               </Button>
@@ -401,6 +396,11 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
           </div>
         ) : null;
       })()}
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? `${t.loading}...` : (payment ? "Update Payment" : t.recordPayment)}
+        </Button>
+      </form>
     </>
   );
 }
