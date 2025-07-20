@@ -24,6 +24,7 @@ import OfflineIndicator from "@/components/PWA/OfflineIndicator";
 import LoginPage from "@/components/Auth/LoginPage";
 import usePWA from "@/hooks/usePWA";
 import { useSMSToasts } from "@/hooks/useSMSToasts";
+import { adMobService } from "@/services/admobService";
 import { useState, useEffect } from "react";
 
 function Router() {
@@ -65,6 +66,10 @@ function App() {
         });
       }
     }
+
+    // Initialize AdMob for native platforms
+    adMobService.initialize();
+
     // Check if user is already logged in
     const authStatus = localStorage.getItem("thar_dairy_auth");
     if (authStatus === "authenticated") {

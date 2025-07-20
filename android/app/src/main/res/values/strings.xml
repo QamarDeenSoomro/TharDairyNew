@@ -4,4 +4,6 @@
     <string name="title_activity_main">Thar Dairy</string>
     <string name="package_name">com.thardairy.app</string>
     <string name="custom_url_scheme">com.thardairy.app</string>
+    <!-- AdMob App ID - Replace with your real App ID for production -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>

@@ -12,6 +12,8 @@ import { format, subDays, startOfDay, startOfWeek, startOfMonth, endOfMonth, end
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 import { useState, useMemo } from 'react';
+import AdMobBanner from "@/components/AdMob/AdMobBanner";
+import AdMobInterstitial from "@/components/AdMob/AdMobInterstitial";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -354,6 +356,16 @@ export default function Dashboard() {
           vendors={vendors}
           customers={customers}
         />
+      </div>
+
+      {/* AdMob Banner */}
+      <div className="mt-6">
+        <AdMobBanner />
+      </div>
+
+      {/* Ad Controls for Testing */}
+      <div className="mt-4 flex gap-2 justify-center">
+        <AdMobInterstitial buttonText="Show Full Screen Ad" />
       </div>
     </div>
   );
