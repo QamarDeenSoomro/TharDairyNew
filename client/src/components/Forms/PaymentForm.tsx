@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +32,8 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingData, setPendingData] = useState<any>(null);
   const [selectedNotificationMethod, setSelectedNotificationMethod] = useState<'none' | 'sms' | 'whatsapp'>('none');
+  const [partySearchOpen, setPartySearchOpen] = useState(false);
+  const [selectedParty, setSelectedParty] = useState<Vendor | Customer | null>(null);
   const { transactions } = useTransactions();
   const { payments } = usePayments();
   const { t } = useLanguage();
@@ -213,6 +218,24 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
     return null;
   };
 
+  // Initialize selected party from form data (for editing or prefilled data)
+  useEffect(() => {
+    const currentPartyId = form.watch(partyKey);
+    if (currentPartyId && availableParties.length > 0 && !selectedParty) {
+      const party = availableParties.find(p => p.id === currentPartyId);
+      if (party) {
+        setSelectedParty(party);
+      }
+    } else if (!currentPartyId) {
+      setSelectedParty(null);
+    }
+  }, [form.watch(partyKey), availableParties, selectedParty, partyKey]);
+
+  // Reset selected party when payment type changes
+  useEffect(() => {
+    setSelectedParty(null);
+  }, [watchedType]);
+
   return (
     <>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -241,29 +264,51 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
 
       <div>
         <Label htmlFor="party">{watchedType === "received" ? t.customer : t.vendor}</Label>
-        <Select
-          value={form.watch(partyKey) || ""}
-          onValueChange={(value) => {
-            if (watchedType === "received") {
-              form.setValue("customerId", value);
-              form.setValue("vendorId", null);
-            } else {
-              form.setValue("vendorId", value);
-              form.setValue("customerId", null);
-            }
-          }}
-        >
-          <SelectTrigger className="mt-1">
-            <SelectValue placeholder={t.selectParty} />
-          </SelectTrigger>
-          <SelectContent>
-            {availableParties.map((party) => (
-              <SelectItem key={party.id} value={party.id}>
-                {party.name} ({watchedType === "received" ? "Customer" : "Vendor"})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Popover open={partySearchOpen} onOpenChange={setPartySearchOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={partySearchOpen}
+              className="w-full mt-1 justify-between"
+            >
+              {selectedParty ? `${selectedParty.name} (${watchedType === "received" ? "Customer" : "Vendor"})` : t.selectParty}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder={`Search ${watchedType === "received" ? "customers" : "vendors"}...`} />
+              <CommandList>
+                <CommandEmpty>No {watchedType === "received" ? "customer" : "vendor"} found.</CommandEmpty>
+                <CommandGroup>
+                  {availableParties.map((party) => (
+                    <CommandItem
+                      key={party.id}
+                      value={party.name}
+                      onSelect={() => {
+                        setSelectedParty(party);
+                        if (watchedType === "received") {
+                          form.setValue("customerId", party.id);
+                          form.setValue("vendorId", null);
+                        } else {
+                          form.setValue("vendorId", party.id);
+                          form.setValue("customerId", null);
+                        }
+                        setPartySearchOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={`mr-2 h-4 w-4 ${selectedParty?.id === party.id ? "opacity-100" : "opacity-0"}`}
+                      />
+                      {party.name} ({watchedType === "received" ? "Customer" : "Vendor"})
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
         {(form.formState.errors.vendorId || form.formState.errors.customerId) && (
           <p className="text-sm text-destructive mt-1">Please select a party</p>
         )}
