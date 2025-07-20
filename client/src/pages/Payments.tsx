@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePayments, useVendors, useCustomers } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PaymentForm from "@/components/Forms/PaymentForm";
@@ -12,8 +12,30 @@ export default function Payments() {
   const { vendors, loading: vendorsLoading } = useVendors();
   const { customers, loading: customersLoading } = useCustomers();
   const { t } = useLanguage();
+  const [prefilledData, setPrefilledData] = useState<any>(null);
 
   const loading = paymentsLoading || vendorsLoading || customersLoading;
+
+  // Parse URL parameters for prefilling
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    const vendorId = urlParams.get('vendorId');
+    const customerId = urlParams.get('customerId');
+    const amount = urlParams.get('amount');
+
+    if (type && (vendorId || customerId) && amount) {
+      setPrefilledData({
+        type: type as 'paid' | 'received',
+        vendorId: vendorId || null,
+        customerId: customerId || null,
+        amount: parseFloat(amount),
+        method: 'cash',
+        reference: '',
+        date: new Date().toISOString().split('T')[0],
+      });
+    }
+  }, []);
 
   const totalReceived = payments
     .filter(p => p.type === 'received')
@@ -57,7 +79,17 @@ export default function Payments() {
             <CardTitle>{t.recordPayment}</CardTitle>
           </CardHeader>
           <CardContent>
-            <PaymentForm vendors={vendors} customers={customers} />
+            <PaymentForm 
+              vendors={vendors} 
+              customers={customers} 
+              payment={prefilledData}
+              onSuccess={() => {
+                // Clear prefilled data after successful payment
+                setPrefilledData(null);
+                // Clear URL parameters
+                window.history.replaceState({}, '', window.location.pathname);
+              }}
+            />
           </CardContent>
         </Card>
 

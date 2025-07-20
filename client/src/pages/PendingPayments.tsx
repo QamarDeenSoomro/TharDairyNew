@@ -1,11 +1,14 @@
 import { useMemo } from "react";
+import { useLocation } from "wouter";
 import { useVendors, useCustomers, useTransactions, usePayments } from "@/hooks/useFirestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
+import { CreditCard, DollarSign } from "lucide-react";
 
 interface PendingEntry {
   id: string;
@@ -17,10 +20,17 @@ interface PendingEntry {
 }
 
 export default function PendingPayments() {
+  const [, setLocation] = useLocation();
   const { vendors, loading: vendorsLoading } = useVendors();
   const { customers, loading: customersLoading } = useCustomers();
   const { transactions, loading: transactionsLoading } = useTransactions();
   const { payments, loading: paymentsLoading } = usePayments();
+
+  const handlePayment = (entry: PendingEntry) => {
+    const paymentType = entry.type === 'vendor' ? 'paid' : 'received';
+    const partyParam = entry.type === 'vendor' ? `vendorId=${entry.id}` : `customerId=${entry.id}`;
+    setLocation(`/payments?type=${paymentType}&${partyParam}&amount=${entry.pendingAmount}`);
+  };
 
   const pendingEntries = useMemo(() => {
     if (vendorsLoading || customersLoading || transactionsLoading || paymentsLoading) {
@@ -184,6 +194,7 @@ export default function PendingPayments() {
                       <TableHead>Type</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Last Transaction</TableHead>
+                      <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -206,6 +217,25 @@ export default function PendingPayments() {
                             ? format(new Date(entry.lastTransactionDate), "dd/MM/yyyy")
                             : "-"
                           }
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            size="sm" 
+                            onClick={() => handlePayment(entry)}
+                            className={entry.type === "vendor" ? "bg-destructive hover:bg-destructive/90" : "bg-green-600 hover:bg-green-700"}
+                          >
+                            {entry.type === "vendor" ? (
+                              <>
+                                <CreditCard className="h-4 w-4 mr-1" />
+                                Pay
+                              </>
+                            ) : (
+                              <>
+                                <DollarSign className="h-4 w-4 mr-1" />
+                                Receive
+                              </>
+                            )}
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -241,6 +271,25 @@ export default function PendingPayments() {
                           <span>{format(new Date(entry.lastTransactionDate), "dd/MM/yyyy")}</span>
                         </div>
                       )}
+                    </div>
+                    <div className="mt-3 pt-3 border-t">
+                      <Button 
+                        size="sm" 
+                        onClick={() => handlePayment(entry)}
+                        className={`w-full ${entry.type === "vendor" ? "bg-destructive hover:bg-destructive/90" : "bg-green-600 hover:bg-green-700"}`}
+                      >
+                        {entry.type === "vendor" ? (
+                          <>
+                            <CreditCard className="h-4 w-4 mr-2" />
+                            Pay {entry.name}
+                          </>
+                        ) : (
+                          <>
+                            <DollarSign className="h-4 w-4 mr-2" />
+                            Receive from {entry.name}
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </Card>
                 ))}
