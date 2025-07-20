@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ArrowDown, ArrowUp, Receipt, Edit, Trash2 } from "lucide-react";
@@ -125,54 +126,113 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Party</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Reference</TableHead>
-            {showActions && <TableHead>Actions</TableHead>}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {payments.map((payment) => (
-            <TableRow key={payment.id} className="hover:bg-muted/50">
-              <TableCell className="text-muted-foreground">
-                {new Date(payment.date!).toLocaleDateString()}
-                <div className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(payment.date!), { addSuffix: true })}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2">
-                  {getTypeIcon(payment.type)}
+    <>
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Party</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Method</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Reference</TableHead>
+              {showActions && <TableHead>Actions</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {payments.map((payment) => (
+              <TableRow key={payment.id} className="hover:bg-muted/50">
+                <TableCell className="text-muted-foreground">
+                  {new Date(payment.date!).toLocaleDateString()}
+                  <div className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(payment.date!), { addSuffix: true })}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    {getTypeIcon(payment.type)}
+                    <div>
+                      <div className="font-medium">{getPartyName(payment)}</div>
+                      <div className="text-xs text-muted-foreground">{getPartyType(payment)}</div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {getTypeBadge(payment.type)}
+                </TableCell>
+                <TableCell>
+                  {getMethodBadge(payment.method)}
+                </TableCell>
+                <TableCell className="font-medium">
+                  <span className={payment.type === 'received' ? 'text-green-600' : 'text-orange-600'}>
+                    {payment.type === 'received' ? '+' : '-'}{formatCurrency(payment.amount)}
+                  </span>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {payment.reference || '-'}
+                </TableCell>
+                {showActions && (
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(payment)}
+                        title="Edit Payment"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm" title="Delete Payment">
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Payment</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this payment record? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(payment.id.toString())}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {payments.map((payment) => (
+          <Card key={payment.id} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    payment.type === 'received' ? 'bg-green-100 dark:bg-green-900/20' : 'bg-orange-100 dark:bg-orange-900/20'
+                  }`}>
+                    {getTypeIcon(payment.type)}
+                  </div>
                   <div>
                     <div className="font-medium">{getPartyName(payment)}</div>
                     <div className="text-xs text-muted-foreground">{getPartyType(payment)}</div>
                   </div>
                 </div>
-              </TableCell>
-              <TableCell>
-                {getTypeBadge(payment.type)}
-              </TableCell>
-              <TableCell>
-                {getMethodBadge(payment.method)}
-              </TableCell>
-              <TableCell className="font-medium">
-                <span className={payment.type === 'received' ? 'text-green-600' : 'text-orange-600'}>
-                  {payment.type === 'received' ? '+' : '-'}{formatCurrency(payment.amount)}
-                </span>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {payment.reference || '-'}
-              </TableCell>
-              {showActions && (
-                <TableCell>
-                  <div className="flex items-center space-x-2">
+                {showActions && (
+                  <div className="flex items-center space-x-1">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -203,12 +263,43 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
-                </TableCell>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <div className="text-xs text-muted-foreground">Amount</div>
+                  <div className={`font-semibold ${payment.type === 'received' ? 'text-green-600' : 'text-orange-600'}`}>
+                    {payment.type === 'received' ? '+' : '-'}{formatCurrency(payment.amount)}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Method</div>
+                  <div>{getMethodBadge(payment.method)}</div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs text-muted-foreground">Type</div>
+                  <div>{getTypeBadge(payment.type)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Date</div>
+                  <div className="text-sm">{new Date(payment.date!).toLocaleDateString()}</div>
+                </div>
+              </div>
+              
+              {payment.reference && (
+                <div className="mt-3 pt-3 border-t">
+                  <div className="text-xs text-muted-foreground">Reference</div>
+                  <div className="text-sm font-medium">{payment.reference}</div>
+                </div>
               )}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {/* Edit Payment Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -224,6 +315,6 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

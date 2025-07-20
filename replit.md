@@ -156,6 +156,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Pending Payments Breakdown Display**: Enhanced pending payments card to show detailed breakdown of Payables (amount due to vendors) and Receivables (amount due from customers) using the details view in StatsCard component (January 2025)
 - **Dashboard Stats Card Navigation**: Added click navigation to Milk Received and Milk Sent cards that redirect to their respective module pages (MilkReceiving and MilkSending) with hover effects for better user experience (January 2025)
 - **Searchable Party Selection**: Enhanced vendor and customer selection dropdowns in Milk Receiving, Milk Sending, and Payment forms with searchable Command components, replacing basic Select dropdowns for improved user experience with large datasets (January 2025)
+- **Mobile Responsive PaymentTable**: Added mobile-first card layout for PaymentTable component with proper spacing, visual hierarchy, and touch-friendly action buttons while maintaining desktop table view (January 2025)
 
 ### File Structure
 - `client/`: React frontend application
