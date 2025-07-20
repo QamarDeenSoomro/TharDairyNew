@@ -124,8 +124,8 @@ export class MemStorage implements IStorage {
     const newTransaction: MilkTransaction = {
       ...transaction,
       id,
-      vendorId: transaction.vendorId || null,
-      customerId: transaction.customerId || null,
+      vendorId: typeof transaction.vendorId === 'string' ? parseInt(transaction.vendorId) : (transaction.vendorId || null),
+      customerId: typeof transaction.customerId === 'string' ? parseInt(transaction.customerId) : (transaction.customerId || null),
       fat: transaction.fat || null,
       snf: transaction.snf || null,
       date: transaction.date || new Date(),
@@ -175,11 +175,11 @@ export class MemStorage implements IStorage {
   }
 
   async getPaymentsByVendor(vendorId: number): Promise<Payment[]> {
-    return Array.from(this.payments.values()).filter(p => p.vendorId === vendorId);
+    return Array.from(this.payments.values()).filter(p => p.vendorId === vendorId || p.vendorId === vendorId.toString());
   }
 
   async getPaymentsByCustomer(customerId: number): Promise<Payment[]> {
-    return Array.from(this.payments.values()).filter(p => p.customerId === customerId);
+    return Array.from(this.payments.values()).filter(p => p.customerId === customerId || p.customerId === customerId.toString());
   }
 
   async getPaymentsByDateRange(startDate: Date, endDate: Date): Promise<Payment[]> {
