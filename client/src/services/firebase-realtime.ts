@@ -47,6 +47,9 @@ export type FirebaseMilkTransaction = {
   totalAmount: number;
   date: string;
   createdAt: string;
+  savedOnHard?: boolean;
+  savedOnHardDate?: string | null;
+  savedOnHardBy?: string | null;
 };
 
 export type FirebasePayment = {
@@ -59,6 +62,9 @@ export type FirebasePayment = {
   reference: string | null;
   date: string;
   createdAt: string;
+  savedOnHard?: boolean;
+  savedOnHardDate?: string | null;
+  savedOnHardBy?: string | null;
 };
 
 export type FirebaseDailyExpense = {
@@ -293,7 +299,10 @@ export const transactionService = {
         fat: data[key].fat || null,
         snf: data[key].snf || null,
         date: data[key].date,
-        createdAt: data[key].createdAt
+        createdAt: data[key].createdAt,
+        savedOnHard: data[key].savedOnHard || false,
+        savedOnHardDate: data[key].savedOnHardDate || null,
+        savedOnHardBy: data[key].savedOnHardBy || null
       };
       console.log(`Retrieved transaction ${key}:`, transaction);
       return transaction;
@@ -360,7 +369,10 @@ export const transactionService = {
             fat: data[key].fat || null,
             snf: data[key].snf || null,
             date: data[key].date,
-            createdAt: data[key].createdAt
+            createdAt: data[key].createdAt,
+            savedOnHard: data[key].savedOnHard || false,
+            savedOnHardDate: data[key].savedOnHardDate || null,
+            savedOnHardBy: data[key].savedOnHardBy || null
           };
           transactions.push(transaction);
         });
@@ -404,7 +416,17 @@ export const paymentService = {
     const data = snapshot.val();
     return Object.keys(data).map(key => ({
       id: key,
-      ...data[key]
+      type: data[key].type,
+      vendorId: data[key].vendorId || null,
+      customerId: data[key].customerId || null,
+      amount: data[key].amount,
+      method: data[key].method,
+      reference: data[key].reference || null,
+      date: data[key].date,
+      createdAt: data[key].createdAt,
+      savedOnHard: data[key].savedOnHard || false,
+      savedOnHardDate: data[key].savedOnHardDate || null,
+      savedOnHardBy: data[key].savedOnHardBy || null
     })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   },
 
@@ -463,7 +485,10 @@ export const paymentService = {
             method: data[key].method,
             reference: data[key].reference || null,
             date: data[key].date,
-            createdAt: data[key].createdAt
+            createdAt: data[key].createdAt,
+            savedOnHard: data[key].savedOnHard || false,
+            savedOnHardDate: data[key].savedOnHardDate || null,
+            savedOnHardBy: data[key].savedOnHardBy || null
           };
           payments.push(payment);
         });
