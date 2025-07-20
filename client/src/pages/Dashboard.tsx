@@ -93,10 +93,18 @@ export default function Dashboard() {
     // Calculate profit (sent amount - received amount - daily expenses)
     const profit = sentAmount - receivedAmount;
 
-    // Calculate pending payments (this might need adjustment based on your business logic)
-    const totalReceived = filteredPayments.filter(p => p.type === 'received').reduce((sum, p) => sum + p.amount, 0);
-    const totalPaid = filteredPayments.filter(p => p.type === 'paid').reduce((sum, p) => sum + p.amount, 0);
-    const pendingPayments = Math.abs(totalReceived - totalPaid);
+    // Calculate pending payments breakdown
+    // Payables (amount due to vendors)
+    const vendorTransactionAmount = transactions.filter(t => t.type === 'receive').reduce((sum, t) => sum + t.totalAmount, 0);
+    const vendorPaymentsAmount = payments.filter(p => p.type === 'paid').reduce((sum, p) => sum + p.amount, 0);
+    const payables = Math.max(0, vendorTransactionAmount - vendorPaymentsAmount);
+
+    // Receivables (amount due from customers)
+    const customerTransactionAmount = transactions.filter(t => t.type === 'send').reduce((sum, t) => sum + t.totalAmount, 0);
+    const customerPaymentsAmount = payments.filter(p => p.type === 'received').reduce((sum, p) => sum + p.amount, 0);
+    const receivables = Math.max(0, customerTransactionAmount - customerPaymentsAmount);
+
+    const pendingPayments = payables + receivables;
 
     return {
       receivedQuantity,
@@ -105,6 +113,8 @@ export default function Dashboard() {
       sentAmount,
       profit,
       pendingPayments,
+      payables,
+      receivables,
       startDate,
       endDate
     };
@@ -264,6 +274,11 @@ export default function Dashboard() {
           value={`${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.pendingPayments))}`}
           color="warning"
           onClick={handlePendingPaymentsClick}
+          details={{
+            quantity: `Payables: ${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.payables || 0))}`,
+            amount: `Receivables: ${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.receivables || 0))}`,
+            averageRate: `Total: ${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.pendingPayments))}`
+          }}
         />
       </div>
 
