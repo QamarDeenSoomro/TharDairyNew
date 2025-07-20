@@ -653,29 +653,36 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
           
 
           {/* Communication Actions */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Button 
               onClick={confirmWhatsAppSend} 
               disabled={isSendingWhatsApp} 
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full"
             >
               <MessageSquare className="h-4 w-4" />
-              {isSendingWhatsApp ? "Opening WhatsApp..." : "Send via WhatsApp"}
+              <span className="hidden sm:inline">{isSendingWhatsApp ? "Opening WhatsApp..." : "Send via WhatsApp"}</span>
+              <span className="sm:hidden">WhatsApp</span>
             </Button>
             
             <Button 
               onClick={confirmSMSSend} 
               disabled={isSendingSMS} 
               variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full"
             >
               <Smartphone className="h-4 w-4" />
-              {isSendingSMS ? "Opening SMS..." : "Send via SMS"}
+              <span className="hidden sm:inline">{isSendingSMS ? "Opening SMS..." : "Send via SMS"}</span>
+              <span className="sm:hidden">SMS</span>
             </Button>
             
-            <Button variant="outline" onClick={downloadLedger} className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={downloadLedger} 
+              className="flex items-center justify-center gap-2 w-full"
+            >
               <Download className="h-4 w-4" />
-              Download Ledger
+              <span className="hidden sm:inline">Download Ledger</span>
+              <span className="sm:hidden">Download</span>
             </Button>
           </div>
 
