@@ -707,7 +707,42 @@ export const settlementService = {
     finalBalance: number,
     notes?: string
   ): Promise<string> {
-    // Create settlement record
+    // If there's a remaining balance, create a balancing entry to clear it
+    if (Math.abs(finalBalance) > 0.01) {
+      const balanceNote = notes ? `Settlement: ${notes}` : 'Manual Settlement';
+      
+      if (finalBalance > 0) {
+        // Entity owes money - create a payment to clear the balance
+        const settlementPayment: InsertPayment = {
+          type: 'received',
+          vendorId: entityType === 'vendor' ? entityId : null,
+          customerId: entityType === 'customer' ? entityId : null,
+          amount: finalBalance,
+          method: 'settlement',
+          reference: 'AUTO-SETTLEMENT',
+          notes: balanceNote,
+          date: new Date().toISOString(),
+        };
+        await paymentService.create(settlementPayment);
+      } else {
+        // You owe money to entity - create a transaction to clear the balance
+        const settlementTransaction: InsertMilkTransaction = {
+          type: entityType === 'vendor' ? 'receive' : 'send',
+          vendorId: entityType === 'vendor' ? entityId : null,
+          customerId: entityType === 'customer' ? entityId : null,
+          milkType: 'settlement',
+          quantity: 0,
+          fat: null,
+          snf: null,
+          rate: 0,
+          totalAmount: Math.abs(finalBalance),
+          date: new Date().toISOString(),
+        };
+        await transactionService.create(settlementTransaction);
+      }
+    }
+
+    // Create settlement record to archive everything
     const settlementData: InsertSettlement = {
       vendorId: entityType === 'vendor' ? entityId : null,
       customerId: entityType === 'customer' ? entityId : null,

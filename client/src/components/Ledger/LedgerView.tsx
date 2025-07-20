@@ -242,8 +242,8 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
       setShowSettlementDialog(false);
       setSettlementNotes("");
       toast({
-        title: "Settlement Created",
-        description: `${entityType === 'vendor' ? 'Vendor' : 'Customer'} data has been archived. Current ledger now shows only transactions after settlement.`,
+        title: "Auto-Settlement Completed",
+        description: `${entity.name}'s account has been automatically settled and all data archived. Starting fresh with zero balance.`,
       });
     } catch (error) {
       toast({
@@ -549,7 +549,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                       className="flex items-center gap-2"
                     >
                       <Archive className="h-4 w-4" />
-                      Manual Settlement
+                      Auto-Settlement
                     </Button>
                   )}
                 </div>
@@ -977,17 +977,35 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
       <Dialog open={showSettlementDialog} onOpenChange={setShowSettlementDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Create Settlement</DialogTitle>
+            <DialogTitle>Auto-Settlement</DialogTitle>
             <DialogDescription>
-              Archive current data and start fresh with a settlement balance of {formatCurrency(Math.abs(totals.finalBalance))}
+              This will automatically settle all transactions and payments, clear the remaining balance, and archive all data.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-medium text-blue-900 mb-2">What will happen:</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                {Math.abs(totals.finalBalance) > 0.01 ? (
+                  <>
+                    <li>• Clear remaining balance of {formatCurrency(Math.abs(totals.finalBalance))}</li>
+                    <li>• {totals.finalBalance > 0 
+                      ? `Create settlement payment to clear what ${entity.name} owes`
+                      : `Create settlement entry to clear what you owe ${entity.name}`}
+                    </li>
+                  </>
+                ) : (
+                  <li>• Balance is already settled</li>
+                )}
+                <li>• Archive all existing transactions and payments</li>
+                <li>• Start fresh with zero balance</li>
+              </ul>
+            </div>
             <div>
               <Label htmlFor="settlement-notes">Settlement Notes (Optional)</Label>
               <Input
                 id="settlement-notes"
-                placeholder="e.g., Full payment received"
+                placeholder="e.g., Full payment received, Account settled"
                 value={settlementNotes}
                 onChange={(e) => setSettlementNotes(e.target.value)}
               />
@@ -998,7 +1016,7 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
               Cancel
             </Button>
             <Button onClick={handleManualSettlement}>
-              Create Settlement
+              {Math.abs(totals.finalBalance) > 0.01 ? "Auto-Settle & Archive" : "Archive Data"}
             </Button>
           </DialogFooter>
         </DialogContent>
