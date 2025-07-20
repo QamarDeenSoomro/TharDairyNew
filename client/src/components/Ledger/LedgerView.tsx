@@ -471,28 +471,32 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-4">
-                <div className="w-full">
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="mt-1 w-full"
-                  />
+              <div className="flex flex-col sm:flex-row gap-4 items-end">
+                <div className="flex-1 sm:flex-initial">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="startDate">Start Date</Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endDate">End Date</Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="w-full">
-                  <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="mt-1 w-full"
-                  />
-                </div>
-                <div className="flex justify-end">
+                <div className="flex-shrink-0">
                   {(startDate || endDate) && (
                     <Button variant="outline" onClick={clearDateFilter}>
                       Clear
