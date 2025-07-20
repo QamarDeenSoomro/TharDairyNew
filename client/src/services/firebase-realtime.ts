@@ -712,9 +712,9 @@ export const settlementService = {
       const balanceNote = notes ? `Settlement: ${notes}` : 'Manual Settlement';
       
       if (finalBalance > 0) {
-        // Entity owes money - create a payment to clear the balance
+        // Entity owes money - create a payment FROM them to clear the balance
         const settlementPayment: InsertPayment = {
-          type: 'received',
+          type: 'paid',
           vendorId: entityType === 'vendor' ? entityId : null,
           customerId: entityType === 'customer' ? entityId : null,
           amount: finalBalance,

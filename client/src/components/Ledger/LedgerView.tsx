@@ -1079,8 +1079,8 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                   <>
                     <li>• Clear remaining balance of {formatCurrency(Math.abs(totals.finalBalance))}</li>
                     <li>• {totals.finalBalance > 0 
-                      ? `Create settlement payment to clear what ${entity.name} owes`
-                      : `Create settlement entry to clear what you owe ${entity.name}`}
+                      ? `Create payment FROM ${entity.name} to clear ₹${Math.abs(totals.finalBalance)} debt`
+                      : `Create entry showing you paid ₹${Math.abs(totals.finalBalance)} to ${entity.name}`}
                     </li>
                   </>
                 ) : (
