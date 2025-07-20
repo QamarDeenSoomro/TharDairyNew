@@ -21,6 +21,7 @@ const getNavigationItems = (t: any) => [
   { name: t.payments, href: "/payments", icon: "payment" },
   { name: t.pendingPayments, href: "/pending-payments", icon: "pending" },
   { name: t.dailyExpenses, href: "/expenses", icon: "trending_down" },
+  { name: t.statement, href: "/bank-statement", icon: "receipt" },
   { name: t.reports, href: "/reports", icon: "assessment" },
   { name: t.databaseManagement, href: "/database", icon: "storage" },
 ];

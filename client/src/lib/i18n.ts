@@ -26,6 +26,7 @@ export interface Translation {
   vendorLedger: string;
   customerLedger: string;
   pendingPayments: string;
+  statement: string;
   databaseManagement: string;
   
   // Dashboard
@@ -233,6 +234,7 @@ export const translations: Record<Language, Translation> = {
     vendorLedger: 'Vendor Ledger',
     customerLedger: 'Customer Ledger',
     pendingPayments: 'Pending Payments',
+    statement: 'Statement',
     databaseManagement: 'Database Management',
     
     // Dashboard
@@ -465,6 +467,7 @@ export const translations: Record<Language, Translation> = {
     vendorLedger: 'وينڊر ليجر',
     customerLedger: 'گراهڪ ليجر',
     pendingPayments: 'باقي ادائيگيون',
+    statement: 'بيان',
     databaseManagement: 'ڊيٽابيس منظوري',
     
     // Dashboard
