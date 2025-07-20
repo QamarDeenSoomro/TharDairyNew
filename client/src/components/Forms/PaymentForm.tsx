@@ -130,11 +130,14 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
     try {
       if (payment) {
         // Update existing payment
-        onSuccess?.(data);
+        console.log('PaymentForm - Updating payment with data:', data, 'Payment ID:', payment.id);
+        await paymentService.update(payment.id, data);
+        
         toast({
           title: "Success",
           description: "Payment updated successfully",
         });
+        onSuccess?.(data);
       } else {
         // Create new payment
         console.log('PaymentForm - Creating payment with data:', data);
