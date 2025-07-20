@@ -24,8 +24,8 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
   const [selectedCustomer, setSelectedCustomer] = useState<FirebaseCustomer | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showSMSConfirmDialog, setShowSMSConfirmDialog] = useState(false);
   const [pendingData, setPendingData] = useState<any>(null);
+  const [selectedNotificationMethod, setSelectedNotificationMethod] = useState<'none' | 'sms' | 'whatsapp'>('none');
 
   const form = useForm<InsertMilkTransaction>({
     resolver: zodResolver(insertMilkTransactionSchema),
@@ -111,6 +111,11 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
         
         await transactionService.create(transformedData);
         
+        // Send notification based on selected method
+        if (selectedCustomer?.contact && selectedNotificationMethod !== 'none') {
+          await sendSelectedNotification(transformedData);
+        }
+        
         toast({
           title: "Success",
           description: "Milk delivery recorded successfully",
@@ -119,6 +124,7 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
         form.reset();
         setSelectedCustomer(null);
         setTotalAmount(0);
+        setSelectedNotificationMethod('none');
       }
       
       onSuccess?.(transformedData);
@@ -134,59 +140,37 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
     }
   };
 
-  const sendSMSWithConfirmation = async () => {
-    if (!selectedCustomer?.contact) {
-      toast({
-        title: "Error",
-        description: "No contact number available for customer",
-        variant: "destructive",
-      });
-      return;
-    }
+  const sendSelectedNotification = async (transactionData: any) => {
+    if (!selectedCustomer?.contact) return;
 
-    // Get current form data
-    const currentData = form.getValues();
-    
-    setPendingData({
-      ...currentData,
-      customer: selectedCustomer,
-      totalAmount: totalAmount
-    });
-    setShowSMSConfirmDialog(true);
-  };
-
-  const confirmSendSMS = async () => {
     try {
-      if (!selectedCustomer?.contact || !pendingData) return;
-
-      console.log('MilkSendForm - Attempting to send SMS to customer:', selectedCustomer.name, selectedCustomer.contact);
-      const smsResult = await smsService.sendMilkTransactionSMS(
-        selectedCustomer.contact,
-        'send',
-        {
-          name: selectedCustomer.name,
-          quantity: pendingData.quantity,
-          milkType: pendingData.milkType,
-          rate: pendingData.rate,
-          totalAmount: pendingData.totalAmount,
-          time: pendingData.time,
-          date: new Date().toISOString(),
-        }
-      );
-      
-      console.log('MilkSendForm - SMS result:', smsResult);
-      
-      toast({
-        title: "Success",
-        description: "SMS sent to customer successfully",
-      });
-      
-      setShowSMSConfirmDialog(false);
+      if (selectedNotificationMethod === 'sms') {
+        console.log('MilkSendForm - Sending SMS to customer:', selectedCustomer.name, selectedCustomer.contact);
+        await smsService.sendMilkTransactionSMS(
+          selectedCustomer.contact,
+          'send',
+          {
+            name: selectedCustomer.name,
+            quantity: transactionData.quantity,
+            milkType: transactionData.milkType,
+            rate: transactionData.rate,
+            totalAmount: transactionData.totalAmount,
+            time: transactionData.time,
+            date: new Date().toISOString(),
+          }
+        );
+        console.log('MilkSendForm - SMS sent successfully');
+      } else if (selectedNotificationMethod === 'whatsapp') {
+        const message = `🥛 Milk Delivered\n\nDear ${selectedCustomer.name},\n\nMilk delivered: ${transactionData.quantity}L ${transactionData.milkType} at rate ${transactionData.rate}.\nTotal: ${transactionData.totalAmount}\nTime: ${transactionData.time}\n\nThank you!\n- Thar Dairy`;
+        const whatsappUrl = `https://wa.me/${selectedCustomer.contact}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        console.log('MilkSendForm - WhatsApp opened');
+      }
     } catch (error) {
-      console.error('MilkSendForm - SMS notification failed:', error);
+      console.error('MilkSendForm - Notification failed:', error);
       toast({
-        title: "Error",
-        description: "Failed to send SMS notification",
+        title: "Warning",
+        description: "Delivery saved but notification failed to send",
         variant: "destructive",
       });
     }
@@ -300,70 +284,54 @@ export default function MilkSendForm({ customers, transaction, onSuccess }: Milk
         </div>
       </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Recording..." : "Record Delivery"}
-        </Button>
-      </form>
-
-      {/* SMS/WhatsApp Actions */}
+      {/* Notification Method Selection */}
       {selectedCustomer?.contact && (
-        <div className="mt-4 p-4 bg-muted rounded-lg">
-          <h3 className="text-sm font-medium mb-3">Send Notification</h3>
+        <div className="bg-muted p-4 rounded-lg">
+          <h3 className="text-sm font-medium mb-3">Notification Method (Optional)</h3>
           <div className="flex gap-2">
             <Button 
               type="button" 
-              variant="outline" 
+              variant={selectedNotificationMethod === 'none' ? 'default' : 'outline'}
               size="sm"
-              onClick={sendSMSWithConfirmation}
+              onClick={() => setSelectedNotificationMethod('none')}
               className="flex-1"
             >
-              📱 Send SMS
+              🚫 No Notification
             </Button>
             <Button 
               type="button" 
-              variant="outline" 
+              variant={selectedNotificationMethod === 'sms' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => {
-                const formData = form.getValues();
-                const message = `🥛 Milk Delivered\n\nDear ${selectedCustomer.name},\n\nMilk delivered: ${formData.quantity}L ${formData.milkType} at rate ${formData.rate}.\nTotal: ${totalAmount}\nTime: ${formData.time}\n\nThank you!\n- Thar Dairy`;
-                const whatsappUrl = `https://wa.me/${selectedCustomer.contact}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank');
-              }}
+              onClick={() => setSelectedNotificationMethod('sms')}
+              className="flex-1"
+            >
+              📱 SMS
+            </Button>
+            <Button 
+              type="button" 
+              variant={selectedNotificationMethod === 'whatsapp' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedNotificationMethod('whatsapp')}
               className="flex-1"
             >
               💬 WhatsApp
             </Button>
           </div>
+          {selectedNotificationMethod !== 'none' && (
+            <p className="text-xs text-muted-foreground mt-2">
+              {selectedNotificationMethod === 'sms' 
+                ? 'SMS will be sent after recording delivery' 
+                : 'WhatsApp will open after recording delivery'
+              }
+            </p>
+          )}
         </div>
       )}
 
-      {/* SMS Confirmation Dialog */}
-      <AlertDialog open={showSMSConfirmDialog} onOpenChange={setShowSMSConfirmDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm SMS Notification</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to send SMS notification to customer?
-              <br /><br />
-              <strong>Customer:</strong> {selectedCustomer?.name}
-              <br />
-              <strong>Contact:</strong> {selectedCustomer?.contact}
-              <br />
-              <strong>Details:</strong> {pendingData?.quantity}L {pendingData?.milkType} - Rs. {pendingData?.totalAmount}
-              <br /><br />
-              <span className="text-sm text-muted-foreground">
-                This will open your SMS app with a pre-filled message.
-              </span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmSendSMS}>
-              Send SMS
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Recording..." : "Record Delivery"}
+        </Button>
+      </form>
     </>
   );
 }

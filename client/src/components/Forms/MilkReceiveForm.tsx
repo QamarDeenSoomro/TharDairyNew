@@ -24,8 +24,9 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
   const [selectedVendor, setSelectedVendor] = useState<FirebaseVendor | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showSMSConfirmDialog, setShowSMSConfirmDialog] = useState(false);
+
   const [pendingData, setPendingData] = useState<any>(null);
+  const [selectedNotificationMethod, setSelectedNotificationMethod] = useState<'none' | 'sms' | 'whatsapp'>('none');
 
   const form = useForm<InsertMilkTransaction>({
     resolver: zodResolver(insertMilkTransactionSchema),
@@ -134,63 +135,7 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
     }
   };
 
-  const sendSMSWithConfirmation = async () => {
-    if (!selectedVendor?.contact) {
-      toast({
-        title: "Error",
-        description: "No contact number available for vendor",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    // Get current form data
-    const currentData = form.getValues();
-    
-    setPendingData({
-      ...currentData,
-      vendor: selectedVendor,
-      totalAmount: totalAmount
-    });
-    setShowSMSConfirmDialog(true);
-  };
-
-  const confirmSendSMS = async () => {
-    try {
-      if (!selectedVendor?.contact || !pendingData) return;
-
-      console.log('MilkReceiveForm - Attempting to send SMS to vendor:', selectedVendor.name, selectedVendor.contact);
-      const smsResult = await smsService.sendMilkTransactionSMS(
-        selectedVendor.contact,
-        'receive',
-        {
-          name: selectedVendor.name,
-          quantity: pendingData.quantity,
-          milkType: pendingData.milkType,
-          rate: pendingData.rate,
-          totalAmount: pendingData.totalAmount,
-          time: pendingData.time,
-          date: new Date().toISOString(),
-        }
-      );
-      
-      console.log('MilkReceiveForm - SMS result:', smsResult);
-      
-      toast({
-        title: "Success",
-        description: "SMS sent to vendor successfully",
-      });
-      
-      setShowSMSConfirmDialog(false);
-    } catch (error) {
-      console.error('MilkReceiveForm - SMS notification failed:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send SMS notification",
-        variant: "destructive",
-      });
-    }
-  };
 
 
 
@@ -300,70 +245,56 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
         </div>
       </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Recording..." : "Record Receipt"}
-        </Button>
-      </form>
-
-      {/* SMS/WhatsApp Actions */}
+      {/* Notification Method Selection */}
       {selectedVendor?.contact && (
-        <div className="mt-4 p-4 bg-muted rounded-lg">
-          <h3 className="text-sm font-medium mb-3">Send Notification</h3>
+        <div className="bg-muted p-4 rounded-lg">
+          <h3 className="text-sm font-medium mb-3">Notification Method (Optional)</h3>
           <div className="flex gap-2">
             <Button 
               type="button" 
-              variant="outline" 
+              variant={selectedNotificationMethod === 'none' ? 'default' : 'outline'}
               size="sm"
-              onClick={sendSMSWithConfirmation}
+              onClick={() => setSelectedNotificationMethod('none')}
               className="flex-1"
             >
-              📱 Send SMS
+              🚫 No Notification
             </Button>
             <Button 
               type="button" 
-              variant="outline" 
+              variant={selectedNotificationMethod === 'sms' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => {
-                const formData = form.getValues();
-                const message = `🥛 Milk Received\n\nDear ${selectedVendor.name},\n\nMilk received: ${formData.quantity}L ${formData.milkType} at rate ${formData.rate}.\nTotal: ${totalAmount}\nTime: ${formData.time}\n\nThank you!\n- Thar Dairy`;
-                const whatsappUrl = `https://wa.me/${selectedVendor.contact}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank');
-              }}
+              onClick={() => setSelectedNotificationMethod('sms')}
+              className="flex-1"
+            >
+              📱 SMS
+            </Button>
+            <Button 
+              type="button" 
+              variant={selectedNotificationMethod === 'whatsapp' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedNotificationMethod('whatsapp')}
               className="flex-1"
             >
               💬 WhatsApp
             </Button>
           </div>
+          {selectedNotificationMethod !== 'none' && (
+            <p className="text-xs text-muted-foreground mt-2">
+              {selectedNotificationMethod === 'sms' 
+                ? 'SMS will be sent after recording receipt' 
+                : 'WhatsApp will open after recording receipt'
+              }
+            </p>
+          )}
         </div>
       )}
 
-      {/* SMS Confirmation Dialog */}
-      <AlertDialog open={showSMSConfirmDialog} onOpenChange={setShowSMSConfirmDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm SMS Notification</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to send SMS notification to vendor?
-              <br /><br />
-              <strong>Vendor:</strong> {selectedVendor?.name}
-              <br />
-              <strong>Contact:</strong> {selectedVendor?.contact}
-              <br />
-              <strong>Details:</strong> {pendingData?.quantity}L {pendingData?.milkType} - Rs. {pendingData?.totalAmount}
-              <br /><br />
-              <span className="text-sm text-muted-foreground">
-                This will open your SMS app with a pre-filled message.
-              </span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmSendSMS}>
-              Send SMS
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Recording..." : "Record Receipt"}
+        </Button>
+      </form>
+
+
     </>
   );
 }

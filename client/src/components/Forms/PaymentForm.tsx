@@ -27,8 +27,8 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
   const [loading, setLoading] = useState(false);
   const [selectedPartyBalance, setSelectedPartyBalance] = useState<number | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showSMSConfirmDialog, setShowSMSConfirmDialog] = useState(false);
   const [pendingData, setPendingData] = useState<any>(null);
+  const [selectedNotificationMethod, setSelectedNotificationMethod] = useState<'none' | 'sms' | 'whatsapp'>('none');
   const { transactions } = useTransactions();
   const { payments } = usePayments();
   const { t } = useLanguage();
@@ -135,6 +135,18 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         console.log('PaymentForm - Creating payment with data:', data);
         await paymentService.create(data);
         
+        // Send notification based on selected method
+        let contactPerson = null;
+        if (data.type === 'received' && data.customerId) {
+          contactPerson = customers.find(c => c.id === data.customerId);
+        } else if (data.type === 'paid' && data.vendorId) {
+          contactPerson = vendors.find(v => v.id === data.vendorId);
+        }
+        
+        if (contactPerson?.contact && selectedNotificationMethod !== 'none') {
+          await sendSelectedNotification(data, contactPerson);
+        }
+        
         toast({
           title: "Success",
           description: "Payment recorded successfully",
@@ -142,6 +154,7 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         
         form.reset();
         setSelectedPartyBalance(null);
+        setSelectedNotificationMethod('none');
         onSuccess?.();
       }
     } catch (error) {
@@ -156,63 +169,33 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
     }
   };
 
-  const sendSMSWithConfirmation = async () => {
-    // Get current form data
-    const formData = form.getValues();
-    
-    let contactPerson = null;
-    if (formData.type === 'received' && formData.customerId) {
-      contactPerson = customers.find(c => c.id === formData.customerId);
-    } else if (formData.type === 'paid' && formData.vendorId) {
-      contactPerson = vendors.find(v => v.id === formData.vendorId);
-    }
-
-    if (!contactPerson?.contact) {
-      toast({
-        title: "Error",
-        description: `No contact number available for ${formData.type === 'received' ? 'customer' : 'vendor'}`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setPendingData({
-      ...formData,
-      contactPerson: contactPerson
-    });
-    setShowSMSConfirmDialog(true);
-  };
-
-  const confirmSendSMS = async () => {
+  const sendSelectedNotification = async (paymentData: any, contactPerson: any) => {
     try {
-      if (!pendingData?.contactPerson?.contact) return;
-
-      console.log('PaymentForm - Attempting to send SMS to:', pendingData.contactPerson.name, pendingData.contactPerson.contact);
-      const smsResult = await smsService.sendPaymentSMS(
-        pendingData.contactPerson.contact,
-        pendingData.type,
-        {
-          name: pendingData.contactPerson.name,
-          amount: Number(pendingData.amount),
-          method: pendingData.method,
-          reference: pendingData.reference || undefined,
-          date: new Date().toISOString(),
-        }
-      );
-      
-      console.log('PaymentForm - SMS result:', smsResult);
-      
-      toast({
-        title: "Success",
-        description: `SMS sent to ${pendingData.type === 'received' ? 'customer' : 'vendor'} successfully`,
-      });
-      
-      setShowSMSConfirmDialog(false);
+      if (selectedNotificationMethod === 'sms') {
+        console.log('PaymentForm - Sending SMS to:', contactPerson.name, contactPerson.contact);
+        await smsService.sendPaymentSMS(
+          contactPerson.contact,
+          paymentData.type,
+          {
+            name: contactPerson.name,
+            amount: Number(paymentData.amount),
+            method: paymentData.method,
+            reference: paymentData.reference || undefined,
+            date: new Date().toISOString(),
+          }
+        );
+        console.log('PaymentForm - SMS sent successfully');
+      } else if (selectedNotificationMethod === 'whatsapp') {
+        const message = `💰 Payment ${paymentData.type === 'received' ? 'Received' : 'Made'}\n\nDear ${contactPerson.name},\n\nAmount: ${paymentData.amount}\nMethod: ${paymentData.method}\n${paymentData.reference ? `Reference: ${paymentData.reference}\n` : ''}Date: ${new Date().toLocaleDateString()}\n\nThank you!\n- Thar Dairy`;
+        const whatsappUrl = `https://wa.me/${contactPerson.contact}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        console.log('PaymentForm - WhatsApp opened');
+      }
     } catch (error) {
-      console.error('PaymentForm - SMS notification failed:', error);
+      console.error('PaymentForm - Notification failed:', error);
       toast({
-        title: "Error",
-        description: "Failed to send SMS notification",
+        title: "Warning",
+        description: "Payment saved but notification failed to send",
         variant: "destructive",
       });
     }
@@ -365,7 +348,7 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         </Button>
       </form>
 
-      {/* SMS/WhatsApp Actions */}
+      {/* Notification Method Selection */}
       {(() => {
         const formData = form.getValues();
         let contactPerson = null;
@@ -376,71 +359,48 @@ export default function PaymentForm({ vendors, customers, payment, onSuccess }: 
         }
         
         return contactPerson?.contact ? (
-          <div className="mt-4 p-4 bg-muted rounded-lg">
-            <h3 className="text-sm font-medium mb-3">Send Notification</h3>
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="text-sm font-medium mb-3">Notification Method (Optional)</h3>
             <div className="flex gap-2">
               <Button 
                 type="button" 
-                variant="outline" 
+                variant={selectedNotificationMethod === 'none' ? 'default' : 'outline'}
                 size="sm"
-                onClick={sendSMSWithConfirmation}
+                onClick={() => setSelectedNotificationMethod('none')}
                 className="flex-1"
               >
-                📱 Send SMS
+                🚫 No Notification
               </Button>
               <Button 
                 type="button" 
-                variant="outline" 
+                variant={selectedNotificationMethod === 'sms' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => {
-                  const message = `💰 Payment ${formData.type === 'received' ? 'Received' : 'Made'}\n\nDear ${contactPerson.name},\n\nAmount: ${formData.amount}\nMethod: ${formData.method}\n${formData.reference ? `Reference: ${formData.reference}\n` : ''}Date: ${new Date().toLocaleDateString()}\n\nThank you!\n- Thar Dairy`;
-                  const whatsappUrl = `https://wa.me/${contactPerson.contact}?text=${encodeURIComponent(message)}`;
-                  window.open(whatsappUrl, '_blank');
-                }}
+                onClick={() => setSelectedNotificationMethod('sms')}
+                className="flex-1"
+              >
+                📱 SMS
+              </Button>
+              <Button 
+                type="button" 
+                variant={selectedNotificationMethod === 'whatsapp' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedNotificationMethod('whatsapp')}
                 className="flex-1"
               >
                 💬 WhatsApp
               </Button>
             </div>
+            {selectedNotificationMethod !== 'none' && (
+              <p className="text-xs text-muted-foreground mt-2">
+                {selectedNotificationMethod === 'sms' 
+                  ? `SMS will be sent after recording payment to ${contactPerson.name}` 
+                  : `WhatsApp will open after recording payment to ${contactPerson.name}`
+                }
+              </p>
+            )}
           </div>
         ) : null;
       })()}
-
-      {/* SMS Confirmation Dialog */}
-      <AlertDialog open={showSMSConfirmDialog} onOpenChange={setShowSMSConfirmDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm SMS Notification</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to send SMS notification?
-              <br /><br />
-              <strong>To:</strong> {pendingData?.contactPerson?.name}
-              <br />
-              <strong>Contact:</strong> {pendingData?.contactPerson?.contact}
-              <br />
-              <strong>Payment:</strong> {pendingData?.type === "received" ? "Received" : "Made"} - Rs. {pendingData?.amount}
-              <br />
-              <strong>Method:</strong> {pendingData?.method}
-              {pendingData?.reference && (
-                <>
-                  <br />
-                  <strong>Reference:</strong> {pendingData.reference}
-                </>
-              )}
-              <br /><br />
-              <span className="text-sm text-muted-foreground">
-                This will open your SMS app with a pre-filled message.
-              </span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmSendSMS}>
-              Send SMS
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
