@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { useVendors, useCustomers, useTransactions, usePayments } from "@/hooks/useFirestore";
 import { hardCopyTrackingService, type PartyTrackingSummary } from "@/services/hardCopyTrackingService";
+import { transactionService, paymentService } from "@/services/firebase-realtime";
 import { FileCheck, FileX, Save, Download, Printer, Search, CheckCircle2, XCircle, Calendar, User } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
