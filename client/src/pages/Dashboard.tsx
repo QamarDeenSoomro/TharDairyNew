@@ -26,6 +26,14 @@ export default function Dashboard() {
     setLocation('/pending-payments');
   };
 
+  const handleMilkReceivedClick = () => {
+    setLocation('/milk-receiving');
+  };
+
+  const handleMilkSentClick = () => {
+    setLocation('/milk-sending');
+  };
+
   // Date filter state
   const [dateFilter, setDateFilter] = useState<'today' | 'week' | 'month' | 'custom'>('today');
   const [customStartDate, setCustomStartDate] = useState('');
@@ -239,6 +247,7 @@ export default function Dashboard() {
             title="Milk Received"
             value={`${Math.round(filteredStats.receivedQuantity)}L`}
             color="primary"
+            onClick={handleMilkReceivedClick}
             details={{
               quantity: `${Math.round(filteredStats.receivedQuantity)}L`,
               amount: `${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.receivedAmount))}`,
@@ -249,6 +258,7 @@ export default function Dashboard() {
             title="Milk Sent"
             value={`${Math.round(filteredStats.sentQuantity)}L`}
             color="secondary"
+            onClick={handleMilkSentClick}
             details={{
               quantity: `${Math.round(filteredStats.sentQuantity)}L`,
               amount: `${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.sentAmount))}`,
