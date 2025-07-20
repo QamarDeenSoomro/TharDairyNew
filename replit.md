@@ -157,6 +157,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Dashboard Stats Card Navigation**: Added click navigation to Milk Received and Milk Sent cards that redirect to their respective module pages (MilkReceiving and MilkSending) with hover effects for better user experience (January 2025)
 - **Searchable Party Selection**: Enhanced vendor and customer selection dropdowns in Milk Receiving, Milk Sending, and Payment forms with searchable Command components, replacing basic Select dropdowns for improved user experience with large datasets (January 2025)
 - **Mobile Responsive PaymentTable**: Added mobile-first card layout for PaymentTable component with proper spacing, visual hierarchy, and touch-friendly action buttons while maintaining desktop table view (January 2025)
+- **Full Width Mobile Date Filters**: Made date range filter inputs in LedgerView component full width on mobile devices for better usability and touch interaction (January 2025)
 
 ### File Structure
 - `client/`: React frontend application
