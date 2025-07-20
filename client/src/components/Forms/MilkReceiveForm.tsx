@@ -112,6 +112,11 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
         
         await transactionService.create(transformedData);
         
+        // Send notification based on selected method
+        if (selectedVendor?.contact && selectedNotificationMethod !== 'none') {
+          await sendSelectedNotification(transformedData);
+        }
+        
         toast({
           title: "Success",
           description: "Milk receipt recorded successfully",
@@ -120,6 +125,7 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
         form.reset();
         setSelectedVendor(null);
         setTotalAmount(0);
+        setSelectedNotificationMethod('none');
       }
       
       onSuccess?.(transformedData);
@@ -132,6 +138,42 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const sendSelectedNotification = async (transactionData: any) => {
+    if (!selectedVendor?.contact) return;
+
+    try {
+      if (selectedNotificationMethod === 'sms') {
+        console.log('MilkReceiveForm - Sending SMS to vendor:', selectedVendor.name, selectedVendor.contact);
+        await smsService.sendMilkTransactionSMS(
+          selectedVendor.contact,
+          'receive',
+          {
+            name: selectedVendor.name,
+            quantity: transactionData.quantity,
+            milkType: transactionData.milkType,
+            rate: transactionData.rate,
+            totalAmount: transactionData.totalAmount,
+            time: transactionData.time,
+            date: new Date().toISOString(),
+          }
+        );
+        console.log('MilkReceiveForm - SMS sent successfully');
+      } else if (selectedNotificationMethod === 'whatsapp') {
+        const message = `🥛 Milk Received\n\nDear ${selectedVendor.name},\n\nMilk received: ${transactionData.quantity}L ${transactionData.milkType} at rate ${transactionData.rate}.\nTotal: ${transactionData.totalAmount}\nTime: ${transactionData.time}\n\nThank you!\n- Thar Dairy`;
+        const whatsappUrl = `https://wa.me/${selectedVendor.contact}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        console.log('MilkReceiveForm - WhatsApp opened');
+      }
+    } catch (error) {
+      console.error('MilkReceiveForm - Notification failed:', error);
+      toast({
+        title: "Warning",
+        description: "Receipt saved but notification failed to send",
+        variant: "destructive",
+      });
     }
   };
 

@@ -149,6 +149,7 @@ Thar Dairy's comprehensive milk supply management system for efficient dairy ope
 - **Dashboard Amount Display**: Updated to show actual amounts with comma separators instead of K/M format, removed currency prefix and decimals for cleaner display (January 2025)
 - **Android Offline-First Configuration**: Enhanced Capacitor configuration and service worker for optimal offline functionality, including cache-first strategy, Android platform detection, and comprehensive offline asset caching (January 2025)
 - **Vendor Settlement Archiving System**: Implemented automatic settlement system that archives vendor/customer data when balance is less than ₹1, with manual settlement option and archive viewing functionality (January 2025)
+- **SMS/WhatsApp Workflow Enhancement**: Redesigned notification system with pre-selection above form buttons - users select notification method before submission, then notifications are sent automatically after successful form save (January 2025)
 
 ### File Structure
 - `client/`: React frontend application
