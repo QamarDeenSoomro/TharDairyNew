@@ -73,10 +73,15 @@ export default function HardCopyTracking() {
   const handleMarkAsSaved = async () => {
     setLoading(true);
     try {
+      console.log('Selected transactions:', selectedTransactions);
+      console.log('Selected payments:', selectedPayments);
+      
       if (selectedTransactions.length > 0) {
+        console.log('Calling markMultipleTransactionsAsSaved...');
         await hardCopyTrackingService.markMultipleTransactionsAsSaved(selectedTransactions);
       }
       if (selectedPayments.length > 0) {
+        console.log('Calling markMultiplePaymentsAsSaved...');
         await hardCopyTrackingService.markMultiplePaymentsAsSaved(selectedPayments);
       }
 
@@ -86,8 +91,10 @@ export default function HardCopyTracking() {
       });
 
       // Reload data
+      console.log('Reloading party summaries...');
       await loadPartySummaries();
       if (selectedParty) {
+        console.log('Reloading unsaved entries...');
         await loadUnsavedEntries(selectedParty);
       }
       

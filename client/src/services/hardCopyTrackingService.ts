@@ -23,36 +23,90 @@ export interface PartyTrackingSummary {
 class HardCopyTrackingService {
   // Mark a milk transaction as saved on hard
   async markTransactionAsSaved(transactionId: string, savedBy?: string): Promise<void> {
-    const transactionRef = ref(db, `milk_transactions/${transactionId}`);
-    const updates: HardCopyStatus = {
-      savedOnHard: true,
-      savedOnHardDate: new Date().toISOString(),
-      savedOnHardBy: savedBy || 'System'
-    };
-    await update(transactionRef, updates);
+    try {
+      console.log('Marking transaction as saved:', transactionId);
+      
+      // First, let's check if the transaction exists
+      const transactionRef = ref(db, `milk_transactions/${transactionId}`);
+      const snapshot = await get(transactionRef);
+      
+      if (!snapshot.exists()) {
+        console.error('Transaction not found:', transactionId);
+        throw new Error(`Transaction ${transactionId} not found`);
+      }
+      
+      console.log('Transaction exists, current data:', snapshot.val());
+      
+      const updates: HardCopyStatus = {
+        savedOnHard: true,
+        savedOnHardDate: new Date().toISOString(),
+        savedOnHardBy: savedBy || 'System'
+      };
+      console.log('Updates to apply:', updates);
+      
+      await update(transactionRef, updates);
+      
+      // Verify the update
+      const updatedSnapshot = await get(transactionRef);
+      console.log('Updated transaction data:', updatedSnapshot.val());
+      
+      console.log('Transaction marked as saved successfully:', transactionId);
+    } catch (error) {
+      console.error('Error marking transaction as saved:', error);
+      throw error;
+    }
   }
 
   // Mark a payment as saved on hard
   async markPaymentAsSaved(paymentId: string, savedBy?: string): Promise<void> {
-    const paymentRef = ref(db, `payments/${paymentId}`);
-    const updates: HardCopyStatus = {
-      savedOnHard: true,
-      savedOnHardDate: new Date().toISOString(),
-      savedOnHardBy: savedBy || 'System'
-    };
-    await update(paymentRef, updates);
+    try {
+      console.log('Marking payment as saved:', paymentId);
+      
+      // First, let's check if the payment exists
+      const paymentRef = ref(db, `payments/${paymentId}`);
+      const snapshot = await get(paymentRef);
+      
+      if (!snapshot.exists()) {
+        console.error('Payment not found:', paymentId);
+        throw new Error(`Payment ${paymentId} not found`);
+      }
+      
+      console.log('Payment exists, current data:', snapshot.val());
+      
+      const updates: HardCopyStatus = {
+        savedOnHard: true,
+        savedOnHardDate: new Date().toISOString(),
+        savedOnHardBy: savedBy || 'System'
+      };
+      console.log('Updates to apply:', updates);
+      
+      await update(paymentRef, updates);
+      
+      // Verify the update
+      const updatedSnapshot = await get(paymentRef);
+      console.log('Updated payment data:', updatedSnapshot.val());
+      
+      console.log('Payment marked as saved successfully:', paymentId);
+    } catch (error) {
+      console.error('Error marking payment as saved:', error);
+      throw error;
+    }
   }
 
   // Mark multiple transactions as saved
   async markMultipleTransactionsAsSaved(transactionIds: string[], savedBy?: string): Promise<void> {
+    console.log('Marking multiple transactions as saved:', transactionIds);
     const promises = transactionIds.map(id => this.markTransactionAsSaved(id, savedBy));
     await Promise.all(promises);
+    console.log('All transactions marked as saved successfully');
   }
 
   // Mark multiple payments as saved
   async markMultiplePaymentsAsSaved(paymentIds: string[], savedBy?: string): Promise<void> {
+    console.log('Marking multiple payments as saved:', paymentIds);
     const promises = paymentIds.map(id => this.markPaymentAsSaved(id, savedBy));
     await Promise.all(promises);
+    console.log('All payments marked as saved successfully');
   }
 
   // Get party-wise tracking summary
