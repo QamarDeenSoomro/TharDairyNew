@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
 import { adMobService } from '@/services/admobService';
-import { BannerAdPosition } from '@capacitor-community/admob';
 import { cn } from '@/lib/utils';
 
 interface AdMobBannerProps {
-  position?: BannerAdPosition;
+  position?: string; // Use string instead of BannerAdPosition type
   className?: string;
   showOnMobile?: boolean;
 }
 
 const AdMobBanner = ({ 
-  position = BannerAdPosition.BOTTOM_CENTER, 
+  position = 'BOTTOM_CENTER', 
   className,
   showOnMobile = true 
 }: AdMobBannerProps) => {

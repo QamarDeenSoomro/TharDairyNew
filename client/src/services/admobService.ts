@@ -1,20 +1,30 @@
-import { 
-  AdMob, 
-  BannerAdOptions, 
-  BannerAdSize, 
-  BannerAdPosition,
-  BannerAdPluginEvents,
-  AdOptions,
-  InterstitialAdPluginEvents,
-  RewardAdPluginEvents,
-  AdmobConsentStatus,
-  AdmobConsentDebugGeography
-} from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
+
+// Types for AdMob - safe to import even on web
+type BannerAdPosition = any;
+type InterstitialAdPluginEvents = any;
+type RewardAdPluginEvents = any;
+type BannerAdPluginEvents = any;
+
+// Create a mock AdMob object for web builds
+const AdMobMock = {
+  initialize: () => Promise.resolve(),
+  showBanner: () => Promise.resolve(),
+  hideBanner: () => Promise.resolve(),
+  removeBanner: () => Promise.resolve(),
+  prepareInterstitial: () => Promise.resolve(),
+  showInterstitial: () => Promise.resolve(),
+  prepareRewardVideoAd: () => Promise.resolve(),
+  showRewardVideoAd: () => Promise.resolve({ type: 'rewarded', amount: 0 }),
+  addListener: () => ({ remove: () => {} }),
+  requestConsentInfo: () => Promise.resolve({ status: 'obtained', isConsentFormAvailable: false }),
+  showConsentForm: () => Promise.resolve({ status: 'obtained' })
+};
 
 class AdMobService {
   private isNative = Capacitor.isNativePlatform();
   private isInitialized = false;
+  private AdMob: any = AdMobMock;
 
   // Test Ad Unit IDs - Replace with your real ones for production
   private readonly adUnits = {
@@ -34,7 +44,11 @@ class AdMobService {
     }
 
     try {
-      await AdMob.initialize({
+      // Dynamically import AdMob for native platforms
+      const { AdMob } = await import('@capacitor-community/admob');
+      this.AdMob = AdMob;
+
+      await this.AdMob.initialize({
         requestTrackingAuthorization: true,
         testingDevices: ['YOUR_TEST_DEVICE_ID'], // Add your test device ID
         initializeForTesting: true // Remove for production
@@ -54,14 +68,16 @@ class AdMobService {
     if (!this.isNative) return;
 
     try {
-      const consentInfo = await AdMob.requestConsentInfo({
+      const { AdmobConsentDebugGeography, AdmobConsentStatus } = await import('@capacitor-community/admob');
+      
+      const consentInfo = await this.AdMob.requestConsentInfo({
         debugGeography: AdmobConsentDebugGeography.EEA,
         testDeviceIdentifiers: ['YOUR_TEST_DEVICE_ID']
       });
 
       if (consentInfo.isConsentFormAvailable && 
           consentInfo.status === AdmobConsentStatus.REQUIRED) {
-        const { status } = await AdMob.showConsentForm();
+        const { status } = await this.AdMob.showConsentForm();
         console.log('GDPR Consent status:', status);
       }
     } catch (error) {
@@ -69,23 +85,25 @@ class AdMobService {
     }
   }
 
-  async showBanner(position: BannerAdPosition = BannerAdPosition.BOTTOM_CENTER): Promise<void> {
+  async showBanner(position: any = 'BOTTOM_CENTER'): Promise<void> {
     if (!this.isNative || !this.isInitialized) {
       console.log('AdMob: Banner not shown - not available on web platform');
       return;
     }
 
     try {
+      const { BannerAdPluginEvents, BannerAdSize, BannerAdPosition } = await import('@capacitor-community/admob');
+      
       // Subscribe to banner events
-      AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
+      this.AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
         console.log('Banner ad loaded successfully');
       });
 
-      AdMob.addListener(BannerAdPluginEvents.FailedToLoad, (error) => {
+      this.AdMob.addListener(BannerAdPluginEvents.FailedToLoad, (error: any) => {
         console.error('Banner ad failed to load:', error);
       });
 
-      const options: BannerAdOptions = {
+      const options = {
         adId: this.adUnits.banner,
         adSize: BannerAdSize.BANNER,
         position: position,
@@ -93,7 +111,7 @@ class AdMobService {
         isTesting: true // Remove for production
       };
 
-      await AdMob.showBanner(options);
+      await this.AdMob.showBanner(options);
       console.log('Banner ad requested');
     } catch (error) {
       console.error('Failed to show banner ad:', error);
@@ -104,7 +122,7 @@ class AdMobService {
     if (!this.isNative) return;
 
     try {
-      await AdMob.hideBanner();
+      await this.AdMob.hideBanner();
       console.log('Banner ad hidden');
     } catch (error) {
       console.error('Failed to hide banner ad:', error);
@@ -118,27 +136,29 @@ class AdMobService {
     }
 
     try {
+      const { InterstitialAdPluginEvents } = await import('@capacitor-community/admob');
+      
       // Subscribe to interstitial events
-      AdMob.addListener(InterstitialAdPluginEvents.Loaded, async () => {
+      this.AdMob.addListener(InterstitialAdPluginEvents.Loaded, async () => {
         console.log('Interstitial ad loaded, showing now');
-        await AdMob.showInterstitial();
+        await this.AdMob.showInterstitial();
       });
 
-      AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, (error) => {
+      this.AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, (error: any) => {
         console.error('Interstitial ad failed to load:', error);
       });
 
-      AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+      this.AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
         console.log('Interstitial ad dismissed');
       });
 
-      const options: AdOptions = {
+      const options = {
         adId: this.adUnits.interstitial,
         isTesting: true // Remove for production
       };
 
       // Prepare the interstitial ad
-      await AdMob.prepareInterstitial(options);
+      await this.AdMob.prepareInterstitial(options);
       console.log('Interstitial ad prepared');
     } catch (error) {
       console.error('Failed to show interstitial ad:', error);

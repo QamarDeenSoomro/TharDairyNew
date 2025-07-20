@@ -1,7 +1,9 @@
 # Thar Dairy Deployment Guide
 
 ## 🚨 Current Issue
-The `deploy.sh` script requires Firebase authentication which cannot be done in Replit environment.
+The `deploy.sh` script fails with error: **"Failed to authenticate, have you run firebase login?"**
+
+Firebase CLI requires browser-based authentication which cannot be done in Replit environment.
 
 ## ✅ Solution Options
 

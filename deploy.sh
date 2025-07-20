@@ -38,7 +38,7 @@ fi
 # Deploy to Firebase
 echo "🚀 Deploying to Firebase Hosting..."
 firebase deploy --only hosting 2>&1 | tee deploy-output.log
-DEPLOY_STATUS=$?
+DEPLOY_STATUS=${PIPESTATUS[0]} # Get the exit status of firebase command, not tee
 
 if [ $DEPLOY_STATUS -ne 0 ]; then
     echo ""
@@ -59,6 +59,12 @@ else
     echo "https://thar-dairy.firebaseapp.com"
 fi
 
+echo ""
+echo ""
+echo "ℹ️  Note: Firebase deployment requires authentication that cannot be done in Replit."
+echo "   To deploy, either:"
+echo "   1. Use Replit's Deploy button (recommended)"
+echo "   2. Download project and run 'firebase login' on your local machine"
 echo ""
 echo "Script completed. Press any key to exit..."
 read -n 1 -s
