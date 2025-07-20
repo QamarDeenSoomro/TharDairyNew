@@ -591,16 +591,6 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-sm text-muted-foreground">
-                    {entityType === "vendor" ? "Milk Purchased" : "Milk Sold"}
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600">{formatCurrency(totals.transactions)}</div>
-                </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-sm text-muted-foreground">Payments</div>
-                  <div className="text-2xl font-bold text-green-600">{formatCurrency(totals.payments)}</div>
-                </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <div className="text-sm text-muted-foreground">
                     {startDate && totals.previousMilkWeight > 0 ? "Period Weight" : "Milk Weight"}
@@ -611,6 +601,16 @@ export default function LedgerView({ entity, entityType, isOpen = true, onClose 
                       Total: {totals.totalMilkWeight}L
                     </div>
                   )}
+                </div>
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-sm text-muted-foreground">
+                    {entityType === "vendor" ? "Milk Purchased" : "Milk Sold"}
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600">{formatCurrency(totals.transactions)}</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-sm text-muted-foreground">Payments</div>
+                  <div className="text-2xl font-bold text-green-600">{formatCurrency(totals.payments)}</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-sm text-muted-foreground">
