@@ -12,6 +12,7 @@ interface StatsCardProps {
     amount?: string;
     averageRate?: string;
   };
+  onClick?: () => void; // Add click handler
 }
 
 // Utility function to format numbers for display
@@ -30,7 +31,7 @@ function formatDisplayValue(value: string): string {
   return `${formattedNum}${suffix}`;
 }
 
-export default function StatsCard({ title, value, icon, color, textColor, details }: StatsCardProps) {
+export default function StatsCard({ title, value, icon, color, textColor, details, onClick }: StatsCardProps) {
   // Format the value for display
   const displayValue = formatDisplayValue(value);
   
@@ -44,7 +45,14 @@ export default function StatsCard({ title, value, icon, color, textColor, detail
   };
 
   return (
-    <Card className={cn("border-0 shadow-lg", cardGradients[color])}>
+    <Card 
+      className={cn(
+        "border-0 shadow-lg", 
+        cardGradients[color], 
+        onClick && "cursor-pointer hover:shadow-xl transition-shadow duration-200"
+      )}
+      onClick={onClick}
+    >
       <CardContent className="p-4">
         {/* Title row */}
         <div className="mb-3">

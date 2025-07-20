@@ -10,15 +10,21 @@ import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays, startOfDay, startOfWeek, startOfMonth, endOfMonth, endOfWeek } from 'date-fns';
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useLocation } from "wouter";
 import { useState, useMemo } from 'react';
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
   const { transactions, loading: transactionsLoading } = useTransactions();
   const { payments, loading: paymentsLoading } = usePayments();
   const { stats, loading: statsLoading } = useDashboard();
   const { vendors, loading: vendorsLoading } = useVendors();
   const { customers, loading: customersLoading } = useCustomers();
   const { t, isRTL } = useLanguage();
+
+  const handlePendingPaymentsClick = () => {
+    setLocation('/pending-payments');
+  };
 
   // Date filter state
   const [dateFilter, setDateFilter] = useState<'today' | 'week' | 'month' | 'custom'>('today');
@@ -257,6 +263,7 @@ export default function Dashboard() {
           title="Pending Payments"
           value={`${new Intl.NumberFormat('en-US').format(Math.round(filteredStats.pendingPayments))}`}
           color="warning"
+          onClick={handlePendingPaymentsClick}
         />
       </div>
 
