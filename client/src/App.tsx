@@ -19,6 +19,7 @@ import VendorLedger from "@/pages/VendorLedger";
 import CustomerLedger from "@/pages/CustomerLedger";
 import DailyExpenses from "@/pages/DailyExpenses";
 import BankStatement from "@/pages/BankStatement";
+import HardCopyTracking from "@/pages/HardCopyTracking";
 import PWAInstallPrompt from "@/components/PWA/PWAInstallPrompt";
 import OfflineIndicator from "@/components/PWA/OfflineIndicator";
 import LoginPage from "@/components/Auth/LoginPage";
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/customer-ledger" component={CustomerLedger} />
       <Route path="/expenses" component={DailyExpenses} />
       <Route path="/bank-statement" component={BankStatement} />
+      <Route path="/hard-copy-tracking" component={HardCopyTracking} />
       <Route component={NotFound} />
     </Switch>
   );

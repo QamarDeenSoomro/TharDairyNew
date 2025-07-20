@@ -68,6 +68,11 @@ export default function MilkReceiving() {
                           {vendor?.name || t.unknownVendor}
                         </span>
                         <div className="flex items-center gap-2">
+                          {(receipt as any).savedOnHard && (
+                            <span className="material-icons text-green-600 text-sm" title="Saved on hard copy">
+                              check_circle
+                            </span>
+                          )}
                           <span className="text-xs sm:text-sm text-muted-foreground">
                             {formatDistanceToNow(new Date(receipt.date!), { addSuffix: true })}
                           </span>

@@ -68,6 +68,11 @@ export default function MilkSending() {
                           {customer?.name || t.unknownCustomer}
                         </span>
                         <div className="flex items-center gap-2">
+                          {(send as any).savedOnHard && (
+                            <span className="material-icons text-green-600 text-sm" title="Saved on hard copy">
+                              check_circle
+                            </span>
+                          )}
                           <span className="text-xs sm:text-sm text-muted-foreground">
                             {formatDistanceToNow(new Date(send.date!), { addSuffix: true })}
                           </span>

@@ -145,9 +145,18 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
             {payments.map((payment) => (
               <TableRow key={payment.id} className="hover:bg-muted/50">
                 <TableCell className="text-muted-foreground">
-                  {new Date(payment.date!).toLocaleDateString()}
-                  <div className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(payment.date!), { addSuffix: true })}
+                  <div className="flex items-center gap-2">
+                    <div>
+                      {new Date(payment.date!).toLocaleDateString()}
+                      <div className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(payment.date!), { addSuffix: true })}
+                      </div>
+                    </div>
+                    {(payment as any).savedOnHard && (
+                      <span className="material-icons text-green-600 text-sm" title="Saved on hard copy">
+                        check_circle
+                      </span>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -286,7 +295,14 @@ export default function PaymentTable({ payments, vendors, customers, showPaginat
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">Date</div>
-                  <div className="text-sm">{new Date(payment.date!).toLocaleDateString()}</div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm">{new Date(payment.date!).toLocaleDateString()}</span>
+                    {(payment as any).savedOnHard && (
+                      <span className="material-icons text-green-600 text-sm" title="Saved on hard copy">
+                        check_circle
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
               
