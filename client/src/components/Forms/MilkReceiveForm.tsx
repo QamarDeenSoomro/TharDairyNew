@@ -255,7 +255,7 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
               variant={selectedNotificationMethod === 'none' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedNotificationMethod('none')}
-              className="flex-1"
+              className="flex-1 pl-[1px] pr-[1px]"
             >
               🚫 No Notification
             </Button>
@@ -264,7 +264,7 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
               variant={selectedNotificationMethod === 'sms' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedNotificationMethod('sms')}
-              className="flex-1"
+              className="flex-1 pl-[1px] pr-[1px]"
             >
               📱 SMS
             </Button>
@@ -273,7 +273,7 @@ export default function MilkReceiveForm({ vendors, transaction, onSuccess }: Mil
               variant={selectedNotificationMethod === 'whatsapp' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedNotificationMethod('whatsapp')}
-              className="flex-1"
+              className="flex-1 pl-[1px] pr-[1px]"
             >
               💬 WhatsApp
             </Button>
