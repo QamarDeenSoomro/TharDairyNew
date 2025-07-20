@@ -49,7 +49,13 @@ export default function HardCopyTracking() {
         vendors,
         customers
       );
-      setPartySummaries(summaries);
+      
+      // Only show parties that have unsaved entries
+      const partiesWithUnsavedEntries = summaries.filter(
+        summary => summary.unsavedTransactions > 0 || summary.unsavedPayments > 0
+      );
+      
+      setPartySummaries(partiesWithUnsavedEntries);
     } catch (error) {
       console.error('Error loading party summaries:', error);
     }
@@ -87,8 +93,26 @@ export default function HardCopyTracking() {
 
       // Reload data
       await loadPartySummaries();
+      
+      // Check if the selected party still has unsaved entries using fresh data
       if (selectedParty) {
-        await loadUnsavedEntries(selectedParty);
+        const freshTransactions = await transactionService.getAll();
+        const freshPayments = await paymentService.getAll();
+        
+        const updatedEntries = await hardCopyTrackingService.getUnsavedEntriesForParty(
+          selectedParty.partyId,
+          selectedParty.partyType,
+          freshTransactions,
+          freshPayments
+        );
+        
+        // If no more unsaved entries, clear the selection
+        if (updatedEntries.transactions.length === 0 && updatedEntries.payments.length === 0) {
+          setSelectedParty(null);
+          setUnsavedEntries(null);
+        } else {
+          setUnsavedEntries(updatedEntries);
+        }
       }
       
       // Clear selections
