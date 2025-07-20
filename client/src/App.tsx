@@ -18,6 +18,7 @@ import PendingPayments from "@/pages/PendingPayments";
 import VendorLedger from "@/pages/VendorLedger";
 import CustomerLedger from "@/pages/CustomerLedger";
 import DailyExpenses from "@/pages/DailyExpenses";
+import BankStatement from "@/pages/BankStatement";
 import PWAInstallPrompt from "@/components/PWA/PWAInstallPrompt";
 import OfflineIndicator from "@/components/PWA/OfflineIndicator";
 import LoginPage from "@/components/Auth/LoginPage";
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/vendor-ledger" component={VendorLedger} />
       <Route path="/customer-ledger" component={CustomerLedger} />
       <Route path="/expenses" component={DailyExpenses} />
+      <Route path="/bank-statement" component={BankStatement} />
       <Route component={NotFound} />
     </Switch>
   );
